@@ -39,3 +39,8 @@ migrate_working_dir/
 
 # Widgetbook web build
 /widgetbook/build/
+
+# Golden tests: only the platform-agnostic CI goldens are committed
+/widgetbook/test/goldens/*
+!/widgetbook/test/goldens/ci/
+/widgetbook/test/**/failures/
