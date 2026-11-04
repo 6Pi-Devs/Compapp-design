@@ -18,6 +18,23 @@ dependencies:
 
 Bump the tag to upgrade. Releases are listed in [CHANGELOG.md](CHANGELOG.md).
 
+```dart
+import 'package:compapp_design/compapp_design.dart';
+
+void main() {
+  CompappDesign.registerLicenses(); // lists the bundled OFL fonts in the license page
+  runApp(
+    MaterialApp(
+      theme: CompappTheme.light,
+      darkTheme: CompappTheme.dark,
+      home: const Placeholder(),
+    ),
+  );
+}
+```
+
+Read colors from `Theme.of(context).colorScheme`, or `context.appColors` for presence, busy and pebble colors. Spacing, radius, motion and sizes come from `AppSpacing`, `AppRadius`, `AppMotion` and `AppSizes`.
+
 ## Develop
 
 Requires Flutter 3.47.9 (see `pubspec.yaml`).

@@ -144,6 +144,47 @@ The analyzer enforces the Dart 3.13 shorthand. Write `const new(this.x)` for the
 - The fonts are SIL OFL. The app calls `CompappDesign.registerLicenses()` once in `main` so the license page lists them.
 - `AppPalette` (colors that have a Material slot) is internal and not exported. Widgets read those colors from `Theme.of(context).colorScheme`, the rest with `context.appColors`.
 
+### Token to Flutter target
+
+| Token | Flutter target |
+|-------|----------------|
+| `color.ground` | `ColorScheme.surface`, `scaffoldBackgroundColor` |
+| `color.surface` | `ColorScheme.surfaceContainerLowest` (also `surfaceBright`) |
+| `color.surface-sunken` | `ColorScheme.surfaceContainerHigh` (also `surfaceDim`, `surfaceContainerHighest`) |
+| `color.ink` | `ColorScheme.onSurface` |
+| `color.ink-muted` | `ColorScheme.onSurfaceVariant` (also `outline`) |
+| `color.line` | `ColorScheme.outlineVariant` |
+| `color.primary` | `ColorScheme.primary` |
+| `color.on-primary` | `ColorScheme.onPrimary` |
+| `color.primary-soft` | `ColorScheme.primaryContainer` |
+| `color.danger` | `ColorScheme.error` |
+| `color.danger-soft` | `ColorScheme.errorContainer` |
+| `color.presence-home`, `presence-away`, `busy`, `busy-soft` | `AppColors.presenceHome`, `presenceAway`, `busy`, `busySoft` |
+| `pebble.*` | `AppColors.pebbles` (sage, sky, apricot, rose, sand, tide), `AppColors.pebbleAt(joinOrder)` |
+| `font.display`, `headline`, `title` | `TextTheme.displayMedium`, `headlineSmall`, `titleLarge` |
+| `font.body-lg`, `body`, `label`, `caption` | `TextTheme.bodyLarge`, `bodyMedium`, `labelLarge`, `bodySmall` |
+| `space.xs` to `xxl` | `AppSpacing.xs`, `sm`, `md`, `lg`, `xl`, `xxl` (4, 8, 16, 24, 32, 48) |
+| `radius.xs` to `lg`, `radius.pebble` | `AppRadius.xs`, `sm`, `md`, `lg`, `AppRadius.pebble(size)` |
+| `elevation.sheet` | `AppShadows.sheet` |
+| `elevation.flat` | `AppSizes.hairline` (1px `colorScheme.outlineVariant` border) |
+| `motion.presence`, `motion.in-use` | `AppMotion.presence`, `inUse` and their curves |
+| `target.min` | `AppSizes.minTarget` (48 hit area), `AppSizes.minDrawn` (44 drawn) |
+
+`ColorScheme` slots with no token are filled explicitly. Only `shadow`, `scrim` and the `*Fixed` slots keep Flutter's defaults:
+
+| Slot | Value | Why |
+|------|-------|-----|
+| `secondary`, `onSecondary`, `secondaryContainer`, `onSecondaryContainer` | primary, on-primary, primary-soft, ink | The design has one accent |
+| `tertiary`, `onTertiary`, `tertiaryContainer`, `onTertiaryContainer` | busy, on-primary, busy-soft, ink | Tertiary is the in-use accent |
+| `onPrimaryContainer`, `onErrorContainer` | ink | Text on soft fills uses ink |
+| `onError` | on-primary | Danger is light in dark mode, so it needs dark text, like primary |
+| `surfaceContainerLow`, `surfaceContainer` | surface | Cards, sheets, nav bar and menus use surface |
+| `inverseSurface`, `onInverseSurface` | ink, ground | Snackbars invert the page |
+| `inversePrimary` | primary-soft | Passes 4.5:1 on the inverse surface in both themes |
+| `surfaceTint` | transparent | No Material tint over surfaces |
+
+The sheet shadow uses the light ink color at 18% in both themes, so it darkens the page in dark mode too.
+
 ## Releases
 
 Releases are semver tags `vX.Y.Z`. The app pins a tag in its `pubspec.yaml`:
