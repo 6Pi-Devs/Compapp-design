@@ -2,7 +2,7 @@ name: compapp_design
 description: Compapp design system - design tokens and atomic widgets for the Compapp Flutter app.
 publish_to: none
 
-version: 0.0.0
+version: 0.1.0
 
 environment:
   sdk: ^3.13.7
