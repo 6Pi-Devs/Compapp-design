@@ -51,3 +51,62 @@ class _StatesControllerHostState extends State<StatesControllerHost> {
   @override
   Widget build(BuildContext context) => widget.builder(context, _controller);
 }
+
+/// Owns a [TextEditingController] that starts with [text], so a use case can
+/// show a filled field and the controller is disposed with it.
+class TextControllerHost extends StatefulWidget {
+  const new({required this.text, required this.builder, super.key});
+
+  final String text;
+  final Widget Function(BuildContext context, TextEditingController controller)
+  builder;
+
+  @override
+  State<TextControllerHost> createState() => _TextControllerHostState();
+}
+
+class _TextControllerHostState extends State<TextControllerHost> {
+  late final TextEditingController _controller = TextEditingController(
+    text: widget.text,
+  )..selection = TextSelection.collapsed(offset: widget.text.length);
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.builder(context, _controller);
+}
+
+/// A focus node that always reports focus, so a use case can show the focused
+/// look of a field in every golden scenario. Only one widget can really hold
+/// the primary focus, and the four scenarios of a golden render side by side.
+class _FocusedNode extends FocusNode {
+  @override
+  bool get hasFocus => true;
+}
+
+/// Owns a [FocusNode] that reports focus (see [_FocusedNode]) and disposes it.
+class FocusedNodeHost extends StatefulWidget {
+  const new({required this.builder, super.key});
+
+  final Widget Function(BuildContext context, FocusNode focusNode) builder;
+
+  @override
+  State<FocusedNodeHost> createState() => _FocusedNodeHostState();
+}
+
+class _FocusedNodeHostState extends State<FocusedNodeHost> {
+  final FocusNode _node = _FocusedNode();
+
+  @override
+  void dispose() {
+    _node.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.builder(context, _node);
+}

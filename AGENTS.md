@@ -138,6 +138,8 @@ The analyzer enforces the Dart 3.13 shorthand. Write `const new(this.x)` for the
   - `catalog_contract_test.dart`: the use case paths equal the union of every manifest `stories` entry, in both directions, follow the naming pattern, and each manifest entry has exactly one story per variant x state.
   - `catalog_goldens_test.dart`: one golden per use case, named after its path, holding four scenarios (light and dark, text scale 1.0 and 2.0).
   - `catalog_semantics_test.dart`: every use case, light and dark, meets `androidTapTargetGuideline`, `iOSTapTargetGuideline`, `labeledTapTargetGuideline` and `textContrastGuideline`.
+- States a static builder cannot reach by gesture are rendered deterministically without a test-only prop on the component, so every golden scenario shows them. Buttons take Material's `statesController` holding `WidgetState.pressed` or `WidgetState.focused` (`StatesControllerHost`). Fields and the code input take a `FocusNode` that reports focus (`FocusedNodeHost`), because only one widget can really hold the primary focus and the four scenarios of a golden render side by side. Spinners freeze under `FrozenMotion` (`MediaQuery.disableAnimations`), so `pumpAndSettle` can finish. The helpers live in `widgetbook/lib/src/support/story_support.dart`.
+- alchemist draws the text of an editable field as blocks, so a golden never proves its text color: component widget tests read the painted pixel instead.
 - Widgetbook shows light and dark (`CompappTheme`), `en` and `es`, text scale and phone viewports through addons.
 
 #### Golden tooling

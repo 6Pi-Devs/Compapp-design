@@ -58,6 +58,76 @@ void main() {
     expect(() => seen.addListener(() {}), throwsFlutterError);
   });
 
+  testWidgets('TextControllerHost starts with its text and disposes', (
+    tester,
+  ) async {
+    late TextEditingController seen;
+    await tester.pumpWidget(
+      TextControllerHost(
+        text: 'ana@compapp.test',
+        builder: (context, controller) {
+          seen = controller;
+          return const SizedBox();
+        },
+      ),
+    );
+
+    expect(seen.text, 'ana@compapp.test');
+
+    await tester.pumpWidget(const SizedBox());
+
+    expect(() => seen.addListener(() {}), throwsFlutterError);
+  });
+
+  testWidgets('TextControllerHost puts the caret after its text', (
+    tester,
+  ) async {
+    late TextEditingController seen;
+    await tester.pumpWidget(
+      TextControllerHost(
+        text: 'ana@compapp.test',
+        builder: (context, controller) {
+          seen = controller;
+          return const SizedBox();
+        },
+      ),
+    );
+
+    expect(seen.selection, const TextSelection.collapsed(offset: 16));
+  });
+
+  testWidgets('FocusedNodeHost gives a node that always reports focus', (
+    tester,
+  ) async {
+    late FocusNode seen;
+    await tester.pumpWidget(
+      FocusedNodeHost(
+        builder: (context, node) {
+          seen = node;
+          return const SizedBox();
+        },
+      ),
+    );
+
+    expect(seen.hasFocus, isTrue);
+    expect(seen.hasPrimaryFocus, isFalse, reason: 'no real focus is taken');
+  });
+
+  testWidgets('FocusedNodeHost disposes its node', (tester) async {
+    late FocusNode seen;
+    await tester.pumpWidget(
+      FocusedNodeHost(
+        builder: (context, node) {
+          seen = node;
+          return const SizedBox();
+        },
+      ),
+    );
+    await tester.pumpWidget(const SizedBox());
+
+    expect(() => seen.addListener(() {}), throwsFlutterError);
+  });
+
   testWidgets('useCaseFrame pads by AppSpacing.md', (tester) async {
     await tester.pumpWidget(
       Directionality(
