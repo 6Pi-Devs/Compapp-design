@@ -165,6 +165,33 @@
         "Atoms/AppTextField/password-error-focus",
         "Atoms/AppTextField/password-disabled"
       ]
+    },
+    {
+      "id": "app-code-input",
+      "level": "atom",
+      "class": "AppCodeInput",
+      "path": "atoms/app_code_input.dart",
+      "props": [
+        { "name": "label", "type": "String", "required": true },
+        { "name": "onCompleted", "type": "ValueChanged<String>", "required": true },
+        { "name": "length", "type": "int", "required": false, "default": "6" },
+        { "name": "numeric", "type": "bool", "required": false, "default": "true" },
+        { "name": "controller", "type": "TextEditingController?", "required": false },
+        { "name": "errorText", "type": "String?", "required": false },
+        { "name": "onChanged", "type": "ValueChanged<String>?", "required": false },
+        { "name": "autofocus", "type": "bool", "required": false, "default": "false" },
+        { "name": "focusNode", "type": "FocusNode?", "required": false }
+      ],
+      "variants": ["digits"],
+      "states": ["empty", "partial", "filled", "error"],
+      "semantics": "One text field node named by label whose value is the code entered so far, never one node per cell; invalid when errorText is set, and the error is a live region",
+      "key": "codeInput.digit.<i>",
+      "stories": [
+        "Atoms/AppCodeInput/digits-empty",
+        "Atoms/AppCodeInput/digits-partial",
+        "Atoms/AppCodeInput/digits-filled",
+        "Atoms/AppCodeInput/digits-error"
+      ]
     }
   ]
 }
