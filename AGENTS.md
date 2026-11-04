@@ -152,7 +152,7 @@ The analyzer enforces the Dart 3.13 shorthand. Write `const new(this.x)` for the
 | `color.ground` | `ColorScheme.surface`, `scaffoldBackgroundColor` |
 | `color.surface` | `ColorScheme.surfaceContainerLowest` (also `surfaceBright`) |
 | `color.surface-sunken` | `ColorScheme.surfaceContainerHigh` (also `surfaceDim`, `surfaceContainerHighest`) |
-| `color.ink` | `ColorScheme.onSurface` |
+| `color.ink` | `ColorScheme.onSurface`, `ThemeData.iconTheme` color |
 | `color.ink-muted` | `ColorScheme.onSurfaceVariant` (also `outline`) |
 | `color.line` | `ColorScheme.outlineVariant` |
 | `color.primary` | `ColorScheme.primary` |
