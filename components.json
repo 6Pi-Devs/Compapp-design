@@ -102,6 +102,27 @@
         "Atoms/AppChip/type-selected",
         "Atoms/AppChip/type-disabled"
       ]
+    },
+    {
+      "id": "app-switch",
+      "level": "atom",
+      "class": "AppSwitch",
+      "path": "atoms/app_switch.dart",
+      "props": [
+        { "name": "value", "type": "bool", "required": true },
+        { "name": "onChanged", "type": "ValueChanged<bool>?", "required": true, "default": "null disables the switch" },
+        { "name": "label", "type": "String", "required": true }
+      ],
+      "variants": ["on", "off"],
+      "states": ["default", "disabled"],
+      "semantics": "One node with the label, a toggled state and a tap action; the track and the label toggle it",
+      "key": "switch.<name>",
+      "stories": [
+        "Atoms/AppSwitch/on-default",
+        "Atoms/AppSwitch/on-disabled",
+        "Atoms/AppSwitch/off-default",
+        "Atoms/AppSwitch/off-disabled"
+      ]
     }
   ]
 }
