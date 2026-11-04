@@ -72,9 +72,9 @@ fonts/                      bundled Bricolage Grotesque and Instrument Sans, wit
 | `molecules` | `tokens`, `models`, `atoms` | other molecules, organisms and above |
 | `organisms` | `tokens`, `models`, `atoms`, `molecules` | other organisms, templates |
 | `templates` | everything below | app or feature code |
-| all levels | Flutter, Dart SDK, `package:compapp_design/...` | `flutter_bloc`, `get_it`, `dio`, `go_router`, l10n delegates, anything from Compapp-app |
+| all levels | Flutter, Dart SDK, `path_parsing`, `package:compapp_design/...` | `flutter_bloc`, `get_it`, `dio`, `go_router`, l10n delegates, anything from Compapp-app |
 
-`BuildContext` is read only for `Theme`, `MediaQuery` and `Directionality`. View models (`MemberView`, `RoomView`) and shared enums (`AppIcons`) live in `lib/src/models/`: plain immutable data owned by this package, importable from every level, exempt from the manifest. The app maps its business objects to them. Nothing in `models` imports upward.
+`BuildContext` is read only for `Theme`, `IconTheme`, `MediaQuery` and `Directionality`. View models (`MemberView`, `RoomView`) and shared enums (`AppIcons`) live in `lib/src/models/`: plain immutable data owned by this package, importable from every level, exempt from the manifest. The app maps its business objects to them. Nothing in `models` imports upward.
 
 Imports under `lib/` are `package:compapp_design/...`. Tests may import `test/helpers/` with a relative path.
 

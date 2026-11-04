@@ -6,6 +6,7 @@ All notable changes are documented here. The format follows [Keep a Changelog](h
 
 ### Added
 
+- `AppIcon` atom and the `AppIcons` enum: the 30 stroke glyphs of the Atoms board, drawn from SVG path data on a 24 px grid with `path_parsing`.
 - Widgetbook catalog in `widgetbook/` with theme, locale, text scale and viewport addons, and a hand-written tree.
 - Generic golden (alchemist CI goldens), semantics and manifest-contract tests that cover every use case in the catalog.
 - CI analyzes and tests the Widgetbook package, uploads golden failures and runs `flutter build web` as a build check.

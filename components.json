@@ -1,4 +1,22 @@
 {
   "$schema-version": 1,
-  "components": []
+  "components": [
+    {
+      "id": "app-icon",
+      "level": "atom",
+      "class": "AppIcon",
+      "path": "atoms/app_icon.dart",
+      "props": [
+        { "name": "icon", "type": "AppIcons", "required": true },
+        { "name": "size", "type": "double?", "required": false, "default": "IconTheme size, else 24" },
+        { "name": "color", "type": "Color?", "required": false },
+        { "name": "semanticLabel", "type": "String?", "required": false }
+      ],
+      "variants": ["gallery"],
+      "states": ["default"],
+      "semantics": "Decorative and excluded from semantics unless semanticLabel is non-empty, then an image with that label in its own node",
+      "key": "none",
+      "stories": ["Atoms/AppIcon/gallery-default"]
+    }
+  ]
 }
