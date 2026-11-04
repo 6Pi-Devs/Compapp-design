@@ -1,0 +1,21 @@
+name: compapp_design
+description: Compapp design system - design tokens and atomic widgets for the Compapp Flutter app.
+publish_to: none
+
+version: 0.0.0
+
+environment:
+  sdk: ^3.13.7
+  flutter: 3.47.9
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  very_good_analysis: ^11.0.0
+
+flutter:
+  uses-material-design: true
