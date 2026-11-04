@@ -8,15 +8,21 @@ abstract final class AppMotion {
   static const Duration inUse = Duration(milliseconds: 4000);
   static const Curve inUseCurve = Curves.easeInOut;
 
+  /// Period of one turn of a loading spinner.
+  static const Duration spin = Duration(milliseconds: 1000);
+  static const Curve spinCurve = Curves.linear;
+
   /// Durations by JSON name, compared against the JSON by the parity test.
   static const Map<String, Duration> values = {
     'presence': presence,
     'in-use': inUse,
+    'spin': spin,
   };
 
   /// Curves by JSON name, compared against the JSON by the parity test.
   static const Map<String, Curve> curves = {
     'presence': presenceCurve,
     'in-use': inUseCurve,
+    'spin': spinCurve,
   };
 }

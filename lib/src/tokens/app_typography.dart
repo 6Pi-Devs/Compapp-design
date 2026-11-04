@@ -84,6 +84,16 @@ abstract final class AppTypography {
     fontFeatures: _tabular,
   );
 
+  static const TextStyle labelLg = TextStyle(
+    fontFamily: bodyFamily,
+    package: package,
+    fontWeight: FontWeight.w600,
+    fontSize: 15,
+    height: 22 / 15,
+    letterSpacing: 0,
+    fontFeatures: _tabular,
+  );
+
   static const TextStyle caption = TextStyle(
     fontFamily: bodyFamily,
     package: package,
@@ -103,12 +113,14 @@ abstract final class AppTypography {
     'body-lg': bodyLg,
     'body': body,
     'label': label,
+    'label-lg': labelLg,
     'caption': caption,
   };
 
   /// display to `displayMedium`, headline to `headlineSmall`, title to
   /// `titleLarge`, body-lg to `bodyLarge`, body to `bodyMedium`, label to
-  /// `labelLarge`, caption to `bodySmall`.
+  /// `labelLarge`, caption to `bodySmall`. label-lg has no Material slot: the
+  /// button themes use it for their label.
   static const TextTheme textTheme = TextTheme(
     displayMedium: display,
     headlineSmall: headline,

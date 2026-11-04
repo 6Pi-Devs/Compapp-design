@@ -35,6 +35,7 @@
     "body-lg": { "$type": "typography", "$value": { "fontFamily": "Instrument Sans", "fontWeight": 400, "fontSize": "17px", "lineHeight": "24px" } },
     "body": { "$type": "typography", "$value": { "fontFamily": "Instrument Sans", "fontWeight": 400, "fontSize": "15px", "lineHeight": "22px" } },
     "label": { "$type": "typography", "$value": { "fontFamily": "Instrument Sans", "fontWeight": 600, "fontSize": "13px", "lineHeight": "16px", "letterSpacing": "0.2px" } },
+    "label-lg": { "$type": "typography", "$value": { "fontFamily": "Instrument Sans", "fontWeight": 600, "fontSize": "15px", "lineHeight": "22px" } },
     "caption": { "$type": "typography", "$value": { "fontFamily": "Instrument Sans", "fontWeight": 400, "fontSize": "12px", "lineHeight": "16px" } }
   },
   "space": {
@@ -65,9 +66,30 @@
   },
   "motion": {
     "presence": { "$type": "duration", "$value": "600ms", "$extensions": { "curve": "easeOut" } },
-    "in-use": { "$type": "duration", "$value": "4000ms", "$extensions": { "curve": "easeInOut", "repeat": true } }
+    "in-use": { "$type": "duration", "$value": "4000ms", "$extensions": { "curve": "easeInOut", "repeat": true } },
+    "spin": { "$type": "duration", "$value": "1000ms", "$extensions": { "curve": "linear", "repeat": true } }
   },
   "target": {
     "min": { "$type": "dimension", "$value": "48px", "$extensions": { "drawn": "44px" } }
+  },
+  "size": {
+    "control-md": { "$type": "dimension", "$value": "44px", "$description": "height of a medium button and chip" },
+    "control-lg": { "$type": "dimension", "$value": "52px", "$description": "height of a large button and of a text field" },
+    "glyph-md": { "$type": "dimension", "$value": "16px", "$description": "icon or spinner beside a medium label" },
+    "glyph-lg": { "$type": "dimension", "$value": "18px", "$description": "icon or spinner beside a large label" },
+    "border-emphasis": { "$type": "dimension", "$value": "2px", "$description": "selected, focused and error borders, spinner stroke" },
+    "focus-ring": { "$type": "dimension", "$value": "4px", "$description": "primary-soft ring around a focused field" },
+    "spinner-md": { "$type": "dimension", "$value": "12px", "$description": "ring of a spinner beside a medium label, drawn in a glyph-md box" },
+    "spinner-lg": { "$type": "dimension", "$value": "13.5px", "$description": "ring of a spinner beside a large label, drawn in a glyph-lg box" },
+    "dash": { "$type": "dimension", "$value": "4px", "$description": "dash of a dashed 1px border, scales with the border width" },
+    "dash-gap": { "$type": "dimension", "$value": "3px", "$description": "gap of a dashed 1px border, scales with the border width" },
+    "code-cell-width": { "$type": "dimension", "$value": "56px", "$description": "width of one code input cell, cells shrink to share a narrow column" },
+    "code-cell-height": { "$type": "dimension", "$value": "60px", "$description": "height of one code input cell" }
+  },
+  "state-layer": {
+    "pressed-primary": { "$type": "number", "$value": 0.12, "$description": "ink over a primary fill when pressed" },
+    "pressed-secondary": { "$type": "number", "$value": 0.08, "$description": "ink over a surface fill when pressed" },
+    "pressed-danger": { "$type": "number", "$value": 0.16, "$description": "ink over a danger fill when pressed" },
+    "spinner-track": { "$type": "number", "$value": 0.35, "$description": "track of a spinner drawn on a solid fill" }
   }
 }
