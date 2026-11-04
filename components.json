@@ -75,6 +75,33 @@
       "semantics": "Decorative and excluded from semantics unless semanticLabel is non-empty, then an image with that label in its own node",
       "key": "none",
       "stories": ["Atoms/AppIcon/gallery-default"]
+    },
+    {
+      "id": "app-chip",
+      "level": "atom",
+      "class": "AppChip",
+      "path": "atoms/app_chip.dart",
+      "props": [
+        { "name": "label", "type": "String", "required": true },
+        { "name": "onTap", "type": "VoidCallback?", "required": true, "default": "null disables the chip" },
+        { "name": "selected", "type": "bool", "required": false, "default": "false" },
+        { "name": "kind", "type": "AppChipKind", "required": false, "default": "room" }
+      ],
+      "variants": ["room", "item", "type"],
+      "states": ["default", "selected", "disabled"],
+      "semantics": "Button named by its label with a selected state; the check shown when selected is decorative",
+      "key": "chip.<kind>.<id>",
+      "stories": [
+        "Atoms/AppChip/room-default",
+        "Atoms/AppChip/room-selected",
+        "Atoms/AppChip/room-disabled",
+        "Atoms/AppChip/item-default",
+        "Atoms/AppChip/item-selected",
+        "Atoms/AppChip/item-disabled",
+        "Atoms/AppChip/type-default",
+        "Atoms/AppChip/type-selected",
+        "Atoms/AppChip/type-disabled"
+      ]
     }
   ]
 }
