@@ -4,6 +4,10 @@ All notable changes are documented here. The format follows [Keep a Changelog](h
 
 ## [Unreleased]
 
+### Fixed
+
+- `CompappTheme` sets the icon theme color to ink, so icons no longer fall back to Material's black87 or white.
+
 ## [0.1.0] - 2026-11-04
 
 ### Added

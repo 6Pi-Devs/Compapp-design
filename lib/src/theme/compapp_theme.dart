@@ -77,6 +77,7 @@ abstract final class CompappTheme {
       colorScheme: colorScheme,
       scaffoldBackgroundColor: palette.ground,
       textTheme: textTheme,
+      iconTheme: IconThemeData(color: palette.ink),
       extensions: [colors],
     );
   }
