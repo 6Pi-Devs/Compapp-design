@@ -46,6 +46,24 @@ Requires Flutter 3.47.9 (see `pubspec.yaml`).
 | Analyze | `flutter analyze --fatal-infos` |
 | Test | `flutter test` |
 
+## Catalog
+
+The components are cataloged in Widgetbook, a separate Flutter app in `widgetbook/` that depends on this package by path.
+
+```sh
+cd widgetbook
+flutter pub get
+flutter run -d chrome
+```
+
+Use the addons to switch light and dark, English and Spanish, text scale and phone viewports. The same use cases drive the golden and accessibility tests:
+
+| Task | Command (in `widgetbook/`) |
+|------|----------------------------|
+| Test | `flutter test` |
+
+The committed goldens are Linux renders: Linux CI is the only reference platform. On other operating systems a local run compares with a tolerance and cannot write CI goldens. To add or update one, push, let CI fail, then run `rm -rf widgetbook/test/goldens/ci && gh run download <run-id> -n ci-goldens -D widgetbook/test/goldens/ci` (the artifact holds every golden and `gh` will not overwrite files), review the images with `git status` and `git diff --stat`, and commit them. Never commit a golden rendered outside Linux. See [AGENTS.md](AGENTS.md) for the details.
+
 ## Release
 
 The git tag is the only version. A `feat` since the last tag bumps the minor version, anything else the patch (breaking changes: major from 1.0.0, minor before). See [AGENTS.md](AGENTS.md#releases).
