@@ -1,0 +1,121 @@
+import 'package:flutter/material.dart';
+
+/// Type scale. Numbers are always tabular, so every style carries
+/// `FontFeature.tabularFigures()`. Styles without tracking in the spec set
+/// `letterSpacing: 0` so Material defaults do not leak in.
+///
+/// Bricolage Grotesque is a variable font. `fontWeight` drives its `wght`
+/// axis, so the styles set no `wght` variation (an explicit one would override
+/// `copyWith(fontWeight:)` and iOS Bold Text). Every Bricolage style sets
+/// `opsz` to its font size, clamped to the axis range, like
+/// `font-optical-sizing: auto` in browsers. Never `copyWith(fontSize:)` on a
+/// Bricolage style: it would keep the old `opsz`.
+abstract final class AppTypography {
+  static const String displayFamily = 'Bricolage Grotesque';
+  static const String bodyFamily = 'Instrument Sans';
+  static const String package = 'compapp_design';
+
+  /// Range of the `opsz` axis of the bundled Bricolage Grotesque.
+  static const double opticalSizeMin = 12;
+  static const double opticalSizeMax = 96;
+
+  static const List<FontFeature> _tabular = [FontFeature.tabularFigures()];
+
+  static const TextStyle display = TextStyle(
+    fontFamily: displayFamily,
+    package: package,
+    fontWeight: FontWeight.w600,
+    fontSize: 40,
+    fontVariations: [FontVariation.opticalSize(40)],
+    height: 44 / 40,
+    letterSpacing: 0,
+    fontFeatures: _tabular,
+  );
+
+  static const TextStyle headline = TextStyle(
+    fontFamily: displayFamily,
+    package: package,
+    fontWeight: FontWeight.w600,
+    fontSize: 28,
+    fontVariations: [FontVariation.opticalSize(28)],
+    height: 32 / 28,
+    letterSpacing: 0,
+    fontFeatures: _tabular,
+  );
+
+  static const TextStyle title = TextStyle(
+    fontFamily: displayFamily,
+    package: package,
+    fontWeight: FontWeight.w600,
+    fontSize: 20,
+    fontVariations: [FontVariation.opticalSize(20)],
+    height: 26 / 20,
+    letterSpacing: 0,
+    fontFeatures: _tabular,
+  );
+
+  static const TextStyle bodyLg = TextStyle(
+    fontFamily: bodyFamily,
+    package: package,
+    fontWeight: FontWeight.w400,
+    fontSize: 17,
+    height: 24 / 17,
+    letterSpacing: 0,
+    fontFeatures: _tabular,
+  );
+
+  static const TextStyle body = TextStyle(
+    fontFamily: bodyFamily,
+    package: package,
+    fontWeight: FontWeight.w400,
+    fontSize: 15,
+    height: 22 / 15,
+    letterSpacing: 0,
+    fontFeatures: _tabular,
+  );
+
+  static const TextStyle label = TextStyle(
+    fontFamily: bodyFamily,
+    package: package,
+    fontWeight: FontWeight.w600,
+    fontSize: 13,
+    height: 16 / 13,
+    letterSpacing: 0.2,
+    fontFeatures: _tabular,
+  );
+
+  static const TextStyle caption = TextStyle(
+    fontFamily: bodyFamily,
+    package: package,
+    fontWeight: FontWeight.w400,
+    fontSize: 12,
+    height: 16 / 12,
+    letterSpacing: 0,
+    fontFeatures: _tabular,
+  );
+
+  /// Every style by its JSON name, compared against the JSON by the parity
+  /// test.
+  static const Map<String, TextStyle> values = {
+    'display': display,
+    'headline': headline,
+    'title': title,
+    'body-lg': bodyLg,
+    'body': body,
+    'label': label,
+    'caption': caption,
+  };
+
+  /// display to `displayMedium`, headline to `headlineSmall`, title to
+  /// `titleLarge`, body-lg to `bodyLarge`, body to `bodyMedium`, label to
+  /// `labelLarge`, caption to `bodySmall`.
+  static const TextTheme textTheme = TextTheme(
+    displayMedium: display,
+    headlineSmall: headline,
+    titleLarge: title,
+    bodyLarge: bodyLg,
+    bodyMedium: body,
+    labelLarge: label,
+    bodySmall: caption,
+  );
+}

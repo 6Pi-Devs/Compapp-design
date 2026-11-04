@@ -36,7 +36,7 @@ Widgetbook (`widgetbook/`) and golden tests arrive with the atoms slice and add 
 lib/
   compapp_design.dart     barrel: the only import an app needs
   src/
-    tokens/               AppColors, AppSpacing, AppRadius, AppShadows, AppMotion, AppSizes, AppTypography
+    tokens/               AppColors, AppSpacing, AppRadius, AppShadows, AppMotion, AppSizes, AppTypography (AppPalette is internal)
     theme/                CompappTheme.light / dark
     models/               view models and shared enums (MemberView, RoomView, AppIcons)
     atoms/                single-purpose controls (AppButton, AppPebble, AppChip)
@@ -134,9 +134,15 @@ The analyzer enforces the Dart 3.13 shorthand. Write `const new(this.x)` for the
 
 - `tokens/compapp.tokens.json` (DTCG-style JSON: string values, `px` line heights, un-namespaced `$extensions`) is the source of truth. Edit it first. It does not claim strict compliance with a specific DTCG spec revision.
 - The Dart tokens in `lib/src/tokens/` are **hand-written**, not generated. The app consumes this package as a git dependency, and a git dependency never runs `build_runner`. Generated files would have to be committed, which is forbidden.
-- `test/tokens/parity_test.dart` loads the JSON and asserts every token equals its Dart value and that no token exists on one side only. Change both sides in the same commit or CI fails.
+- Every token class exposes a `values` map keyed by JSON token name (`AppSpacing.values`, `AppPalette.values`, `AppColors.values`, `AppTypography.values`, and so on). `test/tokens/parity_test.dart` loads the JSON and compares it with those maps in both directions: a token on one side only, or with a different value, fails CI. Add every new token to its class and to `values`, and to the JSON, in the same commit. A constant that is not added to `values` is invisible to the test.
+- `test/tokens/font_manifest_test.dart` checks that every family and weight `AppTypography` uses is declared in `pubspec.yaml`, so renaming a family there fails CI.
 - Dark values live under `$extensions.mode.dark`, as on the canvas Contracts board.
-- Fonts are bundled and declared in `pubspec.yaml`. Text styles carry `package: 'compapp_design'` so a consuming app resolves them.
+- Bricolage styles (display, headline, title) set `fontVariations: [FontVariation.opticalSize(fontSize)]` and `fontWeight: w600`. `fontWeight` drives the variable font's `wght` axis, so never add `FontVariation.weight`: it would override `copyWith(fontWeight:)` and iOS Bold Text. Without `opsz` the font renders at its 96 default (display cut), so `opsz` equals the font size, clamped to the axis range 12 to 96, like `font-optical-sizing: auto` in browsers. The JSON records the rule under `font.$extensions.opticalSizing` and the parity test checks it.
+- Never `copyWith(fontSize:)` on a Bricolage style: it keeps the old `opsz`. Add a size token to the JSON and `AppTypography` instead.
+- Styles without tracking in the spec set `letterSpacing: 0`, so Material defaults do not leak in.
+- Fonts are bundled (Bricolage Grotesque as a variable font with `opsz`, `wdth` and `wght` axes; Instrument Sans as static 400 and 600 TTFs) and declared in `pubspec.yaml`. Text styles carry `package: 'compapp_design'` so a consuming app resolves them. Numbers are always tabular, so every style carries `FontFeature.tabularFigures()`.
+- The fonts are SIL OFL. The app calls `CompappDesign.registerLicenses()` once in `main` so the license page lists them.
+- `AppPalette` (colors that have a Material slot) is internal and not exported. Widgets read those colors from `Theme.of(context).colorScheme`, the rest with `context.appColors`.
 
 ## Releases
 
