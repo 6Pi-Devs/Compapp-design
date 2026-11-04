@@ -42,6 +42,16 @@ void main() {
     expect(mismatched, isEmpty);
   });
 
+  test('a story splits into one variant and one state, even with dashes', () {
+    final ambiguous = [
+      for (final entry in _manifestEntries())
+        for (final story in (entry['stories'] as List<dynamic>).cast<String>())
+          if (_splits(entry, story.split('/').last).length != 1)
+            '$story: ${_splits(entry, story.split('/').last)}',
+    ];
+    expect(ambiguous, isEmpty);
+  });
+
   test('use case paths are <Level>/<Class>/<variant>-<state>', () {
     expect(useCases.where((path) => !_pathPattern.hasMatch(path)), isEmpty);
   });
@@ -69,6 +79,15 @@ Set<String> _expectedStories(Map<String, dynamic> entry) {
         '$folder/${entry['class']}/$variant-$state',
   };
 }
+
+/// The `(variant, state)` pairs of [entry] that spell [name], which is the
+/// last segment of a story path. Variants may contain dashes, so the name is
+/// matched against the declared variants and states, never split on a dash.
+List<(String, String)> _splits(Map<String, dynamic> entry, String name) => [
+  for (final variant in (entry['variants'] as List<dynamic>).cast<String>())
+    for (final state in (entry['states'] as List<dynamic>).cast<String>())
+      if ('$variant-$state' == name) (variant, state),
+];
 
 bool _sameSet(List<String> actual, Set<String> expected) =>
     actual.length == expected.length && actual.toSet().containsAll(expected);
