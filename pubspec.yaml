@@ -19,3 +19,19 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - fonts/OFL-BricolageGrotesque.txt
+    - fonts/OFL-InstrumentSans.txt
+
+  fonts:
+    - family: Bricolage Grotesque
+      fonts:
+        - asset: fonts/BricolageGrotesque-Variable.ttf
+          weight: 600
+    - family: Instrument Sans
+      fonts:
+        - asset: fonts/InstrumentSans-Regular.ttf
+          weight: 400
+        - asset: fonts/InstrumentSans-SemiBold.ttf
+          weight: 600
