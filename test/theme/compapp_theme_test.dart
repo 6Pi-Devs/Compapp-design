@@ -43,6 +43,41 @@ void main() {
         expect(scheme.errorContainer, palette.dangerSoft);
       });
 
+      test('uses standard density, not the compact one of desktop', () {
+        expect(theme.visualDensity, VisualDensity.standard);
+      });
+
+      testWidgets('controls keep their token heights on a desktop platform', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: theme.copyWith(platform: TargetPlatform.windows),
+            home: Scaffold(
+              body: Column(
+                children: [
+                  FilledButton(onPressed: () {}, child: const Text('Filled')),
+                  TextButton(onPressed: () {}, child: const Text('Text')),
+                  TextField(style: theme.textTheme.bodyMedium),
+                ],
+              ),
+            ),
+          ),
+        );
+
+        Size surface(Type type) => tester.getSize(
+          find.descendant(
+            of: find.byType(type),
+            matching: find.byWidgetPredicate(
+              (w) => w is Material && w.type == MaterialType.button,
+            ),
+          ),
+        );
+        expect(surface(FilledButton).height, 52);
+        expect(surface(TextButton).height, 44);
+        expect(tester.getSize(find.byType(TextField)).height, 52);
+      });
+
       test('uses ground as the scaffold background', () {
         expect(theme.scaffoldBackgroundColor, palette.ground);
       });

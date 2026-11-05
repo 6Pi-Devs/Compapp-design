@@ -1,3 +1,4 @@
+import 'package:compapp_design/src/theme/control_themes.dart';
 import 'package:compapp_design/src/tokens/app_colors.dart';
 import 'package:compapp_design/src/tokens/app_palette.dart';
 import 'package:compapp_design/src/tokens/app_typography.dart';
@@ -6,8 +7,8 @@ import 'package:flutter/material.dart';
 /// Material 3 themes built from the design tokens.
 ///
 /// Both themes use an explicit [ColorScheme] (no seed), the [AppColors]
-/// extension and the Compapp type scale. Component themes arrive with the
-/// atoms.
+/// extension and the Compapp type scale, plus the component themes of the form
+/// controls (buttons, chip, switch, text field), see `ControlThemes`.
 abstract final class CompappTheme {
   static final ThemeData light = _build(
     brightness: Brightness.light,
@@ -74,10 +75,23 @@ abstract final class CompappTheme {
       fontFamily: AppTypography.bodyFamily,
       package: AppTypography.package,
       brightness: brightness,
+      // Material's default is compact on desktop and the web, which would draw
+      // every control 8 px shorter than its token height there.
+      visualDensity: VisualDensity.standard,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: palette.ground,
       textTheme: textTheme,
       iconTheme: IconThemeData(color: palette.ink),
+      filledButtonTheme: ControlThemes.filledButton(colorScheme, textTheme),
+      outlinedButtonTheme: ControlThemes.outlinedButton(colorScheme, textTheme),
+      textButtonTheme: ControlThemes.textButton(colorScheme, textTheme),
+      chipTheme: ControlThemes.chip(colorScheme, textTheme),
+      switchTheme: ControlThemes.switchTheme(colorScheme),
+      inputDecorationTheme: ControlThemes.inputDecoration(
+        colorScheme,
+        textTheme,
+      ),
+      textSelectionTheme: ControlThemes.textSelection(colorScheme),
       extensions: [colors],
     );
   }

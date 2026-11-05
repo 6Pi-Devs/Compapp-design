@@ -8,6 +8,7 @@ import 'package:compapp_design/src/tokens/app_radius.dart';
 import 'package:compapp_design/src/tokens/app_shadows.dart';
 import 'package:compapp_design/src/tokens/app_sizes.dart';
 import 'package:compapp_design/src/tokens/app_spacing.dart';
+import 'package:compapp_design/src/tokens/app_state_layers.dart';
 import 'package:compapp_design/src/tokens/app_typography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -38,6 +39,8 @@ void main() {
       'elevation',
       'motion',
       'target',
+      'size',
+      'state-layer',
     ]);
   });
 
@@ -187,7 +190,11 @@ void main() {
 
     expect(AppMotion.values.keys.toSet(), names(motion));
     expect(AppMotion.curves.keys.toSet(), names(motion));
-    const curves = {'easeOut': Curves.easeOut, 'easeInOut': Curves.easeInOut};
+    const curves = {
+      'easeOut': Curves.easeOut,
+      'easeInOut': Curves.easeInOut,
+      'linear': Curves.linear,
+    };
     for (final name in names(motion)) {
       expect(
         AppMotion.values[name],
@@ -201,6 +208,7 @@ void main() {
       );
     }
     expect(extensionsOf(motion, 'in-use')['repeat'], isTrue);
+    expect(extensionsOf(motion, 'spin')['repeat'], isTrue);
   });
 
   test('target and sizes match AppSizes', () {
@@ -214,7 +222,30 @@ void main() {
       _px(extensionsOf(target, 'min')['drawn']),
     );
     expect(sizes.remove('elevation.flat.width'), isNotNull);
+
+    final size = section('size');
+    final sized = {
+      for (final key in sizes.keys.toList())
+        if (key.startsWith('size.')) key.substring(5): sizes.remove(key),
+    };
+    expect(sized.keys.toSet(), names(size));
+    for (final name in names(size)) {
+      expect(sized[name], _px(valueOf(size, name)), reason: 'size.$name');
+    }
     expect(sizes, isEmpty, reason: 'AppSizes values without a JSON token');
+  });
+
+  test('state layers match AppStateLayers', () {
+    final layers = section('state-layer');
+
+    expect(AppStateLayers.values.keys.toSet(), names(layers));
+    for (final name in names(layers)) {
+      expect(
+        AppStateLayers.values[name],
+        valueOf(layers, name),
+        reason: 'state-layer.$name',
+      );
+    }
   });
 }
 

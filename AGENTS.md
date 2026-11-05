@@ -48,7 +48,7 @@ The root `flutter analyze` and `flutter test` skip `widgetbook/`, so run both pa
 lib/
   compapp_design.dart     barrel: the only import an app needs
   src/
-    tokens/               AppColors, AppSpacing, AppRadius, AppShadows, AppMotion, AppSizes, AppTypography (AppPalette is internal)
+    tokens/               AppColors, AppSpacing, AppRadius, AppShadows, AppMotion, AppSizes, AppStateLayers, AppTypography (AppPalette is internal)
     theme/                CompappTheme.light / dark
     models/               view models and shared enums (MemberView, RoomView, AppIcons)
     atoms/                single-purpose controls (AppButton, AppPebble, AppChip)
@@ -99,7 +99,7 @@ The analyzer enforces the Dart 3.13 shorthand. Write `const new(this.x)` for the
 | Keys | Stable `Key('<scope>.<thing>.<id>')` pattern, copied from the manifest, for example `Key('floorplan.room.<roomId>')`. The id comes from a prop, never from list position. |
 | Motion | Respect `MediaQuery.disableAnimations`. Durations and curves come from `AppMotion`. |
 | Calm | Danger colors only in destructive flows. Never show who is behind on a task. |
-| Contrast and targets | Text contrast at least 4.5:1. Hit area at least `AppSizes.minTarget` (48), drawn size at least `AppSizes.minDrawn` (44). |
+| Contrast and targets | Text contrast at least 4.5:1. The boundary of an interactive component (field border, switch off track outline, chip and outlined button border, empty code cell) is `colorScheme.outline` (ink-muted) so it keeps 3:1 against the page (WCAG 1.4.11); `outlineVariant` (line) is for decorative hairlines only. Hit area at least `AppSizes.minTarget` (48), drawn size at least `AppSizes.minDrawn` (44). |
 
 ### Manifest
 
@@ -203,12 +203,27 @@ To add or update a golden (a new atom, or an intentional visual change):
 | `pebble.*` | `AppColors.pebbles` (sage, sky, apricot, rose, sand, tide), `AppColors.pebbleAt(joinOrder)` |
 | `font.display`, `headline`, `title` | `TextTheme.displayMedium`, `headlineSmall`, `titleLarge` |
 | `font.body-lg`, `body`, `label`, `caption` | `TextTheme.bodyLarge`, `bodyMedium`, `labelLarge`, `bodySmall` |
+| `font.label-lg` | `AppTypography.labelLg` (15/22, 600). No `TextTheme` slot: the button themes use it for their label |
 | `space.xs` to `xxl` | `AppSpacing.xs`, `sm`, `md`, `lg`, `xl`, `xxl` (4, 8, 16, 24, 32, 48) |
 | `radius.xs` to `lg`, `radius.pebble` | `AppRadius.xs`, `sm`, `md`, `lg`, `AppRadius.pebble(size)` |
 | `elevation.sheet` | `AppShadows.sheet` |
 | `elevation.flat` | `AppSizes.hairline` (1px `colorScheme.outlineVariant` border) |
 | `motion.presence`, `motion.in-use` | `AppMotion.presence`, `inUse` and their curves |
+| `motion.spin` | `AppMotion.spin`, `spinCurve` (one turn of a loading spinner) |
 | `target.min` | `AppSizes.minTarget` (48 hit area), `AppSizes.minDrawn` (44 drawn) |
+| `size.control-md`, `control-lg` | `AppSizes.controlMd` (44), `controlLg` (52): heights of buttons, chips and fields |
+| `size.glyph-md`, `glyph-lg` | `AppSizes.glyphMd` (16), `glyphLg` (18): icon or spinner beside a label |
+| `size.spinner-md`, `spinner-lg` | `AppSizes.spinnerMd` (12), `spinnerLg` (13.5): the ring of a spinner, drawn in a glyph box |
+| `size.dash`, `dash-gap` | `AppSizes.dash` (4), `dashGap` (3): dash pattern of a 1 px dashed border, scaled by the border width |
+| `size.border-emphasis`, `focus-ring` | `AppSizes.borderEmphasis` (2, selected, focus and error borders), `focusRing` (4, primary-soft ring around a focused field) |
+| `size.code-cell-width`, `code-cell-height` | `AppSizes.codeCellWidth` (56), `codeCellHeight` (60) |
+| `state-layer.*` | `AppStateLayers`: ink opacity over a fill when pressed (primary 12%, surface 8%, danger 16%) and the spinner track (35%) |
+
+### Component themes
+
+`CompappTheme` styles the Material controls through component themes (`lib/src/theme/control_themes.dart`): `FilledButtonThemeData`, `OutlinedButtonThemeData`, `TextButtonThemeData`, `ChipThemeData`, `SwitchThemeData`, `InputDecorationThemeData` and `TextSelectionThemeData`. A raw Material widget looks right in the app, and atoms wrap those widgets with the Compapp API instead of redrawing them.
+
+A component theme sets colors, shapes, sizes and text styles only. It must not remove feedback or change the layout of raw Material widgets (no transparent overlays, no `NoSplash`, no label padding or checkmark changes): atom-specific behavior goes in the atom's own widget-level style. A raw button gets Material's own pressed overlay on the token background. `AppButton` draws pressed as a fill (the ink layer blended over the base color) in its own style, so a `WidgetStatesController` holding `WidgetState.pressed` renders it without a gesture, which is how stories and goldens show it. Button heights are minimums, with vertical padding, so a button grows with a large label. Keyboard focus on buttons is a 2 px ink ring drawn outside the shape: Material buttons do not clip it, but a parent that clips (`ClipRect`, a scroll view without padding) will, so leave `AppSizes.borderEmphasis` of room around a button inside one.
 
 `ColorScheme` slots with no token are filled explicitly. Only `shadow`, `scrim` and the `*Fixed` slots keep Flutter's defaults:
 
