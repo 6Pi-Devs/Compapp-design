@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:compapp_design/src/tokens/app_colors.dart';
 import 'package:compapp_design/src/tokens/app_motion.dart';
 import 'package:compapp_design/src/tokens/app_palette.dart';
+import 'package:compapp_design/src/tokens/app_progress.dart';
 import 'package:compapp_design/src/tokens/app_radius.dart';
 import 'package:compapp_design/src/tokens/app_shadows.dart';
 import 'package:compapp_design/src/tokens/app_sizes.dart';
@@ -41,6 +42,7 @@ void main() {
       'target',
       'size',
       'state-layer',
+      'progress',
     ]);
   });
 
@@ -244,6 +246,19 @@ void main() {
         AppStateLayers.values[name],
         valueOf(layers, name),
         reason: 'state-layer.$name',
+      );
+    }
+  });
+
+  test('progress matches AppProgress', () {
+    final progress = section('progress');
+
+    expect(AppProgress.values.keys.toSet(), names(progress));
+    for (final name in names(progress)) {
+      expect(
+        AppProgress.values[name],
+        valueOf(progress, name),
+        reason: 'progress.$name',
       );
     }
   });

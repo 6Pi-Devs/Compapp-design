@@ -196,6 +196,18 @@ abstract final class AppTypography {
     fontFeatures: _tabular,
   );
 
+  /// Label in the middle of a progress ring. The line is as tall as the font
+  /// size: the ring measures it and grows around it.
+  static const TextStyle ringLabel = TextStyle(
+    fontFamily: bodyFamily,
+    package: package,
+    fontWeight: FontWeight.w600,
+    fontSize: 15,
+    height: 1,
+    letterSpacing: 0,
+    fontFeatures: _tabular,
+  );
+
   /// Every style by its JSON name, compared against the JSON by the parity
   /// test.
   static const Map<String, TextStyle> values = {
@@ -214,6 +226,7 @@ abstract final class AppTypography {
     'pebble-xl': pebbleXl,
     'badge-count': badgeCount,
     'badge-label': badgeLabel,
+    'ring-label': ringLabel,
     'caption': caption,
   };
 

@@ -92,6 +92,12 @@ abstract final class AppSizes {
   /// Corner radius of a label badge (`size.badge-label-radius`).
   static const double badgeLabelRadius = 8;
 
+  /// Side of a progress ring (`size.ring`). It grows to hold a large label.
+  static const double ring = 56;
+
+  /// Stroke of a progress ring, track and arc (`size.ring-stroke`).
+  static const double ringStroke = 4;
+
   /// Every token by its JSON name, checked by the parity test.
   static const Map<String, double> values = {
     'target.min': minTarget,
@@ -123,5 +129,7 @@ abstract final class AppSizes {
     'size.badge-count': badgeCount,
     'size.badge-count-padding': badgeCountPadding,
     'size.badge-label-radius': badgeLabelRadius,
+    'size.ring': ring,
+    'size.ring-stroke': ringStroke,
   };
 }

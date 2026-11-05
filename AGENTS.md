@@ -48,7 +48,7 @@ The root `flutter analyze` and `flutter test` skip `widgetbook/`, so run both pa
 lib/
   compapp_design.dart     barrel: the only import an app needs
   src/
-    tokens/               AppColors, AppSpacing, AppRadius, AppShadows, AppMotion, AppSizes, AppStateLayers, AppTypography (AppPalette is internal)
+    tokens/               AppColors, AppSpacing, AppRadius, AppShadows, AppMotion, AppSizes, AppStateLayers, AppProgress, AppTypography (AppPalette is internal)
     theme/                CompappTheme.light / dark
     models/               view models and shared enums (MemberView, RoomView, AppIcons)
     atoms/                single-purpose controls (AppButton, AppPebble, AppChip)
@@ -226,6 +226,9 @@ To add or update a golden (a new atom, or an intentional visual change):
 | `size.dot`, `dot-unread` | `AppSizes.dot` (8), `dotUnread` (10): `AppStatusDot` |
 | `size.badge-count`, `badge-count-padding`, `badge-label-radius` | `AppSizes.badgeCount` (18, smallest side), `badgeCountPadding` (5), `badgeLabelRadius` (8): `AppBadge` |
 | `font.badge-count`, `badge-label` | `AppTypography.badgeCount` (11, 600, 18 line), `badgeLabel` (12, 600, 16 line): text of `AppBadge` |
+| `font.ring-label` | `AppTypography.ringLabel` (600, 15, line height equal to size): label in the middle of `AppProgressRing` |
+| `size.ring`, `ring-stroke` | `AppSizes.ring` (56, grows with a large label), `ringStroke` (4): `AppProgressRing` |
+| `progress.ring-sweep`, `ring-breathe` | `AppProgress.ringSweep` (0.3 of the circle, the arc of an in-use ring), `ringBreatheOpacity` (0.4, lowest opacity while it breathes) |
 | `size.border-emphasis`, `focus-ring` | `AppSizes.borderEmphasis` (2, selected, focus and error borders), `focusRing` (4, primary-soft ring around a focused field) |
 | `size.code-cell-width`, `code-cell-height` | `AppSizes.codeCellWidth` (56), `codeCellHeight` (60) |
 | `state-layer.*` | `AppStateLayers`: ink opacity over a fill when pressed (primary 12%, surface 8%, danger 16%) and the spinner track (35%) |

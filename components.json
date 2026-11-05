@@ -284,6 +284,30 @@
         "Atoms/AppBadge/label-busy",
         "Atoms/AppBadge/label-soft"
       ]
+    },
+    {
+      "id": "app-progress-ring",
+      "level": "atom",
+      "class": "AppProgressRing",
+      "path": "atoms/app_progress_ring.dart",
+      "props": [
+        { "name": "semanticLabel", "type": "String?", "required": true, "default": "null leaves the ring out of semantics" },
+        { "name": "value", "type": "double?", "required": false, "default": "null: in use with no known end, a breathing arc; 0 to 1 otherwise, clamped; must be finite" },
+        { "name": "tone", "type": "AppRingTone", "required": false, "default": "primary" },
+        { "name": "size", "type": "double", "required": false, "default": "AppSizes.ring (56); grows with a large label" },
+        { "name": "label", "type": "String?", "required": false, "default": "text in the middle" },
+        { "name": "semanticValue", "type": "String?", "required": false, "default": "required with a value, for example 11 of 15 done" }
+      ],
+      "variants": ["indeterminate", "determinate"],
+      "states": ["busy", "primary"],
+      "semantics": "With a semanticLabel the ring is one node: the label names what it measures and, with a value, semanticValue says how far it is (an in-use ring never has a value); the drawing and the middle label are excluded. Null excludes the ring. Like any semantic child it merges into a parent that merges its children. The arc breathes only when animations are enabled, and stands still at full opacity otherwise. A value that is not finite is drawn as 0",
+      "key": "none",
+      "stories": [
+        "Atoms/AppProgressRing/indeterminate-busy",
+        "Atoms/AppProgressRing/indeterminate-primary",
+        "Atoms/AppProgressRing/determinate-busy",
+        "Atoms/AppProgressRing/determinate-primary"
+      ]
     }
   ]
 }
