@@ -28,7 +28,19 @@ Rules for anyone writing code in this repo, human or AI agent. Read this before 
 | Test | `flutter test --coverage` |
 | Fix constructor shorthand | `dart fix --apply` |
 
-Widgetbook (`widgetbook/`) and golden tests arrive with the atoms slice and add their own commands here.
+The Widgetbook catalog is its own Flutter package in `widgetbook/`. Run these from that folder:
+
+| Task | Command |
+|------|---------|
+| Install | `flutter pub get` |
+| Run the catalog | `flutter run -d chrome` |
+| Build check (CI does this, no deploy) | `flutter build web` |
+| Analyze (must be clean) | `flutter analyze --fatal-infos` |
+| Test (use case contract, goldens, semantics) | `flutter test` |
+| Add or update a golden | Push and let CI render it, see [Golden tooling](#golden-tooling). `--update-goldens` refuses to write CI goldens off Linux |
+| Add local platform goldens (never committed) | `flutter test --dart-define=PLATFORM_GOLDENS=true --update-goldens` (the CI variant refuses to write and reports it, which is expected) |
+
+The root `flutter analyze` and `flutter test` skip `widgetbook/`, so run both packages before you push. `widgetbook/pubspec.lock` is committed and pins the version of `compapp_design`: whenever the root version or dependencies change, run `flutter pub get` in `widgetbook/` and commit its lock, or `--enforce-lockfile` fails in CI.
 
 ## Architecture
 
@@ -60,9 +72,9 @@ fonts/                      bundled Bricolage Grotesque and Instrument Sans, wit
 | `molecules` | `tokens`, `models`, `atoms` | other molecules, organisms and above |
 | `organisms` | `tokens`, `models`, `atoms`, `molecules` | other organisms, templates |
 | `templates` | everything below | app or feature code |
-| all levels | Flutter, Dart SDK, `package:compapp_design/...` | `flutter_bloc`, `get_it`, `dio`, `go_router`, l10n delegates, anything from Compapp-app |
+| all levels | Flutter, Dart SDK, `path_parsing`, `package:compapp_design/...` | `flutter_bloc`, `get_it`, `dio`, `go_router`, l10n delegates, anything from Compapp-app |
 
-`BuildContext` is read only for `Theme`, `MediaQuery` and `Directionality`. View models (`MemberView`, `RoomView`) and shared enums (`AppIcons`) live in `lib/src/models/`: plain immutable data owned by this package, importable from every level, exempt from the manifest. The app maps its business objects to them. Nothing in `models` imports upward.
+`BuildContext` is read only for `Theme`, `IconTheme`, `MediaQuery` and `Directionality`. View models (`MemberView`, `RoomView`) and shared enums (`AppIcons`) live in `lib/src/models/`: plain immutable data owned by this package, importable from every level, exempt from the manifest. The app maps its business objects to them. Nothing in `models` imports upward.
 
 Imports under `lib/` are `package:compapp_design/...`. Tests may import `test/helpers/` with a relative path.
 
@@ -118,16 +130,43 @@ The analyzer enforces the Dart 3.13 shorthand. Write `const new(this.x)` for the
 
 - One use case per variant x state listed in the manifest, no more, no fewer.
 - Use case names follow `<Level>/<Class>/<variant>-<state>` (`Atoms/AppButton/primary-disabled`). The manifest `stories`, the Widgetbook tree and the golden file names use the same string.
-- Golden tests run per use case, light and dark, text scale 1.0 and 2.0, plus a semantics test with `meetsGuideline` for tap targets, labels and contrast.
-- The golden tooling (plain `flutter_test` goldens versus a helper package, and how CI keeps them stable across platforms) is decided in the atoms slice. This section is updated then.
-- Goldens in this root package must load the bundled fonts under the `packages/compapp_design/` prefix (for example `packages/compapp_design/Instrument Sans`), because the text styles carry `package: 'compapp_design'`. Fonts registered without the prefix are not used and the golden falls back to the test font.
+- A use case is a plain builder with fixed props, no knobs. The same builder feeds the Widgetbook tree and the tests, so the catalog and the goldens cannot drift.
+- The tree is written by hand in `widgetbook/lib/src/catalog/` (`catalog.dart` composes `atoms.dart`, one file of use cases per atom). There is no `widgetbook_generator` and no `build_runner`: generated files are never committed, and an explicit tree is easier for agents to read.
+- Strings in use cases come in English and Spanish: `context.sample(en: ..., es: ...)` picks one by the locale the Widgetbook localization addon sets. Goldens render `en` only.
+- Three generic tests in `widgetbook/test/` loop over the catalog, so a new atom is covered without touching them:
+  - `catalog_contract_test.dart`: the use case paths equal the union of every manifest `stories` entry, in both directions, follow the naming pattern, and each manifest entry has exactly one story per variant x state.
+  - `catalog_goldens_test.dart`: one golden per use case, named after its path, holding four scenarios (light and dark, text scale 1.0 and 2.0).
+  - `catalog_semantics_test.dart`: every use case, light and dark, meets `androidTapTargetGuideline`, `iOSTapTargetGuideline`, `labeledTapTargetGuideline` and `textContrastGuideline`.
+- Widgetbook shows light and dark (`CompappTheme`), `en` and `es`, text scale and phone viewports through addons.
+
+#### Golden tooling
+
+Goldens use [`alchemist`](https://pub.dev/packages/alchemist), configured in `widgetbook/test/flutter_test_config.dart`. Only its **CI goldens** are committed, under `widgetbook/test/goldens/ci/`. They draw text as solid blocks (sized by the real font metrics) and skip shadows.
+
+**Linux, meaning CI, is the only reference platform for CI goldens.** Windows and macOS rasterize curves slightly differently, so a golden rendered there fails on Linux CI. `CiGoldenComparator` (`widgetbook/test/helpers/`) enforces it:
+
+- On Linux the match is exact.
+- On any other OS a local run uses a tolerant comparison (`nonLinuxGoldenTolerance`, 1% of the pixels) and prints a line saying the strict check runs on Linux CI. It catches gross breaks, not anti-aliasing.
+- On any other OS, writing a CI golden throws, so `--update-goldens` cannot produce a golden that fails CI. `--dart-define=ALLOW_NON_LINUX_GOLDENS=true` lifts the guard for local experiments: never commit what it writes.
+
+To add or update a golden (a new atom, or an intentional visual change):
+
+1. Commit the code and push. CI fails the golden check.
+2. The failed run renders the proposed goldens on Linux and uploads them as the `ci-goldens` artifact. The artifact holds every CI golden and `gh run download` refuses to overwrite files, so replace the folder: `rm -rf widgetbook/test/goldens/ci && gh run download <run-id> -n ci-goldens -D widgetbook/test/goldens/ci`. Then review with `git status` and `git diff --stat`: only the goldens you meant to change should differ.
+3. Review every image, commit them with the code that changed them, and push.
+
+**Never commit a golden rendered outside Linux.**
+
+- Platform goldens (real glyphs and shadows, for looking at a component) are off by default, gitignored, and opt in with `--dart-define=PLATFORM_GOLDENS=true`. Alchemist registers every font in the font manifest itself, including the `packages/compapp_design/` families the text styles resolve to (they carry `package: 'compapp_design'`), so no font loading code is needed. A platform golden run with `--update-goldens` would also rewrite the CI goldens on that machine, so the comparator refuses unless `ALLOW_NON_LINUX_GOLDENS` is set. Never set it for that run.
+- If CI reports a mismatch you cannot reproduce, download the `golden-failures` artifact of the run: it holds the master, test, isolated and masked diff images, named after the whole golden path (`ci_Atoms_AppIcon_gallery-default_testImage.png`), so same-named use cases never overwrite each other.
+- Never raise a diff threshold to silence a mismatch. Find out why the pixels differ.
 
 ### Add a component
 
 1. Add its entry to `components.json` first (level, class, path, props, variants, states, semantics, key, stories).
 2. Create `lib/src/<level>/<name>.dart` following the [Import rules](#import-rules). Export it from the barrel.
-3. Add the Widgetbook use cases and golden tests for every variant x state.
-4. Add a semantics test.
+3. Add `widgetbook/lib/src/catalog/atoms/<name>_use_cases.dart` with one use case per variant x state, and register it in `atoms.dart`. The goldens and the semantics test pick it up on their own.
+4. Push, let CI render the Linux golden, download the `ci-goldens` artifact, review the new PNGs and commit them (see [Golden tooling](#golden-tooling)).
 5. Run the [Definition of Done](#definition-of-done) checklist.
 
 ## Tokens
@@ -151,7 +190,7 @@ The analyzer enforces the Dart 3.13 shorthand. Write `const new(this.x)` for the
 | `color.ground` | `ColorScheme.surface`, `scaffoldBackgroundColor` |
 | `color.surface` | `ColorScheme.surfaceContainerLowest` (also `surfaceBright`) |
 | `color.surface-sunken` | `ColorScheme.surfaceContainerHigh` (also `surfaceDim`, `surfaceContainerHighest`) |
-| `color.ink` | `ColorScheme.onSurface` |
+| `color.ink` | `ColorScheme.onSurface`, `ThemeData.iconTheme` color |
 | `color.ink-muted` | `ColorScheme.onSurfaceVariant` (also `outline`) |
 | `color.line` | `ColorScheme.outlineVariant` |
 | `color.primary` | `ColorScheme.primary` |
@@ -202,8 +241,9 @@ To release:
 
 1. Bump `version` in `pubspec.yaml` to `X.Y.Z`.
 2. Move the `CHANGELOG.md` Unreleased entries under a `[X.Y.Z]` heading with the date.
-3. Merge, then tag the merge commit `vX.Y.Z` and push the tag.
-4. Bump the `ref` in the app.
+3. Run `flutter pub get` in `widgetbook/` and commit its `pubspec.lock`: it pins the package version.
+4. Merge, then tag the merge commit `vX.Y.Z` and push the tag.
+5. Bump the `ref` in the app.
 
 ## Comments
 
@@ -218,7 +258,7 @@ Code explains itself through names. Keep comments rare.
 - [ ] Import rules respected, names follow [Naming](#naming)
 - [ ] No `Color(0x...)` outside `lib/src/tokens/`, no magic numbers, no hardcoded strings
 - [ ] `components.json` entry added or updated, manifest test green
-- [ ] Use cases, goldens and semantics test for every variant x state
+- [ ] Use cases for every variant x state, CI goldens committed, `widgetbook` analyze and test green
 - [ ] Tokens changed in JSON and Dart together, parity test green
 - [ ] Format check (as CI) clean and `flutter analyze --fatal-infos` reports 0 issues
 - [ ] No generated files committed

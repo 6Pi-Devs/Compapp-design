@@ -37,14 +37,55 @@ jobs:
             exit 1
           fi
 
+      - name: Install Widgetbook dependencies
+        working-directory: widgetbook
+        run: flutter pub get --enforce-lockfile
+
       - name: Check formatting
         run: dart format --output=none --set-exit-if-changed $(git ls-files '*.dart')
 
       - name: Analyze
         run: flutter analyze --fatal-infos
 
+      - name: Analyze Widgetbook
+        working-directory: widgetbook
+        run: flutter analyze --fatal-infos
+
       - name: Test
         run: flutter test --coverage
+
+      - name: Test Widgetbook (use cases, goldens and semantics)
+        id: wbtest
+        working-directory: widgetbook
+        run: flutter test
+
+      - name: Upload golden failures
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: golden-failures
+          path: widgetbook/test/**/failures/*.png
+          if-no-files-found: ignore
+
+      # Linux is the only reference platform for CI goldens. A new atom without
+      # a golden, or an intentional visual change, gets its golden here.
+      - name: Render proposed CI goldens
+        if: failure() && steps.wbtest.outcome == 'failure'
+        continue-on-error: true
+        working-directory: widgetbook
+        run: flutter test --update-goldens --tags golden
+
+      - name: Upload proposed CI goldens
+        if: failure() && steps.wbtest.outcome == 'failure'
+        uses: actions/upload-artifact@v7
+        with:
+          name: ci-goldens
+          path: widgetbook/test/goldens/ci/
+          if-no-files-found: ignore
+
+      - name: Build Widgetbook (build check, no deploy)
+        working-directory: widgetbook
+        run: flutter build web
 
       - name: Upload coverage
         uses: actions/upload-artifact@v7
