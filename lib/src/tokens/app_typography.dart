@@ -104,6 +104,75 @@ abstract final class AppTypography {
     fontFeatures: _tabular,
   );
 
+  /// Initials of a pebble, at the board sizes. The line is as tall as the font
+  /// size, except on pebbleMd: its 12 px line is the capital height, so the
+  /// text line box (not every accent or descender) clears the 16 px badge
+  /// squares of a 44 px pebble. The largest is Bricolage like a headline. Two
+  /// capitals up to "MW" fit the nominal pebble inside the ring at these sizes,
+  /// except on the smallest, which has [pebbleXsPair].
+  static const TextStyle pebbleXs = TextStyle(
+    fontFamily: bodyFamily,
+    package: package,
+    fontWeight: FontWeight.w600,
+    fontSize: 12,
+    height: 1,
+    letterSpacing: 0,
+    fontFeatures: _tabular,
+  );
+
+  /// Two initials on the smallest pebble: 10 px, so "MW" fits inside the ring
+  /// of a 28 px pebble.
+  static const TextStyle pebbleXsPair = TextStyle(
+    fontFamily: bodyFamily,
+    package: package,
+    fontWeight: FontWeight.w600,
+    fontSize: 10,
+    height: 1,
+    letterSpacing: 0,
+    fontFeatures: _tabular,
+  );
+
+  static const TextStyle pebbleSm = TextStyle(
+    fontFamily: bodyFamily,
+    package: package,
+    fontWeight: FontWeight.w600,
+    fontSize: 14,
+    height: 1,
+    letterSpacing: 0,
+    fontFeatures: _tabular,
+  );
+
+  static const TextStyle pebbleMd = TextStyle(
+    fontFamily: bodyFamily,
+    package: package,
+    fontWeight: FontWeight.w600,
+    fontSize: 15,
+    height: 12 / 15,
+    letterSpacing: 0,
+    fontFeatures: _tabular,
+  );
+
+  static const TextStyle pebbleLg = TextStyle(
+    fontFamily: bodyFamily,
+    package: package,
+    fontWeight: FontWeight.w600,
+    fontSize: 20,
+    height: 1,
+    letterSpacing: 0,
+    fontFeatures: _tabular,
+  );
+
+  static const TextStyle pebbleXl = TextStyle(
+    fontFamily: displayFamily,
+    package: package,
+    fontWeight: FontWeight.w600,
+    fontSize: 28,
+    fontVariations: [FontVariation.opticalSize(28)],
+    height: 1,
+    letterSpacing: 0,
+    fontFeatures: _tabular,
+  );
+
   /// Every style by its JSON name, compared against the JSON by the parity
   /// test.
   static const Map<String, TextStyle> values = {
@@ -114,6 +183,12 @@ abstract final class AppTypography {
     'body': body,
     'label': label,
     'label-lg': labelLg,
+    'pebble-xs': pebbleXs,
+    'pebble-xs-pair': pebbleXsPair,
+    'pebble-sm': pebbleSm,
+    'pebble-md': pebbleMd,
+    'pebble-lg': pebbleLg,
+    'pebble-xl': pebbleXl,
     'caption': caption,
   };
 
