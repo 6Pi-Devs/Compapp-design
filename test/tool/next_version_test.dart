@@ -107,6 +107,47 @@ void main() {
       expect(next('v1.0.0', const [commit]), '1.0.1');
     });
 
+    test('a footer followed by a Signed-off-by paragraph still counts', () {
+      const commit = CommitMessage(
+        'fix: x',
+        'BREAKING CHANGE: y\n\nSigned-off-by: A Dev <a@b.c>',
+      );
+      expect(next('v1.0.0', const [commit]), '2.0.0');
+    });
+
+    test('a footer followed by a Co-authored-by paragraph still counts', () {
+      const commit = CommitMessage(
+        'fix: x',
+        'Why.\n\nBREAKING CHANGE: y\n\nCo-authored-by: A Dev <a@b.c>',
+      );
+      expect(next('v1.0.0', const [commit]), '2.0.0');
+    });
+
+    test('a footer block spread over two trailing paragraphs counts', () {
+      const commit = CommitMessage(
+        'fix: x',
+        'Why.\n\nBREAKING CHANGE: y\n\nRefs: #1\nReviewed-by: B\n\n'
+            'Signed-off-by: A',
+      );
+      expect(next('v0.5.0', const [commit]), '0.6.0');
+    });
+
+    test('a breaking footer above a prose paragraph is ignored', () {
+      const commit = CommitMessage(
+        'fix: x',
+        'BREAKING CHANGE: y\n\nSome closing prose, not a footer.',
+      );
+      expect(next('v1.0.0', const [commit]), '1.0.1');
+    });
+
+    test('a one-paragraph body that only mentions the footer is ignored', () {
+      const commit = CommitMessage(
+        'docs: explain breaking changes',
+        'Use a footer like\nBREAKING CHANGE: describe it',
+      );
+      expect(next('v1.0.0', const [commit]), '1.0.1');
+    });
+
     test('breaking wins over feat', () {
       expect(
         next('v1.0.0', const [
@@ -151,6 +192,11 @@ void main() {
         ]),
         'v0.1.0',
       );
+    });
+
+    test('ignores tags with leading zeros', () {
+      expect(latestReleaseTag(['v0.1.0', 'v0.02.0', 'v00.3.0']), 'v0.1.0');
+      expect(latestReleaseTag(['v0.02.0']), isNull);
     });
 
     test('returns null when no tag is a strict release', () {
@@ -223,6 +269,8 @@ void main() {
       expect(SemVer.tryParse('v1.2'), isNull);
       expect(SemVer.tryParse('latest'), isNull);
       expect(SemVer.tryParse('v1.2.3-rc.1'), isNull);
+      expect(SemVer.tryParse('v1.02.3'), isNull);
+      expect(SemVer.tryParse('v1.0.0'), isNotNull);
     });
 
     test('compareTo orders numerically', () {

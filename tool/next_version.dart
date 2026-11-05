@@ -11,9 +11,10 @@ class SemVer implements Comparable<SemVer> {
   const new(this.major, this.minor, this.patch);
 
   /// Parses a strict `X.Y.Z` with an optional leading `v`, or returns null.
-  /// Prerelease and build suffixes are rejected.
+  /// Prerelease and build suffixes and leading zeros (`v0.02.0`) are rejected.
   static SemVer? tryParse(String tag) {
-    final match = RegExp(r'^v?(\d+)\.(\d+)\.(\d+)$').firstMatch(tag.trim());
+    final match = RegExp(r'^v?(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$')
+        .firstMatch(tag.trim());
     if (match == null) return null;
     return SemVer(
       int.parse(match.group(1)!),
@@ -117,13 +118,27 @@ final _conventional = RegExp(r'^(\w+)(\([^()]*\))?(!)?: \S');
 String? _conventionalType(String subject) =>
     _conventional.firstMatch(subject)?.group(1)?.toLowerCase();
 
+// `Key: value` or `Key #value`, with BREAKING CHANGE allowed as a key.
+final _footerLine = RegExp(r'^(BREAKING[ -]CHANGE|[\w-]+)(: | #)');
+final _breakingLine = RegExp('^BREAKING[ -]CHANGE: ');
+
 bool _isBreaking(CommitMessage commit) {
   if (_conventional.firstMatch(commit.subject)?.group(3) != null) return true;
+  // Walk the body paragraphs from the end while every line looks like a
+  // footer, so `Signed-off-by:` or `Co-authored-by:` paragraphs after the
+  // BREAKING CHANGE paragraph do not hide it, and prose that merely mentions
+  // it does not count.
   final paragraphs = commit.body.trim().split(RegExp(r'\n\s*\n'));
-  return RegExp(
-    '^BREAKING[ -]CHANGE:',
-    multiLine: true,
-  ).hasMatch(paragraphs.last);
+  for (final paragraph in paragraphs.reversed) {
+    final lines = paragraph
+        .split('\n')
+        .map((line) => line.trimRight())
+        .where((line) => line.isNotEmpty)
+        .toList();
+    if (lines.isEmpty || !lines.every(_footerLine.hasMatch)) return false;
+    if (lines.any(_breakingLine.hasMatch)) return true;
+  }
+  return false;
 }
 
 String? _git(List<String> args) {

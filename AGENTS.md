@@ -201,7 +201,7 @@ The next version is computed from the non-merge commits (subjects and footers) s
 
 | Commits since the last tag | Bump |
 |----------------------------|------|
-| Breaking change: a renamed or removed public token, widget or prop. Mark it with `!` in the subject (`feat(button)!: rename prop`). A `BREAKING CHANGE:` footer in the last paragraph of the body counts too | major from `1.0.0`, minor while the version is `0.x` |
+| Breaking change: a renamed or removed public token, widget or prop. Mark it with `!` in the subject (`feat(button)!: rename prop`). A `BREAKING CHANGE:` footer counts too, as long as only footer lines (`Key: value`, such as `Signed-off-by:`) follow it | major from `1.0.0`, minor while the version is `0.x` |
 | Any `feat` | minor |
 | Anything else (`fix`, `refactor`, `perf`, `docs`, `test`, `ci`, `chore`, `build`, `style`) | patch |
 
@@ -216,7 +216,7 @@ Give the PR a Conventional Commit title that carries the highest type among its 
 
 To release, from `main`:
 
-1. Wait for the CI run on the commit you are releasing to succeed. The workflow refuses to release a commit whose `ci.yml` push run is missing, running or not green, dry runs included.
+1. Wait for the CI run on the commit you are releasing to succeed. A later push cancels pending push runs, so if that run was cancelled, re-run it first. The workflow refuses to release a commit whose `ci.yml` push run is missing, running or not green, dry runs included.
 2. Optionally preview the version: `gh workflow run release.yml --ref main -f dry_run=true`.
 3. Run the Release workflow: `gh workflow run release.yml --ref main`, or the Actions tab, Release, Run workflow, branch `main`. It also fails when there are no commits since the last tag or when the computed tag already exists. The `main`-only check is advisory: a branch carries its own copy of `release.yml`, so it stops a mistaken dispatch, not a deliberate one.
 4. The workflow tags the commit and creates the GitHub Release with generated notes.

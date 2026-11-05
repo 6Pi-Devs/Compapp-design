@@ -51,7 +51,7 @@ Requires Flutter 3.47.9 (see `pubspec.yaml`).
 The git tag is the only version. A `feat` since the last tag bumps the minor version, anything else the patch (breaking changes: major from 1.0.0, minor before). See [AGENTS.md](AGENTS.md#releases).
 
 1. Merge to `main`.
-2. Run the Release workflow on `main`: `gh workflow run release.yml --ref main` (add `-f dry_run=true` to only print the version), or the Actions tab. CI must be green on that commit.
+2. Run the Release workflow on `main`: `gh workflow run release.yml --ref main` (add `-f dry_run=true` to only print the version), or the Actions tab. CI must be green on that commit: a later push cancels pending runs, so re-run a cancelled one first.
 3. It tags the commit and creates the GitHub Release with generated notes, built from PR titles, so give each PR a Conventional Commit title with the highest type among its commits.
 4. In the app, bump the `ref` in `pubspec.yaml`, run `flutter pub get`, and commit `pubspec.yaml` and `pubspec.lock`.
 
