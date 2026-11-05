@@ -2,6 +2,7 @@
 library;
 
 export 'src/compapp_design.dart';
+export 'src/theme/compapp_theme.dart';
 export 'src/tokens/app_colors.dart';
 export 'src/tokens/app_colors_context.dart';
 export 'src/tokens/app_motion.dart';
