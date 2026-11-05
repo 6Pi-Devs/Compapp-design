@@ -1,0 +1,95 @@
+name: Release
+
+# On demand. Computes the next version from the commits since the highest
+# `vX.Y.Z` tag (see AGENTS.md, "Releases") and publishes a GitHub Release with
+# generated notes. Creating the release creates the tag. A dry run does every
+# check and only skips the release.
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Only print the computed version, do not create the release
+        type: boolean
+        default: false
+
+# Real releases queue behind each other. A dry run has its own group, so it
+# never cancels or delays a pending release.
+concurrency:
+  group: release-${{ inputs.dry_run }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      # Advisory: a branch carries its own copy of this file, so this only
+      # stops a mistaken dispatch from another branch.
+      - name: Require main
+        env:
+          REF: ${{ github.ref }}
+        run: |
+          if [ "$REF" != "refs/heads/main" ]; then
+            echo "::error::Releases are cut from main only (ran on $REF)."
+            exit 1
+          fi
+
+      - name: Require a green CI run on this commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          conclusion="$(gh run list --workflow ci.yml --commit "$GITHUB_SHA" \
+            --event push --json conclusion --jq '.[0].conclusion // empty')"
+          if [ "$conclusion" != "success" ]; then
+            echo "::error::CI on $GITHUB_SHA has not succeeded (conclusion: ${conclusion:-none or still running}). Wait for a green run on main."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version-file: pubspec.yaml
+          channel: stable
+          cache: true
+
+      - name: Compute next version
+        id: version
+        run: |
+          status=0
+          version="$(dart tool/next_version.dart)" || status=$?
+          if [ "$status" -eq 1 ]; then
+            echo "::error::Nothing to release: no commits since the last release tag."
+            exit 1
+          elif [ "$status" -ne 0 ]; then
+            echo "::error::Could not compute the next version (exit $status), see the log above."
+            exit 1
+          fi
+          if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Unexpected version output: $version"
+            exit 1
+          fi
+          if git rev-parse -q --verify "refs/tags/v$version" >/dev/null; then
+            echo "::error::Tag v$version already exists."
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Next version: v$version" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Create release
+        if: ${{ !inputs.dry_run }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          gh release create "v$VERSION" \
+            --target "$GITHUB_SHA" \
+            --generate-notes \
+            --title "v$VERSION"

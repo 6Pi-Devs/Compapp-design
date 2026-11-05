@@ -16,7 +16,7 @@ dependencies:
       ref: vX.Y.Z
 ```
 
-Bump the tag to upgrade. Releases are listed in [CHANGELOG.md](CHANGELOG.md).
+Bump the tag to upgrade. Releases and their notes are listed on the [Releases page](https://github.com/6Pi-Devs/Compapp-design/releases).
 
 ```dart
 import 'package:compapp_design/compapp_design.dart';
@@ -48,10 +48,14 @@ Requires Flutter 3.47.9 (see `pubspec.yaml`).
 
 ## Release
 
-1. Bump `version` in `pubspec.yaml`.
-2. Move the `CHANGELOG.md` Unreleased entries under the new version.
-3. Tag the merge commit `vX.Y.Z` and push the tag.
-4. Bump the `ref` in the app.
+The git tag is the only version. A `feat` since the last tag bumps the minor version, anything else the patch (breaking changes: major from 1.0.0, minor before). See [AGENTS.md](AGENTS.md#releases).
+
+1. Merge to `main`.
+2. Run the Release workflow on `main`: `gh workflow run release.yml --ref main` (add `-f dry_run=true` to only print the version), or the Actions tab. CI must be green on that commit: a later push cancels pending runs, so re-run a cancelled one first.
+3. It tags the commit and creates the GitHub Release with generated notes, built from PR titles, so give each PR a Conventional Commit title with the highest type among its commits.
+4. In the app, bump the `ref` in `pubspec.yaml`, run `flutter pub get`, and commit `pubspec.yaml` and `pubspec.lock`.
+
+Preview the next version locally with `git fetch --tags && dart tool/next_version.dart`.
 
 ## Contributing
 

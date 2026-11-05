@@ -46,6 +46,7 @@ lib/
 tokens/compapp.tokens.json   source of truth for every token (DTCG-style JSON)
 components.json             machine-readable component manifest
 widgetbook/                 catalog app (path dependency on this package)
+tool/                       repo tooling such as next_version.dart, not part of the package API
 fonts/                      bundled Bricolage Grotesque and Instrument Sans, with OFL licenses
 ```
 
@@ -64,7 +65,7 @@ fonts/                      bundled Bricolage Grotesque and Instrument Sans, wit
 
 `BuildContext` is read only for `Theme`, `MediaQuery` and `Directionality`. View models (`MemberView`, `RoomView`) and shared enums (`AppIcons`) live in `lib/src/models/`: plain immutable data owned by this package, importable from every level, exempt from the manifest. The app maps its business objects to them. Nothing in `models` imports upward.
 
-Imports under `lib/` are `package:compapp_design/...`. Tests may import `test/helpers/` with a relative path.
+Imports under `lib/` are `package:compapp_design/...`. Tests may import `test/helpers/` and `tool/` with a relative path (`tool/` sits outside `lib/`, so it has no package URI).
 
 ### Naming
 
@@ -187,7 +188,7 @@ The sheet shadow uses the light ink color at 18% in both themes, so it darkens t
 
 ## Releases
 
-Releases are semver tags `vX.Y.Z`. The app pins a tag in its `pubspec.yaml`:
+Releases are semver git tags `vX.Y.Z`, each with a GitHub Release. The tag is the only version: `pubspec.yaml` has no `version`, and there is no changelog. The app pins a tag in its `pubspec.yaml`:
 
 ```yaml
 compapp_design:
@@ -196,14 +197,30 @@ compapp_design:
     ref: vX.Y.Z
 ```
 
-Rules: a renamed or removed public token, widget or prop is a major change (a minor while the version is `0.x`).
+The next version is computed from the non-merge commits (subjects and footers) since the highest `vX.Y.Z` tag merged into `main`, starting from `0.0.0` when there is no tag. Prerelease and malformed tags (`v0.2.0-rc1`, `v1.2`) are ignored. Only well-formed Conventional Commits count: `type(scope): description` with the colon directly after the type or scope and one space after it. `feat:x`, `feat : x` and `feat!(x):` count as plain patch commits.
 
-To release:
+| Commits since the last tag | Bump |
+|----------------------------|------|
+| Breaking change: a renamed or removed public token, widget or prop. Mark it with `!` in the subject (`feat(button)!: rename prop`). A `BREAKING CHANGE:` footer counts too, as long as only footer lines (`Key: value`, such as `Signed-off-by:`) follow it | major from `1.0.0`, minor while the version is `0.x` |
+| Any `feat` | minor |
+| Anything else (`fix`, `refactor`, `perf`, `docs`, `test`, `ci`, `chore`, `build`, `style`) | patch |
 
-1. Bump `version` in `pubspec.yaml` to `X.Y.Z`.
-2. Move the `CHANGELOG.md` Unreleased entries under a `[X.Y.Z]` heading with the date.
-3. Merge, then tag the merge commit `vX.Y.Z` and push the tag.
-4. Bump the `ref` in the app.
+`tool/next_version.dart` implements the rule and `test/tool/next_version_test.dart` covers it. Preview the next version locally with `git fetch --tags && dart tool/next_version.dart`. It exits non-zero when there is nothing to release or when the computed tag already exists.
+
+PRs are merged with merge commits, so two things use different sources:
+
+- The version bump reads the commits inside the PR (merge commits are skipped).
+- The GitHub release notes list the merged PR titles since the previous tag.
+
+Give the PR a Conventional Commit title that carries the highest type among its commits (`feat` if any commit is a `feat`, and `!` if any is breaking), so the notes and the version agree.
+
+To release, from `main`:
+
+1. Wait for the CI run on the commit you are releasing to succeed. A later push cancels pending push runs, so if that run was cancelled, re-run it first. The workflow refuses to release a commit whose `ci.yml` push run is missing, running or not green, dry runs included.
+2. Optionally preview the version: `gh workflow run release.yml --ref main -f dry_run=true`.
+3. Run the Release workflow: `gh workflow run release.yml --ref main`, or the Actions tab, Release, Run workflow, branch `main`. It also fails when there are no commits since the last tag or when the computed tag already exists. The `main`-only check is advisory: a branch carries its own copy of `release.yml`, so it stops a mistaken dispatch, not a deliberate one.
+4. The workflow tags the commit and creates the GitHub Release with generated notes.
+5. In the app, bump the `ref` in its `pubspec.yaml`, run `flutter pub get`, and commit `pubspec.yaml` and `pubspec.lock`.
 
 ## Comments
 
@@ -222,5 +239,4 @@ Code explains itself through names. Keep comments rare.
 - [ ] Tokens changed in JSON and Dart together, parity test green
 - [ ] Format check (as CI) clean and `flutter analyze --fatal-infos` reports 0 issues
 - [ ] No generated files committed
-- [ ] `CHANGELOG.md` updated
-- [ ] Conventional Commit messages
+- [ ] Conventional Commit messages and PR title (the release notes are built from PR titles)
