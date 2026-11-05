@@ -47,6 +47,10 @@ void main() {
         expect(theme.scaffoldBackgroundColor, palette.ground);
       });
 
+      test('gives icons the ink color', () {
+        expect(theme.iconTheme.color, palette.ink);
+      });
+
       test('carries the AppColors extension', () {
         expect(theme.extension<AppColors>(), extras);
       });

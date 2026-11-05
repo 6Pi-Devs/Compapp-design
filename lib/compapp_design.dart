@@ -1,7 +1,9 @@
 /// Compapp design system: tokens and atomic widgets.
 library;
 
+export 'src/atoms/app_icon.dart';
 export 'src/compapp_design.dart';
+export 'src/models/app_icons.dart';
 export 'src/theme/compapp_theme.dart';
 export 'src/tokens/app_colors.dart';
 export 'src/tokens/app_colors_context.dart';
