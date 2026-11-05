@@ -173,6 +173,29 @@ abstract final class AppTypography {
     fontFeatures: _tabular,
   );
 
+  /// Number in a count badge. The 18 px line is the smallest side of the
+  /// badge, so a scaled line keeps its breathing room.
+  static const TextStyle badgeCount = TextStyle(
+    fontFamily: bodyFamily,
+    package: package,
+    fontWeight: FontWeight.w600,
+    fontSize: 11,
+    height: 18 / 11,
+    letterSpacing: 0,
+    fontFeatures: _tabular,
+  );
+
+  /// Text of a label badge.
+  static const TextStyle badgeLabel = TextStyle(
+    fontFamily: bodyFamily,
+    package: package,
+    fontWeight: FontWeight.w600,
+    fontSize: 12,
+    height: 16 / 12,
+    letterSpacing: 0,
+    fontFeatures: _tabular,
+  );
+
   /// Every style by its JSON name, compared against the JSON by the parity
   /// test.
   static const Map<String, TextStyle> values = {
@@ -189,6 +212,8 @@ abstract final class AppTypography {
     'pebble-md': pebbleMd,
     'pebble-lg': pebbleLg,
     'pebble-xl': pebbleXl,
+    'badge-count': badgeCount,
+    'badge-label': badgeLabel,
     'caption': caption,
   };
 

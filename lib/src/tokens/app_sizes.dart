@@ -83,6 +83,15 @@ abstract final class AppSizes {
   /// Unread dot, a little larger than [dot] (`size.dot-unread`).
   static const double dotUnread = 10;
 
+  /// Smallest side of a count badge (`size.badge-count`).
+  static const double badgeCount = 18;
+
+  /// Horizontal padding of a count badge (`size.badge-count-padding`).
+  static const double badgeCountPadding = 5;
+
+  /// Corner radius of a label badge (`size.badge-label-radius`).
+  static const double badgeLabelRadius = 8;
+
   /// Every token by its JSON name, checked by the parity test.
   static const Map<String, double> values = {
     'target.min': minTarget,
@@ -111,5 +120,8 @@ abstract final class AppSizes {
     'size.border-dashed': borderDashed,
     'size.dot': dot,
     'size.dot-unread': dotUnread,
+    'size.badge-count': badgeCount,
+    'size.badge-count-padding': badgeCountPadding,
+    'size.badge-label-radius': badgeLabelRadius,
   };
 }

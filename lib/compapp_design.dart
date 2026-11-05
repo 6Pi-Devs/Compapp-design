@@ -1,6 +1,7 @@
 /// Compapp design system: tokens and atomic widgets.
 library;
 
+export 'src/atoms/app_badge.dart';
 export 'src/atoms/app_button.dart';
 export 'src/atoms/app_chip.dart';
 export 'src/atoms/app_code_input.dart';

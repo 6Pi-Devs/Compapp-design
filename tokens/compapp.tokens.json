@@ -44,6 +44,8 @@
     "pebble-md": { "$type": "typography", "$value": { "fontFamily": "Instrument Sans", "fontWeight": 600, "fontSize": "15px", "lineHeight": "12px" } },
     "pebble-lg": { "$type": "typography", "$value": { "fontFamily": "Instrument Sans", "fontWeight": 600, "fontSize": "20px", "lineHeight": "20px" } },
     "pebble-xl": { "$type": "typography", "$value": { "fontFamily": "Bricolage Grotesque", "fontWeight": 600, "fontSize": "28px", "lineHeight": "28px" } },
+    "badge-count": { "$type": "typography", "$value": { "fontFamily": "Instrument Sans", "fontWeight": 600, "fontSize": "11px", "lineHeight": "18px" } },
+    "badge-label": { "$type": "typography", "$value": { "fontFamily": "Instrument Sans", "fontWeight": 600, "fontSize": "12px", "lineHeight": "16px" } },
     "caption": { "$type": "typography", "$value": { "fontFamily": "Instrument Sans", "fontWeight": 400, "fontSize": "12px", "lineHeight": "16px" } }
   },
   "space": {
@@ -103,7 +105,10 @@
     "pebble-badge-offset": { "$type": "dimension", "$value": "4px", "$description": "how far a pebble badge hangs outside the pebble" },
     "border-dashed": { "$type": "dimension", "$value": "1.5px", "$description": "border of an invited pebble, drawn dashed" },
     "dot": { "$type": "dimension", "$value": "8px", "$description": "status dot beside a label" },
-    "dot-unread": { "$type": "dimension", "$value": "10px", "$description": "unread dot, a little larger than dot" }
+    "dot-unread": { "$type": "dimension", "$value": "10px", "$description": "unread dot, a little larger than dot" },
+    "badge-count": { "$type": "dimension", "$value": "18px", "$description": "smallest side of a count badge, it grows with its text" },
+    "badge-count-padding": { "$type": "dimension", "$value": "5px", "$description": "horizontal padding of a count badge" },
+    "badge-label-radius": { "$type": "dimension", "$value": "8px", "$description": "corner radius of a label badge" }
   },
   "state-layer": {
     "pressed-primary": { "$type": "number", "$value": 0.12, "$description": "ink over a primary fill when pressed" },
