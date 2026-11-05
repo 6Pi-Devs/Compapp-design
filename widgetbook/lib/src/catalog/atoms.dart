@@ -3,6 +3,7 @@ import 'package:compapp_design_widgetbook/src/catalog/atoms/app_chip_use_cases.d
 import 'package:compapp_design_widgetbook/src/catalog/atoms/app_code_input_use_cases.dart';
 import 'package:compapp_design_widgetbook/src/catalog/atoms/app_icon_use_cases.dart';
 import 'package:compapp_design_widgetbook/src/catalog/atoms/app_pebble_use_cases.dart';
+import 'package:compapp_design_widgetbook/src/catalog/atoms/app_status_dot_use_cases.dart';
 import 'package:compapp_design_widgetbook/src/catalog/atoms/app_switch_use_cases.dart';
 import 'package:compapp_design_widgetbook/src/catalog/atoms/app_text_field_use_cases.dart';
 import 'package:widgetbook/widgetbook.dart';
@@ -16,4 +17,5 @@ List<WidgetbookComponent> buildAtoms() => [
   buildAppTextField(),
   buildAppCodeInput(),
   buildAppPebble(),
+  buildAppStatusDot(),
 ];

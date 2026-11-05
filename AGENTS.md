@@ -223,6 +223,7 @@ To add or update a golden (a new atom, or an intentional visual change):
 | `font.pebble-xs` to `pebble-xl`, `pebble-xs-pair` | `AppTypography.pebbleXs` to `pebbleXl` (600, 12, 14, 15, 20 Instrument Sans and 28 Bricolage; `pebbleXsPair` is 10 px, for two initials on the smallest pebble; line height equal to size, except 12 for the 15 px one so it clears the badges of a 44 px pebble): initials of `AppPebble` |
 | `size.pebble-badge`, `pebble-badge-glyph`, `pebble-badge-offset` | `AppSizes.pebbleBadge*`: away and admin badges (20 box, 11 glyph), drawn from s44 up, and how far they hang outside |
 | `size.border-dashed` | `AppSizes.borderDashed` (1.5): dashed outline of an invited pebble |
+| `size.dot`, `dot-unread` | `AppSizes.dot` (8), `dotUnread` (10): `AppStatusDot` |
 | `size.border-emphasis`, `focus-ring` | `AppSizes.borderEmphasis` (2, selected, focus and error borders), `focusRing` (4, primary-soft ring around a focused field) |
 | `size.code-cell-width`, `code-cell-height` | `AppSizes.codeCellWidth` (56), `codeCellHeight` (60) |
 | `state-layer.*` | `AppStateLayers`: ink opacity over a fill when pressed (primary 12%, surface 8%, danger 16%) and the spinner track (35%) |

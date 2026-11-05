@@ -238,6 +238,25 @@
         "Atoms/AppPebble/s72-you",
         "Atoms/AppPebble/s72-admin"
       ]
+    },
+    {
+      "id": "app-status-dot",
+      "level": "atom",
+      "class": "AppStatusDot",
+      "path": "atoms/app_status_dot.dart",
+      "props": [
+        { "name": "status", "type": "AppDotStatus", "required": true }
+      ],
+      "variants": ["dot"],
+      "states": ["home", "away", "busy", "unread"],
+      "semantics": "Decorative and excluded from semantics: the dot has no label. It always sits next to the text that names the status and is never the only cue (home and busy differ only by hue), so it must never stand alone",
+      "key": "none",
+      "stories": [
+        "Atoms/AppStatusDot/dot-home",
+        "Atoms/AppStatusDot/dot-away",
+        "Atoms/AppStatusDot/dot-busy",
+        "Atoms/AppStatusDot/dot-unread"
+      ]
     }
   ]
 }

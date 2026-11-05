@@ -101,7 +101,9 @@
     "pebble-badge": { "$type": "dimension", "$value": "20px", "$description": "side of the away and admin badges, drawn on a medium pebble and up" },
     "pebble-badge-glyph": { "$type": "dimension", "$value": "11px", "$description": "glyph inside pebble-badge" },
     "pebble-badge-offset": { "$type": "dimension", "$value": "4px", "$description": "how far a pebble badge hangs outside the pebble" },
-    "border-dashed": { "$type": "dimension", "$value": "1.5px", "$description": "border of an invited pebble, drawn dashed" }
+    "border-dashed": { "$type": "dimension", "$value": "1.5px", "$description": "border of an invited pebble, drawn dashed" },
+    "dot": { "$type": "dimension", "$value": "8px", "$description": "status dot beside a label" },
+    "dot-unread": { "$type": "dimension", "$value": "10px", "$description": "unread dot, a little larger than dot" }
   },
   "state-layer": {
     "pressed-primary": { "$type": "number", "$value": 0.12, "$description": "ink over a primary fill when pressed" },

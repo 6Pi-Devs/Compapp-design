@@ -77,6 +77,12 @@ abstract final class AppSizes {
   /// Border of an invited pebble, drawn dashed (`size.border-dashed`).
   static const double borderDashed = 1.5;
 
+  /// Status dot beside a label (`size.dot`).
+  static const double dot = 8;
+
+  /// Unread dot, a little larger than [dot] (`size.dot-unread`).
+  static const double dotUnread = 10;
+
   /// Every token by its JSON name, checked by the parity test.
   static const Map<String, double> values = {
     'target.min': minTarget,
@@ -103,5 +109,7 @@ abstract final class AppSizes {
     'size.pebble-badge-glyph': pebbleBadgeGlyph,
     'size.pebble-badge-offset': pebbleBadgeOffset,
     'size.border-dashed': borderDashed,
+    'size.dot': dot,
+    'size.dot-unread': dotUnread,
   };
 }
