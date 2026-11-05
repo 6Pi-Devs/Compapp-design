@@ -98,6 +98,9 @@ abstract final class AppSizes {
   /// Stroke of a progress ring, track and arc (`size.ring-stroke`).
   static const double ringStroke = 4;
 
+  /// Height of the freshness bar (`size.freshness-bar`).
+  static const double freshnessBar = 4;
+
   /// Every token by its JSON name, checked by the parity test.
   static const Map<String, double> values = {
     'target.min': minTarget,
@@ -131,5 +134,6 @@ abstract final class AppSizes {
     'size.badge-label-radius': badgeLabelRadius,
     'size.ring': ring,
     'size.ring-stroke': ringStroke,
+    'size.freshness-bar': freshnessBar,
   };
 }

@@ -308,6 +308,26 @@
         "Atoms/AppProgressRing/determinate-busy",
         "Atoms/AppProgressRing/determinate-primary"
       ]
+    },
+    {
+      "id": "app-freshness-bar",
+      "level": "atom",
+      "class": "AppFreshnessBar",
+      "path": "atoms/app_freshness_bar.dart",
+      "props": [
+        { "name": "ageDays", "type": "int", "required": true, "default": "calendar days since the task was last done, counted by the app in the home's time zone; zero or less is fresh" },
+        { "name": "semanticLabel", "type": "String?", "required": true, "default": "null leaves the bar out of semantics: the age text beside it says it" }
+      ],
+      "variants": ["bar"],
+      "states": ["fresh", "recent", "fading", "stale"],
+      "semantics": "Image named by semanticLabel with container: true when the label is non-empty (a node of its own under a parent that does not merge; it merges into a merging parent like any semantic child), else decorative and excluded because the age text beside it carries the meaning. It always sits beside that text in a fixed-width column and is never the only cue: the track is the sunken surface, so the end of the bar is not visible. The fill is 100, 85, 60 or 25 percent and no danger color is used",
+      "key": "none",
+      "stories": [
+        "Atoms/AppFreshnessBar/bar-fresh",
+        "Atoms/AppFreshnessBar/bar-recent",
+        "Atoms/AppFreshnessBar/bar-fading",
+        "Atoms/AppFreshnessBar/bar-stale"
+      ]
     }
   ]
 }

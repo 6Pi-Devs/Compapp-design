@@ -5,6 +5,7 @@ export 'src/atoms/app_badge.dart';
 export 'src/atoms/app_button.dart';
 export 'src/atoms/app_chip.dart';
 export 'src/atoms/app_code_input.dart';
+export 'src/atoms/app_freshness_bar.dart';
 export 'src/atoms/app_icon.dart';
 export 'src/atoms/app_pebble.dart';
 export 'src/atoms/app_progress_ring.dart';

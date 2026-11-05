@@ -229,6 +229,8 @@ To add or update a golden (a new atom, or an intentional visual change):
 | `font.ring-label` | `AppTypography.ringLabel` (600, 15, line height equal to size): label in the middle of `AppProgressRing` |
 | `size.ring`, `ring-stroke` | `AppSizes.ring` (56, grows with a large label), `ringStroke` (4): `AppProgressRing` |
 | `progress.ring-sweep`, `ring-breathe` | `AppProgress.ringSweep` (0.3 of the circle, the arc of an in-use ring), `ringBreatheOpacity` (0.4, lowest opacity while it breathes) |
+| `progress.freshness-*` | `AppProgress.freshnessFresh`, `Recent`, `Fading`, `Stale` (1, 0.85, 0.6, 0.25): how much of the freshness bar is filled. `maxAgeDays` (0, 2, 6) is the oldest age in calendar days of each tier |
+| `size.freshness-bar` | `AppSizes.freshnessBar` (4): height of `AppFreshnessBar` |
 | `size.border-emphasis`, `focus-ring` | `AppSizes.borderEmphasis` (2, selected, focus and error borders), `focusRing` (4, primary-soft ring around a focused field) |
 | `size.code-cell-width`, `code-cell-height` | `AppSizes.codeCellWidth` (56), `codeCellHeight` (60) |
 | `state-layer.*` | `AppStateLayers`: ink opacity over a fill when pressed (primary 12%, surface 8%, danger 16%) and the spinner track (35%) |

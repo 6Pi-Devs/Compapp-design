@@ -111,7 +111,8 @@
     "badge-count-padding": { "$type": "dimension", "$value": "5px", "$description": "horizontal padding of a count badge" },
     "badge-label-radius": { "$type": "dimension", "$value": "8px", "$description": "corner radius of a label badge" },
     "ring": { "$type": "dimension", "$value": "56px", "$description": "side of a progress ring, it grows to hold a large label" },
-    "ring-stroke": { "$type": "dimension", "$value": "4px", "$description": "stroke of a progress ring, track and arc" }
+    "ring-stroke": { "$type": "dimension", "$value": "4px", "$description": "stroke of a progress ring, track and arc" },
+    "freshness-bar": { "$type": "dimension", "$value": "4px", "$description": "height of the freshness bar" }
   },
   "state-layer": {
     "pressed-primary": { "$type": "number", "$value": 0.12, "$description": "ink over a primary fill when pressed" },
@@ -121,6 +122,10 @@
   },
   "progress": {
     "ring-sweep": { "$type": "number", "$value": 0.3, "$description": "arc of an in-use ring with no known end, as a fraction of the circle" },
-    "ring-breathe": { "$type": "number", "$value": 0.4, "$description": "lowest opacity of the arc while it breathes" }
+    "ring-breathe": { "$type": "number", "$value": 0.4, "$description": "lowest opacity of the arc while it breathes" },
+    "freshness-fresh": { "$type": "number", "$value": 1, "$description": "fill of the freshness bar of a task done today", "$extensions": { "maxAgeDays": 0 } },
+    "freshness-recent": { "$type": "number", "$value": 0.85, "$description": "fill of a task done one or two days ago", "$extensions": { "maxAgeDays": 2 } },
+    "freshness-fading": { "$type": "number", "$value": 0.6, "$description": "fill of a task done three to six days ago", "$extensions": { "maxAgeDays": 6 } },
+    "freshness-stale": { "$type": "number", "$value": 0.25, "$description": "fill of a task done a week or more ago" }
   }
 }

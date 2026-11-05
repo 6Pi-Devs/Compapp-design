@@ -27,6 +27,8 @@ void main() {
   Object? valueOf(Json node, String name) => child(node, name)[r'$value'];
   Json extensionsOf(Json node, String name) =>
       child(node, name)[r'$extensions'] as Json;
+  Json? extensionsOfOrNull(Json node, String name) =>
+      child(node, name)[r'$extensions'] as Json?;
   Set<String> names(Json node) =>
       node.keys.where((key) => !key.startsWith(r'$')).toSet();
 
@@ -261,6 +263,13 @@ void main() {
         reason: 'progress.$name',
       );
     }
+
+    final aged = {
+      for (final name in names(progress))
+        if (extensionsOfOrNull(progress, name)?['maxAgeDays'] != null)
+          name: extensionsOfOrNull(progress, name)!['maxAgeDays'],
+    };
+    expect(AppProgress.freshnessMaxAgeDays, aged);
   });
 }
 
