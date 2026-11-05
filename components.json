@@ -123,6 +123,75 @@
         "Atoms/AppSwitch/off-default",
         "Atoms/AppSwitch/off-disabled"
       ]
+    },
+    {
+      "id": "app-text-field",
+      "level": "atom",
+      "class": "AppTextField",
+      "path": "atoms/app_text_field.dart",
+      "props": [
+        { "name": "label", "type": "String", "required": true },
+        { "name": "controller", "type": "TextEditingController", "required": true },
+        { "name": "hint", "type": "String?", "required": false },
+        { "name": "helperText", "type": "String?", "required": false },
+        { "name": "errorText", "type": "String?", "required": false },
+        { "name": "obscure", "type": "bool", "required": false, "default": "false" },
+        { "name": "revealSemanticLabel", "type": "String?", "required": false },
+        { "name": "concealSemanticLabel", "type": "String?", "required": false },
+        { "name": "keyboardType", "type": "TextInputType?", "required": false },
+        { "name": "textInputAction", "type": "TextInputAction?", "required": false },
+        { "name": "autofillHints", "type": "Iterable<String>?", "required": false },
+        { "name": "enabled", "type": "bool", "required": false, "default": "true" },
+        { "name": "autofocus", "type": "bool", "required": false, "default": "false" },
+        { "name": "focusNode", "type": "FocusNode?", "required": false },
+        { "name": "onChanged", "type": "ValueChanged<String>?", "required": false },
+        { "name": "onSubmitted", "type": "ValueChanged<String>?", "required": false }
+      ],
+      "variants": ["text", "password"],
+      "states": ["default", "filled", "focus", "error", "error-focus", "disabled"],
+      "semantics": "One text field node named by the visible label, with the hint and value; invalid when errorText is set, and the error is a live region. The show/hide toggle of password is a button named by the label of its next action",
+      "key": "field.<name>",
+      "stories": [
+        "Atoms/AppTextField/text-default",
+        "Atoms/AppTextField/text-filled",
+        "Atoms/AppTextField/text-focus",
+        "Atoms/AppTextField/text-error",
+        "Atoms/AppTextField/text-error-focus",
+        "Atoms/AppTextField/text-disabled",
+        "Atoms/AppTextField/password-default",
+        "Atoms/AppTextField/password-filled",
+        "Atoms/AppTextField/password-focus",
+        "Atoms/AppTextField/password-error",
+        "Atoms/AppTextField/password-error-focus",
+        "Atoms/AppTextField/password-disabled"
+      ]
+    },
+    {
+      "id": "app-code-input",
+      "level": "atom",
+      "class": "AppCodeInput",
+      "path": "atoms/app_code_input.dart",
+      "props": [
+        { "name": "label", "type": "String", "required": true },
+        { "name": "onCompleted", "type": "ValueChanged<String>", "required": true },
+        { "name": "length", "type": "int", "required": false, "default": "6" },
+        { "name": "numeric", "type": "bool", "required": false, "default": "true" },
+        { "name": "controller", "type": "TextEditingController?", "required": false },
+        { "name": "errorText", "type": "String?", "required": false },
+        { "name": "onChanged", "type": "ValueChanged<String>?", "required": false },
+        { "name": "autofocus", "type": "bool", "required": false, "default": "false" },
+        { "name": "focusNode", "type": "FocusNode?", "required": false }
+      ],
+      "variants": ["digits"],
+      "states": ["empty", "partial", "filled", "error"],
+      "semantics": "One text field node named by label whose value is the code entered so far, never one node per cell; invalid when errorText is set, and the error is a live region",
+      "key": "codeInput.digit.<i>",
+      "stories": [
+        "Atoms/AppCodeInput/digits-empty",
+        "Atoms/AppCodeInput/digits-partial",
+        "Atoms/AppCodeInput/digits-filled",
+        "Atoms/AppCodeInput/digits-error"
+      ]
     }
   ]
 }
