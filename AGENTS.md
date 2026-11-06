@@ -179,7 +179,7 @@ To add or update a golden (a new atom, or an intentional visual change):
 - Every token class exposes a `values` map keyed by JSON token name (`AppSpacing.values`, `AppPalette.values`, `AppColors.values`, `AppTypography.values`, and so on). `test/tokens/parity_test.dart` loads the JSON and compares it with those maps in both directions: a token on one side only, or with a different value, fails CI. Add every new token to its class and to `values`, and to the JSON, in the same commit. A constant that is not added to `values` is invisible to the test.
 - `test/tokens/font_manifest_test.dart` checks that every family and weight `AppTypography` uses is declared in `pubspec.yaml`, so renaming a family there fails CI.
 - Dark values live under `$extensions.mode.dark`, as on the canvas Contracts board.
-- Bricolage styles (display, headline, title) set `fontVariations: [FontVariation.opticalSize(fontSize)]` and `fontWeight: w600`. `fontWeight` drives the variable font's `wght` axis, so never add `FontVariation.weight`: it would override `copyWith(fontWeight:)` and iOS Bold Text. Without `opsz` the font renders at its 96 default (display cut), so `opsz` equals the font size, clamped to the axis range 12 to 96, like `font-optical-sizing: auto` in browsers. The JSON records the rule under `font.$extensions.opticalSizing` and the parity test checks it.
+- Bricolage styles (display, headline, title, pebble-xl) set `fontVariations: [FontVariation.opticalSize(fontSize)]` and `fontWeight: w600`. `fontWeight` drives the variable font's `wght` axis, so never add `FontVariation.weight`: it would override `copyWith(fontWeight:)` and iOS Bold Text. Without `opsz` the font renders at its 96 default (display cut), so `opsz` equals the font size, clamped to the axis range 12 to 96, like `font-optical-sizing: auto` in browsers. The JSON records the rule under `font.$extensions.opticalSizing` and the parity test checks it.
 - Never `copyWith(fontSize:)` on a Bricolage style: it keeps the old `opsz`. Add a size token to the JSON and `AppTypography` instead.
 - Styles without tracking in the spec set `letterSpacing: 0`, so Material defaults do not leak in.
 - Fonts are bundled (Bricolage Grotesque as a variable font with `opsz`, `wdth` and `wght` axes; Instrument Sans as static 400 and 600 TTFs) and declared in `pubspec.yaml`. Text styles carry `package: 'compapp_design'` so a consuming app resolves them. Numbers are always tabular, so every style carries `FontFeature.tabularFigures()`.
@@ -203,6 +203,8 @@ To add or update a golden (a new atom, or an intentional visual change):
 | `color.danger-soft` | `ColorScheme.errorContainer` |
 | `color.presence-home`, `presence-away`, `busy`, `busy-soft` | `AppColors.presenceHome`, `presenceAway`, `busy`, `busySoft` |
 | `pebble.*` | `AppColors.pebbles` (sage, sky, apricot, rose, sand, tide), `AppColors.pebbleAt(joinOrder)` |
+| `color.on-presence-away` | `AppColors.onPresenceAway`: glyph of the away badge on `presence-away` |
+| `color.on-pebble` | `AppColors.onPebble`: initials and ring on a pebble. Dark in both themes, because the pebble colors are pastel in both |
 | `font.display`, `headline`, `title` | `TextTheme.displayMedium`, `headlineSmall`, `titleLarge` |
 | `font.body-lg`, `body`, `label`, `caption` | `TextTheme.bodyLarge`, `bodyMedium`, `labelLarge`, `bodySmall` |
 | `font.label-lg` | `AppTypography.labelLg` (15/22, 600). No `TextTheme` slot: the button themes use it for their label |
@@ -217,6 +219,11 @@ To add or update a golden (a new atom, or an intentional visual change):
 | `size.glyph-md`, `glyph-lg` | `AppSizes.glyphMd` (16), `glyphLg` (18): icon or spinner beside a label |
 | `size.spinner-md`, `spinner-lg` | `AppSizes.spinnerMd` (12), `spinnerLg` (13.5): the ring of a spinner, drawn in a glyph box |
 | `size.dash`, `dash-gap` | `AppSizes.dash` (4), `dashGap` (3): dash pattern of a 1 px dashed border, scaled by the border width |
+| `size.pebble-xs` to `pebble-xl` | `AppSizes.pebbleXs` to `pebbleXl` (28, 36, 44, 56, 72): sides of `AppPebble` |
+| `font.pebble-xs` to `pebble-xl`, `pebble-xs-pair` | `AppTypography.pebbleXs` to `pebbleXl` (600, 12, 14, 15, 20 Instrument Sans and 28 Bricolage; `pebbleXsPair` is 10 px, for two initials on the smallest pebble; line height equal to size, except 12 for the 15 px one so it clears the badges of a 44 px pebble): initials of `AppPebble` |
+| `size.pebble-badge`, `pebble-badge-glyph`, `pebble-badge-offset` | `AppSizes.pebbleBadge*`: away and admin badges (20 box, 11 glyph), drawn from s44 up, and how far they hang outside |
+| `size.border-dashed` | `AppSizes.borderDashed` (1.5): dashed outline of an invited pebble |
+| `size.dot`, `dot-unread` | `AppSizes.dot` (8), `dotUnread` (10): `AppStatusDot` |
 | `size.border-emphasis`, `focus-ring` | `AppSizes.borderEmphasis` (2, selected, focus and error borders), `focusRing` (4, primary-soft ring around a focused field) |
 | `size.code-cell-width`, `code-cell-height` | `AppSizes.codeCellWidth` (56), `codeCellHeight` (60) |
 | `state-layer.*` | `AppStateLayers`: ink opacity over a fill when pressed (primary 12%, surface 8%, danger 16%) and the spinner track (35%) |
