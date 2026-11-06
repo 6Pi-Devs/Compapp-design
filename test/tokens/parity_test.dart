@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:compapp_design/src/tokens/app_colors.dart';
 import 'package:compapp_design/src/tokens/app_motion.dart';
 import 'package:compapp_design/src/tokens/app_palette.dart';
+import 'package:compapp_design/src/tokens/app_progress.dart';
 import 'package:compapp_design/src/tokens/app_radius.dart';
 import 'package:compapp_design/src/tokens/app_shadows.dart';
 import 'package:compapp_design/src/tokens/app_sizes.dart';
@@ -26,6 +27,8 @@ void main() {
   Object? valueOf(Json node, String name) => child(node, name)[r'$value'];
   Json extensionsOf(Json node, String name) =>
       child(node, name)[r'$extensions'] as Json;
+  Json? extensionsOfOrNull(Json node, String name) =>
+      child(node, name)[r'$extensions'] as Json?;
   Set<String> names(Json node) =>
       node.keys.where((key) => !key.startsWith(r'$')).toSet();
 
@@ -41,6 +44,7 @@ void main() {
       'target',
       'size',
       'state-layer',
+      'progress',
     ]);
   });
 
@@ -246,6 +250,26 @@ void main() {
         reason: 'state-layer.$name',
       );
     }
+  });
+
+  test('progress matches AppProgress', () {
+    final progress = section('progress');
+
+    expect(AppProgress.values.keys.toSet(), names(progress));
+    for (final name in names(progress)) {
+      expect(
+        AppProgress.values[name],
+        valueOf(progress, name),
+        reason: 'progress.$name',
+      );
+    }
+
+    final aged = {
+      for (final name in names(progress))
+        if (extensionsOfOrNull(progress, name)?['maxAgeDays'] != null)
+          name: extensionsOfOrNull(progress, name)!['maxAgeDays'],
+    };
+    expect(AppProgress.freshnessMaxAgeDays, aged);
   });
 }
 

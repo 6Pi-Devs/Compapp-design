@@ -47,6 +47,60 @@ abstract final class AppSizes {
   /// Height of one code input cell (`size.code-cell-height`).
   static const double codeCellHeight = 60;
 
+  /// Side of the smallest pebble (`size.pebble-xs`).
+  static const double pebbleXs = 28;
+
+  /// Side of a small pebble (`size.pebble-sm`).
+  static const double pebbleSm = 36;
+
+  /// Side of a medium pebble (`size.pebble-md`).
+  static const double pebbleMd = 44;
+
+  /// Side of a large pebble (`size.pebble-lg`).
+  static const double pebbleLg = 56;
+
+  /// Side of the largest pebble (`size.pebble-xl`). Its initials use the
+  /// Bricolage style (`font.pebble-xl`).
+  static const double pebbleXl = 72;
+
+  /// Side of the away and admin badges, drawn on a medium pebble and up
+  /// (`size.pebble-badge`).
+  static const double pebbleBadge = 20;
+
+  /// Glyph inside [pebbleBadge] (`size.pebble-badge-glyph`).
+  static const double pebbleBadgeGlyph = 11;
+
+  /// How far a pebble badge hangs outside the pebble
+  /// (`size.pebble-badge-offset`).
+  static const double pebbleBadgeOffset = 4;
+
+  /// Border of an invited pebble, drawn dashed (`size.border-dashed`).
+  static const double borderDashed = 1.5;
+
+  /// Status dot beside a label (`size.dot`).
+  static const double dot = 8;
+
+  /// Unread dot, a little larger than [dot] (`size.dot-unread`).
+  static const double dotUnread = 10;
+
+  /// Smallest side of a count badge (`size.badge-count`).
+  static const double badgeCount = 18;
+
+  /// Horizontal padding of a count badge (`size.badge-count-padding`).
+  static const double badgeCountPadding = 5;
+
+  /// Corner radius of a label badge (`size.badge-label-radius`).
+  static const double badgeLabelRadius = 8;
+
+  /// Side of a progress ring (`size.ring`). It grows to hold a large label.
+  static const double ring = 56;
+
+  /// Stroke of a progress ring, track and arc (`size.ring-stroke`).
+  static const double ringStroke = 4;
+
+  /// Height of the freshness bar (`size.freshness-bar`).
+  static const double freshnessBar = 4;
+
   /// Every token by its JSON name, checked by the parity test.
   static const Map<String, double> values = {
     'target.min': minTarget,
@@ -64,5 +118,22 @@ abstract final class AppSizes {
     'size.dash-gap': dashGap,
     'size.code-cell-width': codeCellWidth,
     'size.code-cell-height': codeCellHeight,
+    'size.pebble-xs': pebbleXs,
+    'size.pebble-sm': pebbleSm,
+    'size.pebble-md': pebbleMd,
+    'size.pebble-lg': pebbleLg,
+    'size.pebble-xl': pebbleXl,
+    'size.pebble-badge': pebbleBadge,
+    'size.pebble-badge-glyph': pebbleBadgeGlyph,
+    'size.pebble-badge-offset': pebbleBadgeOffset,
+    'size.border-dashed': borderDashed,
+    'size.dot': dot,
+    'size.dot-unread': dotUnread,
+    'size.badge-count': badgeCount,
+    'size.badge-count-padding': badgeCountPadding,
+    'size.badge-label-radius': badgeLabelRadius,
+    'size.ring': ring,
+    'size.ring-stroke': ringStroke,
+    'size.freshness-bar': freshnessBar,
   };
 }

@@ -26,6 +26,40 @@ void main() {
       expect(AppColors.light.lerp(AppColors.dark, 0.5).pebbles, hasLength(6));
     });
 
+    test('copyWith replaces onPebble and onPresenceAway', () {
+      final copy = AppColors.light.copyWith(
+        onPebble: Colors.red,
+        onPresenceAway: Colors.blue,
+      );
+
+      expect(copy.onPebble, Colors.red);
+      expect(copy.onPresenceAway, Colors.blue);
+      expect(copy.busy, AppColors.light.busy);
+      expect(
+        AppColors.light.copyWith().onPresenceAway,
+        AppColors.light.onPresenceAway,
+      );
+    });
+
+    test('lerp blends onPebble and onPresenceAway', () {
+      const light = AppColors.light;
+      final other = light.copyWith(
+        onPebble: const Color(0xFF000000),
+        onPresenceAway: const Color(0xFF000000),
+      );
+
+      expect(light.lerp(other, 0).onPebble, light.onPebble);
+      expect(light.lerp(other, 1).onPebble, other.onPebble);
+      expect(
+        light.lerp(other, 0.5).onPebble,
+        Color.lerp(light.onPebble, other.onPebble, 0.5),
+      );
+      expect(
+        light.lerp(other, 0.5).onPresenceAway,
+        Color.lerp(light.onPresenceAway, other.onPresenceAway, 0.5),
+      );
+    });
+
     test('lerp ignores other theme extensions', () {
       expect(AppColors.light.lerp(null, 0.5), AppColors.light);
     });
