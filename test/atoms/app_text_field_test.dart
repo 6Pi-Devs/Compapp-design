@@ -30,6 +30,9 @@ AppTextField _field(
   bool autofocus = false,
   ValueChanged<String>? onChanged,
   TextInputType? keyboardType,
+  bool? autocorrect,
+  bool? enableSuggestions,
+  bool readOnly = false,
 }) {
   return AppTextField(
     label: 'Email',
@@ -44,6 +47,9 @@ AppTextField _field(
     autofocus: autofocus,
     onChanged: onChanged,
     keyboardType: keyboardType,
+    autocorrect: autocorrect,
+    enableSuggestions: enableSuggestions,
+    readOnly: readOnly,
   );
 }
 
@@ -651,6 +657,249 @@ void main() {
     });
   });
 
+  group('typing aids', () {
+    Future<TextField> pumpField(
+      WidgetTester tester, {
+      TextInputType? keyboardType,
+      bool obscure = false,
+      bool? autocorrect,
+      bool? enableSuggestions,
+    }) async {
+      await tester.pumpWidget(
+        _host(
+          _field(
+            controller,
+            keyboardType: keyboardType,
+            obscure: obscure,
+            autocorrect: autocorrect,
+            enableSuggestions: enableSuggestions,
+          ),
+        ),
+      );
+      return tester.widget<TextField>(_input);
+    }
+
+    testWidgets('plain text keeps autocorrect, suggestions and smart typing', (
+      tester,
+    ) async {
+      final field = await pumpField(tester);
+
+      expect(field.autocorrect, isTrue);
+      expect(field.enableSuggestions, isTrue);
+      expect(field.smartQuotesType, SmartQuotesType.enabled);
+      expect(field.smartDashesType, SmartDashesType.enabled);
+    });
+
+    testWidgets('an email field turns off autocorrect and smart typing', (
+      tester,
+    ) async {
+      final field = await pumpField(
+        tester,
+        keyboardType: TextInputType.emailAddress,
+      );
+
+      expect(field.autocorrect, isFalse);
+      expect(field.enableSuggestions, isTrue);
+      expect(field.smartQuotesType, SmartQuotesType.disabled);
+      expect(field.smartDashesType, SmartDashesType.disabled);
+    });
+
+    testWidgets('a url field turns off autocorrect and smart typing', (
+      tester,
+    ) async {
+      final field = await pumpField(tester, keyboardType: TextInputType.url);
+
+      expect(field.autocorrect, isFalse);
+      expect(field.enableSuggestions, isTrue);
+      expect(field.smartQuotesType, SmartQuotesType.disabled);
+      expect(field.smartDashesType, SmartDashesType.disabled);
+    });
+
+    testWidgets('other keyboards keep autocorrect', (tester) async {
+      final field = await pumpField(tester, keyboardType: TextInputType.number);
+
+      expect(field.autocorrect, isTrue);
+    });
+
+    testWidgets('an obscure field turns off both', (tester) async {
+      final field = await pumpField(tester, obscure: true);
+
+      expect(field.autocorrect, isFalse);
+      expect(field.enableSuggestions, isFalse);
+    });
+
+    testWidgets('a revealed password keeps smart typing off', (tester) async {
+      await tester.pumpWidget(
+        _host(
+          _field(
+            controller,
+            obscure: true,
+            reveal: 'Show password',
+            conceal: 'Hide password',
+          ),
+        ),
+      );
+
+      await tester.tap(find.byType(IconButton));
+      await tester.pump();
+
+      final field = tester.widget<TextField>(_input);
+      expect(field.obscureText, isFalse);
+      expect(field.smartQuotesType, SmartQuotesType.disabled);
+      expect(field.smartDashesType, SmartDashesType.disabled);
+    });
+
+    testWidgets('an override wins over the keyboard default', (tester) async {
+      final field = await pumpField(
+        tester,
+        keyboardType: TextInputType.emailAddress,
+        autocorrect: true,
+        enableSuggestions: false,
+      );
+
+      expect(field.autocorrect, isTrue);
+      expect(field.enableSuggestions, isFalse);
+    });
+
+    testWidgets('an override wins over the obscure default', (tester) async {
+      final field = await pumpField(
+        tester,
+        obscure: true,
+        autocorrect: true,
+        enableSuggestions: true,
+      );
+
+      expect(field.autocorrect, isTrue);
+      expect(field.enableSuggestions, isTrue);
+    });
+
+    testWidgets('false overrides a plain field', (tester) async {
+      final field = await pumpField(
+        tester,
+        autocorrect: false,
+        enableSuggestions: false,
+      );
+
+      expect(field.autocorrect, isFalse);
+      expect(field.enableSuggestions, isFalse);
+    });
+  });
+
+  group('read only', () {
+    testWidgets('is off by default', (tester) async {
+      await tester.pumpWidget(_host(_field(controller)));
+
+      expect(tester.widget<TextField>(_input).readOnly, isFalse);
+    });
+
+    testWidgets('refuses edits but keeps the enabled look and focus', (
+      tester,
+    ) async {
+      controller.text = 'ana@compapp.test';
+      await tester.pumpWidget(_host(_field(controller, readOnly: true)));
+
+      final field = tester.widget<TextField>(_input);
+      expect(field.readOnly, isTrue);
+      expect(field.enabled, isTrue);
+
+      await tester.tap(_input);
+      await tester.pump();
+      final editable = tester.widget<EditableText>(find.byType(EditableText));
+      expect(editable.focusNode.hasFocus, isTrue);
+
+      await tester.enterText(_input, 'other');
+      expect(controller.text, 'ana@compapp.test');
+    });
+
+    testWidgets('closes the keyboard until the field is editable again', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_host(_field(controller, readOnly: true)));
+
+      await tester.tap(_input);
+      await tester.pump();
+      final editable = tester.widget<EditableText>(find.byType(EditableText));
+      expect(editable.focusNode.hasFocus, isTrue);
+      expect(tester.testTextInput.hasAnyClients, isFalse);
+
+      await tester.pumpWidget(_host(_field(controller)));
+      await tester.pump();
+
+      expect(editable.focusNode.hasFocus, isTrue);
+      expect(tester.testTextInput.hasAnyClients, isTrue);
+    });
+
+    testWidgets('together with disabled, the field is disabled', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      controller.text = 'ana@compapp.test';
+      await tester.pumpWidget(
+        _host(
+          _field(
+            controller,
+            obscure: true,
+            reveal: 'Show password',
+            conceal: 'Hide password',
+            readOnly: true,
+            enabled: false,
+          ),
+        ),
+      );
+      final scheme = CompappTheme.light.colorScheme;
+
+      expect(
+        tester.widget<Text>(find.text('Email')).style?.color,
+        scheme.onSurfaceVariant,
+      );
+      expect(
+        tester.widget<TextField>(_input).style?.color,
+        scheme.onSurfaceVariant,
+      );
+      expect(
+        tester.widget<IconButton>(find.byType(IconButton)).onPressed,
+        isNull,
+      );
+      expect(
+        tester.getSemantics(_input),
+        isSemantics(
+          label: 'Email',
+          isTextField: true,
+          hasEnabledState: true,
+          isEnabled: false,
+          isReadOnly: true,
+        ),
+      );
+
+      await tester.tap(_input);
+      await tester.pump();
+      final editable = tester.widget<EditableText>(find.byType(EditableText));
+      expect(editable.focusNode.hasFocus, isFalse);
+      expect(tester.testTextInput.hasAnyClients, isFalse);
+      handle.dispose();
+    });
+
+    testWidgets('the reveal toggle still works', (tester) async {
+      await tester.pumpWidget(
+        _host(
+          _field(
+            controller,
+            obscure: true,
+            readOnly: true,
+            reveal: 'Show password',
+            conceal: 'Hide password',
+          ),
+        ),
+      );
+      expect(tester.widget<TextField>(_input).obscureText, isTrue);
+
+      await tester.tap(find.byType(IconButton));
+      await tester.pump();
+
+      expect(tester.widget<TextField>(_input).obscureText, isFalse);
+    });
+  });
+
   group('semantics', () {
     testWidgets('is one text field node named by the label with the hint', (
       tester,
@@ -765,6 +1014,31 @@ void main() {
           isTextField: true,
           hasEnabledState: true,
           isEnabled: false,
+        ),
+      );
+      handle.dispose();
+    });
+
+    testWidgets('a read-only field is reported read-only and enabled', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(_host(_field(controller)));
+      expect(
+        tester.getSemantics(_input),
+        isSemantics(isTextField: true, isReadOnly: false),
+      );
+
+      await tester.pumpWidget(_host(_field(controller, readOnly: true)));
+
+      expect(
+        tester.getSemantics(_input),
+        isSemantics(
+          label: 'Email',
+          isTextField: true,
+          hasEnabledState: true,
+          isEnabled: true,
+          isReadOnly: true,
         ),
       );
       handle.dispose();

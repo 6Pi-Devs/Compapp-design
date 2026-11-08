@@ -21,6 +21,17 @@ import 'package:flutter/material.dart';
 /// With [obscure] the text is hidden. When both [revealSemanticLabel] and
 /// [concealSemanticLabel] are given, a toggle in the field shows or hides it,
 /// named by the label of the action it will do.
+///
+/// [autocorrect] and [enableSuggestions] default to what the field needs: both
+/// are off for hidden text, autocorrect is also off for email and url
+/// keyboards (a keyboard that "fixes" `jon@` into `john@` turns a valid
+/// address into another valid one). Pass a value to override the default.
+/// Smart quotes and dashes are off for hidden, email and url fields, and stay
+/// off while a password is revealed.
+///
+/// [readOnly] refuses edits but, unlike [enabled], keeps focus and the enabled
+/// look. The soft keyboard closes until the field is editable again, and
+/// hidden [obscure] text cannot be selected.
 class AppTextField extends StatefulWidget {
   const new({
     required this.label,
@@ -32,9 +43,12 @@ class AppTextField extends StatefulWidget {
     this.revealSemanticLabel,
     this.concealSemanticLabel,
     this.keyboardType,
+    this.autocorrect,
+    this.enableSuggestions,
     this.textInputAction,
     this.autofillHints,
     this.enabled = true,
+    this.readOnly = false,
     this.autofocus = false,
     this.focusNode,
     this.onChanged,
@@ -55,11 +69,22 @@ class AppTextField extends StatefulWidget {
   /// Names the toggle while the text is shown, for example "Hide password".
   final String? concealSemanticLabel;
   final TextInputType? keyboardType;
+
+  /// Null means off for [obscure] text and for email and url keyboards, on
+  /// otherwise.
+  final bool? autocorrect;
+
+  /// Null means off for [obscure] text, on otherwise.
+  final bool? enableSuggestions;
   final TextInputAction? textInputAction;
   final Iterable<String>? autofillHints;
 
   /// False renders the disabled state and refuses focus and input.
   final bool enabled;
+
+  /// True keeps the focus and the enabled look but refuses edits. The reveal
+  /// toggle of an [obscure] field still works.
+  final bool readOnly;
   final bool autofocus;
   final FocusNode? focusNode;
   final ValueChanged<String>? onChanged;
@@ -118,6 +143,11 @@ class _AppTextFieldState extends State<AppTextField> {
     final conceal = widget.concealSemanticLabel;
     final showToggle = widget.obscure && reveal != null && conceal != null;
 
+    final keyboardType = widget.keyboardType;
+    final isEmail = keyboardType == TextInputType.emailAddress;
+    final isUrl = keyboardType == TextInputType.url;
+    final plainTyping = widget.obscure || isEmail || isUrl;
+
     final field = Semantics(
       label: widget.label,
       hint: widget.errorText,
@@ -130,9 +160,15 @@ class _AppTextFieldState extends State<AppTextField> {
         enabled: enabled,
         autofocus: widget.autofocus,
         obscureText: widget.obscure && !_revealed,
-        enableSuggestions: !widget.obscure,
-        autocorrect: !widget.obscure,
-        keyboardType: widget.keyboardType,
+        readOnly: widget.readOnly,
+        enableSuggestions: widget.enableSuggestions ?? !widget.obscure,
+        autocorrect: widget.autocorrect ?? !plainTyping,
+        // Null lets TextField keep its own default for the smart options. It
+        // would derive them from obscureText, which turns them back on while
+        // a password is revealed.
+        smartQuotesType: plainTyping ? SmartQuotesType.disabled : null,
+        smartDashesType: plainTyping ? SmartDashesType.disabled : null,
+        keyboardType: keyboardType,
         textInputAction: widget.textInputAction,
         autofillHints: widget.autofillHints,
         onChanged: widget.onChanged,
