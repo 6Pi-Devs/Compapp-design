@@ -13,7 +13,7 @@ import 'helpers/use_case_harness.dart';
 /// scenario. A row that takes "the space that is left" gets none when the
 /// harness sizes a scenario to its content, and the golden would show an empty
 /// scenario.
-const _leastWidth = 200.0;
+const _leastWidth = 100.0;
 const _leastHeight = 40.0;
 
 /// Lays every molecule use case out the way the goldens do, with the real

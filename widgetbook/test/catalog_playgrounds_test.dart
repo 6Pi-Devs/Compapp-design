@@ -178,6 +178,7 @@ void main() {
       ('AppIcon', {'size': '0'}),
       ('MemberRow', {'joinOrder': '-1'}),
       ('MemberRow', {'semanticLabel': ''}),
+      ('ItemBeacon', {'semanticLabel': '', 'inUse': 'true'}),
     ]) {
       testWidgets('$component $knobs', (tester) async {
         await _open(tester, _pathOf(component), knobs: knobs);
@@ -214,6 +215,17 @@ void main() {
       await _open(tester, _pathOf('MemberRow'), knobs: {'joinOrder': '99'});
       row = tester.widget<MemberRow>(find.byType(MemberRow));
       expect(row.member.joinOrder, 11);
+    });
+
+    testWidgets('an item beacon falls back to the sample spoken label', (
+      tester,
+    ) async {
+      await _open(tester, _pathOf('ItemBeacon'), knobs: {'semanticLabel': ''});
+
+      expect(
+        tester.widget<ItemBeacon>(find.byType(ItemBeacon)).semanticLabel,
+        'Washer, free',
+      );
     });
   });
 

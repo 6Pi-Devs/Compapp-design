@@ -104,6 +104,10 @@ abstract final class AppSizes {
   /// Least height of a list row (`size.row`). It grows with its text.
   static const double row = 64;
 
+  /// Side of the glyph tile or the breathing ring of an item beacon
+  /// (`size.beacon`).
+  static const double beacon = 34;
+
   /// Every token by its JSON name, checked by the parity test.
   static const Map<String, double> values = {
     'target.min': minTarget,
@@ -139,5 +143,6 @@ abstract final class AppSizes {
     'size.ring-stroke': ringStroke,
     'size.freshness-bar': freshnessBar,
     'size.row': row,
+    'size.beacon': beacon,
   };
 }

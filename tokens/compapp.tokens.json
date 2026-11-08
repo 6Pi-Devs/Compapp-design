@@ -113,7 +113,8 @@
     "ring": { "$type": "dimension", "$value": "56px", "$description": "side of a progress ring, it grows to hold a large label" },
     "ring-stroke": { "$type": "dimension", "$value": "4px", "$description": "stroke of a progress ring, track and arc" },
     "freshness-bar": { "$type": "dimension", "$value": "4px", "$description": "height of the freshness bar" },
-    "row": { "$type": "dimension", "$value": "64px", "$description": "least height of a list row such as a member row, it grows with its text" }
+    "row": { "$type": "dimension", "$value": "64px", "$description": "least height of a list row such as a member row, it grows with its text" },
+    "beacon": { "$type": "dimension", "$value": "34px", "$description": "side of the glyph tile or of the breathing ring of an item beacon" }
   },
   "state-layer": {
     "pressed-primary": { "$type": "number", "$value": 0.12, "$description": "ink over a primary fill when pressed" },

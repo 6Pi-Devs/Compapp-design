@@ -406,6 +406,33 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       (t) => expect(_widget<MemberRow>(t).trailing, 'Zed'),
     ),
   ],
+  'ItemBeacon': [
+    KnobCase(
+      'name',
+      'Zed',
+      (t) => expect(_widget<ItemBeacon>(t).item.name, 'Zed'),
+    ),
+    KnobCase(
+      'icon',
+      'oven',
+      (t) => expect(_widget<ItemBeacon>(t).item.icon, AppIcons.oven),
+    ),
+    KnobCase(
+      'inUse',
+      'true',
+      (t) => expect(_widget<ItemBeacon>(t).inUse, isTrue),
+    ),
+    KnobCase(
+      'statusLabel',
+      'Zed',
+      (t) => expect(_widget<ItemBeacon>(t).statusLabel, 'Zed'),
+    ),
+    KnobCase(
+      'semanticLabel',
+      'Zed',
+      (t) => expect(_widget<ItemBeacon>(t).semanticLabel, 'Zed'),
+    ),
+  ],
   'AppFreshnessBar': [
     KnobCase(
       'ageDays',

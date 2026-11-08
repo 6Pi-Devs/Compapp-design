@@ -365,6 +365,28 @@
         "Molecules/MemberRow/row-invited",
         "Molecules/MemberRow/row-you"
       ]
+    },
+    {
+      "id": "item-beacon",
+      "level": "molecule",
+      "class": "ItemBeacon",
+      "playground": "Molecules/ItemBeacon/playground",
+      "path": "molecules/item_beacon.dart",
+      "props": [
+        { "name": "item", "type": "ItemView", "required": true, "default": "id, name and the appliance glyph" },
+        { "name": "inUse", "type": "bool", "required": true, "default": "in use: glyph in a breathing busy ring and a busy status text; free: glyph on a sunken tile and a muted one" },
+        { "name": "statusLabel", "type": "String", "required": true, "default": "status line under the name: the time in use, or that it is free" },
+        { "name": "semanticLabel", "type": "String", "required": true, "default": "replaces the visible texts for assistive technology" },
+        { "name": "onTap", "type": "VoidCallback", "required": true }
+      ],
+      "variants": ["beacon"],
+      "states": ["in-use", "free"],
+      "semantics": "One focusable button named by semanticLabel (\"Washer, in use by Carlos, 34 minutes\"), activated by tap, Enter and Space; the ring, the glyph and the visible texts add nothing of their own. Drawn at least 44 tall, hit area at least 48",
+      "key": "floorplan.item.<itemId>",
+      "stories": [
+        "Molecules/ItemBeacon/beacon-in-use",
+        "Molecules/ItemBeacon/beacon-free"
+      ]
     }
   ]
 }
