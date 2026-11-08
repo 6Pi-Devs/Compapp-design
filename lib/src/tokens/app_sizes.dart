@@ -101,6 +101,9 @@ abstract final class AppSizes {
   /// Height of the freshness bar (`size.freshness-bar`).
   static const double freshnessBar = 4;
 
+  /// Least height of a list row (`size.row`). It grows with its text.
+  static const double row = 64;
+
   /// Every token by its JSON name, checked by the parity test.
   static const Map<String, double> values = {
     'target.min': minTarget,
@@ -135,5 +138,6 @@ abstract final class AppSizes {
     'size.ring': ring,
     'size.ring-stroke': ringStroke,
     'size.freshness-bar': freshnessBar,
+    'size.row': row,
   };
 }

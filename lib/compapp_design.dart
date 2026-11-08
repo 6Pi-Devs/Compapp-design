@@ -1,4 +1,4 @@
-/// Compapp design system: tokens and atomic widgets.
+/// Compapp design system: tokens, atoms and molecules.
 library;
 
 export 'src/atoms/app_badge.dart';
@@ -14,6 +14,9 @@ export 'src/atoms/app_switch.dart';
 export 'src/atoms/app_text_field.dart';
 export 'src/compapp_design.dart';
 export 'src/models/app_icons.dart';
+export 'src/models/member_status.dart';
+export 'src/models/member_view.dart';
+export 'src/molecules/member_row.dart';
 export 'src/theme/compapp_theme.dart';
 export 'src/tokens/app_colors.dart';
 export 'src/tokens/app_colors_context.dart';

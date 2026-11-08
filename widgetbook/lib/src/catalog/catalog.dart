@@ -1,4 +1,5 @@
 import 'package:compapp_design_widgetbook/src/catalog/atoms.dart';
+import 'package:compapp_design_widgetbook/src/catalog/molecules.dart';
 import 'package:widgetbook/widgetbook.dart';
 
 /// The whole Widgetbook tree, written by hand. Every fixed use case in it is
@@ -7,7 +8,10 @@ import 'package:widgetbook/widgetbook.dart';
 /// a golden nor a story, and the manifest names it in `playground`.
 List<WidgetbookNode> buildCatalog() {
   final atoms = buildAtoms();
+  final molecules = buildMolecules();
   return [
     if (atoms.isNotEmpty) WidgetbookFolder(name: 'Atoms', children: atoms),
+    if (molecules.isNotEmpty)
+      WidgetbookFolder(name: 'Molecules', children: molecules),
   ];
 }

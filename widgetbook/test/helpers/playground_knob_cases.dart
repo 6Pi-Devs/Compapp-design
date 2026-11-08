@@ -359,6 +359,53 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       (t) => expect(_widget<AppProgressRing>(t).semanticValue, 'Zed'),
     ),
   ],
+  'MemberRow': [
+    KnobCase(
+      'name',
+      'Zed',
+      (t) => expect(_widget<MemberRow>(t).member.name, 'Zed'),
+    ),
+    KnobCase(
+      'initials',
+      'Z',
+      (t) => expect(_widget<MemberRow>(t).member.initials, 'Z'),
+    ),
+    KnobCase(
+      'joinOrder',
+      '3',
+      (t) => expect(_widget<MemberRow>(t).member.joinOrder, 3),
+    ),
+    KnobCase(
+      'status',
+      'away',
+      (t) => expect(_widget<MemberRow>(t).member.status, MemberStatus.away),
+    ),
+    KnobCase(
+      'isYou',
+      'true',
+      (t) => expect(_widget<MemberRow>(t).member.isYou, isTrue),
+    ),
+    KnobCase(
+      'isAdmin',
+      'true',
+      (t) => expect(_widget<MemberRow>(t).member.isAdmin, isTrue),
+    ),
+    KnobCase(
+      'semanticLabel',
+      'Zed',
+      (t) => expect(_widget<MemberRow>(t).member.semanticLabel, 'Zed'),
+    ),
+    KnobCase(
+      'subtitle',
+      'Zed',
+      (t) => expect(_widget<MemberRow>(t).subtitle, 'Zed'),
+    ),
+    KnobCase(
+      'trailing',
+      'Zed',
+      (t) => expect(_widget<MemberRow>(t).trailing, 'Zed'),
+    ),
+  ],
   'AppFreshnessBar': [
     KnobCase(
       'ageDays',

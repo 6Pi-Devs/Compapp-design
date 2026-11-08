@@ -68,7 +68,7 @@ fonts/                      bundled Bricolage Grotesque and Instrument Sans, wit
 | Level | May import | Must not import |
 |-------|------------|-----------------|
 | `tokens` | Flutter `painting` and `material` types | everything else in `src/` |
-| `models` | Dart SDK, Flutter `painting` types, other `models` | `tokens` and everything above |
+| `models` | Dart SDK, Flutter `painting` and `foundation` types (`@immutable`), other `models` | `tokens` and everything above |
 | `theme` | `tokens` | atoms and above |
 | `atoms` | `tokens`, `models`, and `AppIcon` (the only atom an atom may use, so a button can show an icon) | every other atom, molecules and above |
 | `molecules` | `tokens`, `models`, `atoms` | other molecules, organisms and above |
@@ -134,13 +134,14 @@ The analyzer enforces the Dart 3.13 shorthand. Write `const new(this.x)` for the
 - One fixed use case per variant x state listed in the manifest, no more, no fewer, plus exactly one `playground` per component (see [Playgrounds](#playgrounds)).
 - Use case names follow `<Level>/<Class>/<variant>-<state>` (`Atoms/AppButton/primary-disabled`). The manifest `stories`, the Widgetbook tree and the golden file names use the same string.
 - A fixed use case is a plain builder with fixed props, no knobs. The same builder feeds the Widgetbook tree and the tests, so the catalog and the goldens cannot drift. Knobs live only in the `playground`.
-- The tree is written by hand in `widgetbook/lib/src/catalog/` (`catalog.dart` composes `atoms.dart`, one file of use cases per atom). There is no `widgetbook_generator` and no `build_runner`: generated files are never committed, and an explicit tree is easier for agents to read.
+- The tree is written by hand in `widgetbook/lib/src/catalog/` (`catalog.dart` composes `atoms.dart` and `molecules.dart`, one file of use cases per component under `atoms/` and `molecules/`). There is no `widgetbook_generator` and no `build_runner`: generated files are never committed, and an explicit tree is easier for agents to read.
 - Strings in use cases come in English and Spanish: `context.sample(en: ..., es: ...)` picks one by the locale the Widgetbook localization addon sets. Goldens render `en` only.
-- Three generic tests in `widgetbook/test/` loop over the catalog, so a new atom is covered without touching them:
+- Generic tests in `widgetbook/test/` loop over the catalog, so a new atom or molecule is covered without touching them:
   - `catalog_contract_test.dart`: the fixed use case paths equal the union of every manifest `stories` entry, in both directions, follow the naming pattern, and each manifest entry has exactly one story per variant x state. The playgrounds in the tree equal the manifest `playground` paths, one per component.
   - `catalog_goldens_test.dart`: one golden per fixed use case, named after its path, holding four scenarios (light and dark, text scale 1.0 and 2.0).
   - `catalog_semantics_test.dart`: every fixed use case, light and dark, meets `androidTapTargetGuideline`, `iOSTapTargetGuideline` and `labeledTapTargetGuideline`. It also runs `textContrastGuideline`, which finds a text by its semantics label and so is blind to a merged or replaced label: do not rely on it for contrast.
   - `catalog_text_contrast_test.dart`: owns the contrast of every rendered text. It walks the `RenderParagraph`s of every fixed use case, light and dark, reads the text color (`color` or `foreground`, times the opacity of its ancestors) and the nearest opaque fill among the render ancestors (the painted pixels around it when the nearest painting ancestor is a custom painter), and holds each text to 4.5:1. A text it cannot read is reported, not skipped, and a fully transparent one is not painted, so it is not read. `widgetbook/test/helpers/rendered_text_contrast_test.dart` holds the cases it must pass and fail.
+  - `catalog_molecules_layout_test.dart`: every fixed molecule use case is laid out the way the goldens do (intrinsic sizing, real fonts), draws at a visible size in all four scenarios and overflows nowhere. A molecule that expands (a row) gets a fixed width in its use case, and must not use `LayoutBuilder` (the golden harness measures intrinsic sizes).
 - States a static builder cannot reach by gesture are rendered deterministically without a test-only prop on the component, so every golden scenario shows them. Buttons take Material's `statesController` holding `WidgetState.pressed` or `WidgetState.focused` (`StatesControllerHost`). Fields and the code input take a `FocusNode` that reports focus (`FocusedNodeHost`), because only one widget can really hold the primary focus and the four scenarios of a golden render side by side. Spinners freeze under `FrozenMotion` (`MediaQuery.disableAnimations`), so `pumpAndSettle` can finish. The helpers live in `widgetbook/lib/src/support/story_support.dart`.
 - alchemist draws the text of an editable field as blocks, so a golden never proves its text color: component widget tests read the painted pixel instead.
 - Widgetbook shows light and dark (`CompappTheme`), `en` and `es`, text scale and phone viewports through addons.
@@ -192,7 +193,7 @@ To add or update a golden (a new atom, or an intentional visual change):
 
 1. Add its entry to `components.json` first (level, class, playground, path, props, variants, states, semantics, key, stories). `playground` is `<Level>/<Class>/playground`.
 2. Create `lib/src/<level>/<name>.dart` following the [Import rules](#import-rules). Export it from the barrel.
-3. Add `widgetbook/lib/src/catalog/atoms/<name>_use_cases.dart` with one use case per variant x state, and register it in `atoms.dart`. The goldens and the semantics test pick it up on their own.
+3. Add `widgetbook/lib/src/catalog/<level>s/<name>_use_cases.dart` (`atoms/` or `molecules/`) with one use case per variant x state, and register it in `atoms.dart` or `molecules.dart`. The goldens and the semantics test pick it up on their own.
 4. In the same file add the `playground` use case with a knob for every prop (see [Playgrounds](#playgrounds)). The playground smoke test picks it up on its own.
 5. Push, let CI render the Linux golden, download the `ci-goldens` artifact, review the new PNGs and commit them (see [Golden tooling](#golden-tooling)).
 6. Run the [Definition of Done](#definition-of-done) checklist.
@@ -256,6 +257,7 @@ To add or update a golden (a new atom, or an intentional visual change):
 | `progress.ring-sweep`, `ring-breathe` | `AppProgress.ringSweep` (0.3 of the circle, the arc of an in-use ring), `ringBreatheOpacity` (0.4, lowest opacity while it breathes) |
 | `progress.freshness-*` | `AppProgress.freshnessFresh`, `Recent`, `Fading`, `Stale` (1, 0.85, 0.6, 0.25): how much of the freshness bar is filled. `maxAgeDays` (0, 2, 6) is the oldest age in calendar days of each tier |
 | `size.freshness-bar` | `AppSizes.freshnessBar` (4): height of `AppFreshnessBar` |
+| `size.row` | `AppSizes.row` (64, grows with its text): least height of a list row, `MemberRow` |
 | `size.border-emphasis`, `focus-ring` | `AppSizes.borderEmphasis` (2, selected, focus and error borders), `focusRing` (4, primary-soft ring around a focused field) |
 | `size.code-cell-width`, `code-cell-height` | `AppSizes.codeCellWidth` (56), `codeCellHeight` (60) |
 | `state-layer.*` | `AppStateLayers`: ink opacity over a fill when pressed (primary 12%, surface 8%, danger 16%) and the spinner track (35%) |

@@ -176,6 +176,8 @@ void main() {
       ('AppProgressRing', {'value': '7', 'size': '1000'}),
       ('AppFreshnessBar', {'ageDays': '-5'}),
       ('AppIcon', {'size': '0'}),
+      ('MemberRow', {'joinOrder': '-1'}),
+      ('MemberRow', {'semanticLabel': ''}),
     ]) {
       testWidgets('$component $knobs', (tester) async {
         await _open(tester, _pathOf(component), knobs: knobs);
@@ -194,6 +196,24 @@ void main() {
         tester.widget<AppPebble>(find.byType(AppPebble)).semanticLabel,
         'Ana',
       );
+    });
+  });
+
+  group('hand-edited values are normalized, not just accepted', () {
+    testWidgets('a member row falls back to the sample label and clamps the '
+        'join order', (tester) async {
+      await _open(
+        tester,
+        _pathOf('MemberRow'),
+        knobs: {'semanticLabel': '', 'joinOrder': '-1'},
+      );
+      var row = tester.widget<MemberRow>(find.byType(MemberRow));
+      expect(row.member.semanticLabel, 'Ana, you, at home');
+      expect(row.member.joinOrder, 0);
+
+      await _open(tester, _pathOf('MemberRow'), knobs: {'joinOrder': '99'});
+      row = tester.widget<MemberRow>(find.byType(MemberRow));
+      expect(row.member.joinOrder, 11);
     });
   });
 
