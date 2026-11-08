@@ -168,6 +168,21 @@ final playgroundKnobCases = <String, List<KnobCase>>{
           expect(_widget<AppTextField>(t).keyboardType, TextInputType.number),
     ),
     KnobCase(
+      'autocorrect',
+      'false',
+      (t) => expect(_widget<AppTextField>(t).autocorrect, isFalse),
+    ),
+    KnobCase(
+      'enableSuggestions',
+      'false',
+      (t) => expect(_widget<AppTextField>(t).enableSuggestions, isFalse),
+    ),
+    KnobCase(
+      'readOnly',
+      'true',
+      (t) => expect(_widget<AppTextField>(t).readOnly, isTrue),
+    ),
+    KnobCase(
       'textInputAction',
       'done',
       (t) => expect(

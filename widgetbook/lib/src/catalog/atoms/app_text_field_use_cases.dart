@@ -179,6 +179,14 @@ WidgetbookUseCase _playground() {
         context.sample(en: 'Hide password', es: 'Ocultar contraseña'),
       );
       final keyboard = context.enumKnobOrNull('keyboardType', _Keyboard.values);
+      final autocorrect = context.knobs.booleanOrNull(
+        label: 'autocorrect',
+        description: 'Unset follows the keyboard: off for email, url, obscure',
+      );
+      final enableSuggestions = context.knobs.booleanOrNull(
+        label: 'enableSuggestions',
+        description: 'Unset is off for obscure text, on otherwise',
+      );
       final action = context.enumKnobOrNull(
         'textInputAction',
         TextInputAction.values,
@@ -190,6 +198,10 @@ WidgetbookUseCase _playground() {
       final enabled = context.knobs.boolean(
         label: 'enabled',
         initialValue: true,
+      );
+      final readOnly = context.knobs.boolean(
+        label: 'readOnly',
+        description: 'Refuses edits but keeps focus and the enabled look',
       );
       final autofocus = context.knobs.boolean(
         label: 'autofocus',
@@ -215,9 +227,12 @@ WidgetbookUseCase _playground() {
               revealSemanticLabel: revealSemanticLabel,
               concealSemanticLabel: concealSemanticLabel,
               keyboardType: keyboard?.type,
+              autocorrect: autocorrect,
+              enableSuggestions: enableSuggestions,
               textInputAction: action,
               autofillHints: autofill == null ? null : [autofill.hint],
               enabled: enabled,
+              readOnly: readOnly,
               autofocus: autofocus,
               focusNode: focusNode,
             ),
