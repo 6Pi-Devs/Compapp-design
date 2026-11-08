@@ -51,9 +51,17 @@ void main() {
       'test/catalog_freshness_bar_layout_test.dart',
       'test/catalog_contract_test.dart',
     ]) {
-      final source = File(file).readAsStringSync();
+      // Only code counts: a comment may name the function it warns about.
+      final source = File(file)
+          .readAsLinesSync()
+          .map((line) => line.replaceFirst(RegExp('//.*'), ''))
+          .join('\n');
       expect(source, contains('collectFixedUseCases('), reason: file);
-      expect(source, isNot(contains('collectUseCases(')), reason: file);
+      expect(
+        RegExp(r'\bcollectUseCases\(').hasMatch(source),
+        isFalse,
+        reason: file,
+      );
     }
   });
 }

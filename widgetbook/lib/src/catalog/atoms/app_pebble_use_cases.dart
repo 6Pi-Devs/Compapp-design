@@ -110,16 +110,21 @@ WidgetbookUseCase _playground() {
         description: 'The admin badge draws from s44 up',
       );
       final initials = context.textKnob('initials', 'A');
-      final joinOrder = context.knobs.int.slider(
-        label: 'joinOrder',
-        description: 'Picks the pebble color, cycling through the palette',
-        max: _maxJoinOrder,
-        divisions: _maxJoinOrder,
-      );
-      final semanticLabel = context.textKnob(
+      final joinOrder = context.knobs.int
+          .slider(
+            label: 'joinOrder',
+            description: 'Picks the pebble color, cycling through the palette',
+            max: _maxJoinOrder,
+            divisions: _maxJoinOrder,
+          )
+          .clamp(0, _maxJoinOrder);
+      final sampleLabel = context.sample(en: 'Ana', es: 'Ana');
+      final typedLabel = context.textKnob(
         'semanticLabel',
-        context.sample(en: 'Ana', es: 'Ana'),
+        sampleLabel,
+        description: 'Must not be empty: an empty one falls back to the sample',
       );
+      final semanticLabel = typedLabel.isEmpty ? sampleLabel : typedLabel;
 
       return useCaseFrame(
         child: Align(

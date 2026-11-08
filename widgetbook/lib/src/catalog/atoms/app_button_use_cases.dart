@@ -152,7 +152,6 @@ WidgetbookUseCase _playground() {
 
       return useCaseFrame(
         child: StatesControllerHost(
-          key: ValueKey(forced),
           states: forced.states,
           builder: (context, controller) => Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,

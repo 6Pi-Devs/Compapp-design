@@ -63,25 +63,16 @@ void main() {
       expect(playgrounds.length, declared.length, reason: 'no duplicates');
     });
 
-    test('every component has one playground, and it is not a story', () {
-      final wrong = [
-        for (final entry in _manifestEntries())
-          if (playgrounds
-                  .where(
-                    (path) => path.startsWith(
-                      '${(entry['playground'] as String).split('/').take(2).join('/')}/',
-                    ),
-                  )
-                  .length !=
-              1)
-            '${entry['id']}: not exactly one playground',
-      ];
-      expect(wrong, isEmpty);
+    test('every component has exactly one playground, and it is no story', () {
+      final perComponent = <String, int>{};
+      for (final path in playgrounds) {
+        final component = path.split('/').take(2).join('/');
+        perComponent[component] = (perComponent[component] ?? 0) + 1;
+      }
+      expect(perComponent, {
+        for (final path in declared) path.split('/').take(2).join('/'): 1,
+      });
       expect(stories.intersection(playgrounds.toSet()), isEmpty);
-    });
-
-    test('a playground is not part of the variant x state rule', () {
-      expect(useCases.where(isPlaygroundPath), isEmpty);
     });
   });
 

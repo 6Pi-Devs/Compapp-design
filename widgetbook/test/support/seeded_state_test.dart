@@ -41,18 +41,24 @@ void main() {
     expect(_switchValue(tester), isTrue);
   });
 
-  testWidgets('a new initial value from the knob resets the state', (
+  testWidgets('a new initial value from the knob replaces the state', (
     tester,
   ) async {
     await tester.pumpWidget(_host(false));
-    await tester.tap(find.byType(Switch));
-    await tester.pump();
     await tester.pumpWidget(_host(true));
+
+    expect(_switchValue(tester), isTrue);
+  });
+
+  testWidgets('a new initial value discards what the user did', (tester) async {
+    await tester.pumpWidget(_host(false));
     await tester.tap(find.byType(Switch));
     await tester.pump();
-    expect(_switchValue(tester), isFalse);
+    expect(_switchValue(tester), isTrue);
 
+    await tester.pumpWidget(_host(true));
     await tester.pumpWidget(_host(false));
-    expect(_switchValue(tester), isFalse, reason: 'reset to the new initial');
+
+    expect(_switchValue(tester), isFalse);
   });
 }

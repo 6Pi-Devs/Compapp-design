@@ -55,18 +55,29 @@ WidgetbookUseCase _playground() {
     name: playgroundUseCaseName,
     builder: (context) {
       final form = context.enumKnob('form', _PlaygroundForm.values);
-      final count = context.knobs.int.slider(
-        label: 'count',
-        description: 'Count form: 99 shows as it is, more shows 99+',
-        initialValue: 3,
-        max: _maxPlaygroundCount,
-      );
+      final count = context.knobs.int
+          .slider(
+            label: 'count',
+            description: 'Count form: 99 shows as it is, more shows 99+',
+            initialValue: 3,
+            max: _maxPlaygroundCount,
+            divisions: _maxPlaygroundCount,
+          )
+          .clamp(0, _maxPlaygroundCount);
       final label = context.textKnob(
         'label',
         context.sample(en: 'New', es: 'Nuevo'),
         description: 'Label form',
       );
-      final tone = context.enumKnob('tone', AppBadgeTone.values);
+      final tone = context.enumKnob(
+        'tone',
+        AppBadgeTone.values,
+        initial: switch (form) {
+          _PlaygroundForm.count => AppBadgeTone.primary,
+          _PlaygroundForm.label => AppBadgeTone.soft,
+        },
+        description: 'Starts at the default of the form until it is changed',
+      );
       final semanticLabel = context.textKnobOrNull('semanticLabel', null);
 
       return useCaseFrame(

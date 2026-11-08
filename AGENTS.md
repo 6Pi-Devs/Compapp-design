@@ -104,16 +104,17 @@ The analyzer enforces the Dart 3.13 shorthand. Write `const new(this.x)` for the
 
 ### Manifest
 
-`components.json` holds one entry per widget. `test/manifest_test.dart` fails when an entry's `path` does not exist, when a Dart file under `lib/src/{atoms,molecules,organisms,templates}/` has no entry, or when `id`s or classes repeat.
+`components.json` holds one entry per widget. `test/manifest_test.dart` fails when an entry's `path` does not exist, when a Dart file under `lib/src/{atoms,molecules,organisms,templates}/` has no entry, when `id`s or classes repeat, or when a `playground` is missing, is not `<Level>/<Class>/playground`, repeats or is also a story. The schema version is 2: version 2 added the required `playground` field.
 
 ```json
 {
-  "$schema-version": 1,
+  "$schema-version": 2,
   "components": [
     {
       "id": "app-button",
       "level": "atom",
       "class": "AppButton",
+      "playground": "Atoms/AppButton/playground",
       "path": "atoms/app_button.dart",
       "props": [{ "name": "label", "type": "String", "required": true }],
       "variants": ["primary", "secondary", "ghost", "danger"],
@@ -159,9 +160,9 @@ Every component has one extra use case named `playground` (`Atoms/AppButton/play
 
 Rules:
 
-- A knob is the initial value. Stateful atoms stay interactive: typing, toggling and selecting drive local state, held by `SeededState` (switch value, chip selected) or `TextControllerHost` (text), which start over when their knob changes. Never wire a knob straight to a value the user can also change.
+- A knob is the initial value. Stateful atoms stay interactive: typing, toggling and selecting drive local state, held by `SeededState` (switch value, chip selected) or `TextControllerHost` (text). Widgetbook keys a use case by the URL, so any knob change rebuilds the preview from the knob values: whatever the user typed or toggled starts over, and a field with `autofocus` takes focus again (the autofocus knobs say to turn it off before editing other knobs). Never wire a knob straight to a value the user can also change.
 - A playground reads knobs, so it only builds inside a Widgetbook app. Goldens, the semantics test, the freshness bar layout test and the contract use `collectFixedUseCases`, which leaves playgrounds out, and `playground_paths_test.dart` fails if one of those files goes back to `collectUseCases`.
-- `catalog_playgrounds_test.dart` opens every playground in a real Widgetbook app (`CatalogApp(initialRoute: ...)` with `path`, `preview` and `knobs` query parameters), checks that the component builds with its default knobs and in the full catalog with the knobs panel, and changes knob values through the URL and through `WidgetbookState.updateQueryField`.
+- `catalog_playgrounds_test.dart` opens every playground in a real Widgetbook app (`CatalogApp(initialRoute: ...)` with `path`, `preview` and `knobs` query parameters), checks that the component builds with its default knobs, and that the full catalog builds with a knobs panel that has knobs (not "No Knobs available"). A table lists every knob of every playground with a value other than its default and a check on the rendered component: the test fails when a knob is missing from the table, registered but unlisted, or not connected to the component (the check also has to fail on the default state). Values are set through the URL and through `WidgetbookState.updateQueryField`. A new knob needs a row in that table.
 - Show a rule, do not hide a knob: the pebble badges draw from s44 up, so the badge knobs stay and have no effect below it.
 
 #### Golden tooling

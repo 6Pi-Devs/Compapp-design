@@ -69,12 +69,14 @@ WidgetbookUseCase _playground() {
   return WidgetbookUseCase(
     name: playgroundUseCaseName,
     builder: (context) {
-      final ageDays = context.knobs.int.slider(
-        label: 'ageDays',
-        description: 'Calendar days since the task was last done',
-        max: _maxPlaygroundAgeDays,
-        divisions: _maxPlaygroundAgeDays,
-      );
+      final ageDays = context.knobs.int
+          .slider(
+            label: 'ageDays',
+            description: 'Calendar days since the task was last done',
+            max: _maxPlaygroundAgeDays,
+            divisions: _maxPlaygroundAgeDays,
+          )
+          .clamp(0, _maxPlaygroundAgeDays);
       final semanticLabel = context.textKnobOrNull(
         'semanticLabel',
         context.sample(en: 'Done today', es: 'Hecho hoy'),
@@ -92,10 +94,16 @@ WidgetbookUseCase _playground() {
               ),
             ),
             const SizedBox(width: AppSpacing.md),
-            Text(context.sample(en: '$ageDays days', es: '$ageDays días')),
+            Text(_ageText(context, ageDays)),
           ],
         ),
       );
     },
   );
 }
+
+String _ageText(BuildContext context, int days) => switch (days) {
+  0 => context.sample(en: 'Today', es: 'Hoy'),
+  1 => context.sample(en: '1 day ago', es: 'Hace 1 día'),
+  _ => context.sample(en: '$days days ago', es: 'Hace $days días'),
+};

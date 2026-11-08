@@ -59,13 +59,15 @@ WidgetbookUseCase _playground() {
     name: playgroundUseCaseName,
     builder: (context) {
       final icon = context.enumKnob('icon', AppIcons.values);
-      final size = context.knobs.doubleOrNull.slider(
-        label: 'size',
-        description: 'Null uses the size of the icon theme',
-        min: _minIconSize,
-        max: _maxIconSize,
-        defaultToNull: true,
-      );
+      final size = context.knobs.doubleOrNull
+          .slider(
+            label: 'size',
+            description: 'Null uses the size of the icon theme',
+            min: _minIconSize,
+            max: _maxIconSize,
+            defaultToNull: true,
+          )
+          ?.clamp(_minIconSize, _maxIconSize);
       final color = context.knobs.colorOrNull(
         label: 'color',
         description: 'Null uses the color of the icon theme',

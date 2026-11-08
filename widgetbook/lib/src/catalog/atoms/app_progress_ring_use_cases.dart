@@ -61,21 +61,29 @@ WidgetbookUseCase _playground() {
         label: 'in use',
         description: 'No value: an arc that breathes',
       );
-      final value = context.knobs.double.slider(
+      final rawValue = context.knobs.double.slider(
         label: 'value',
         initialValue: 0.73,
         max: 1,
         divisions: _ringValueDivisions,
         precision: 2,
       );
-      final tone = context.enumKnob('tone', AppRingTone.values);
-      final size = context.knobs.double.slider(
+      final value = rawValue.isFinite ? rawValue.clamp(0.0, 1.0) : 0.0;
+      final tone = context.enumKnob(
+        'tone',
+        AppRingTone.values,
+        initial: AppRingTone.primary,
+      );
+      final rawSize = context.knobs.double.slider(
         label: 'size',
         description: 'The least side; the ring grows with a large label',
         initialValue: _minRingSize,
         min: _minRingSize,
         max: _maxRingSize,
       );
+      final size = rawSize.isFinite
+          ? rawSize.clamp(_minRingSize, _maxRingSize)
+          : _minRingSize;
       final label = context.textKnobOrNull('label', '11');
       final semanticLabel = context.textKnobOrNull(
         'semanticLabel',

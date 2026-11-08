@@ -141,9 +141,11 @@ enum _Autofill {
 }
 
 /// Every prop of [AppTextField] as a knob. The text knob is the initial text:
-/// typing then edits it (the controller lives in a [TextControllerHost], which
-/// starts over when the knob changes). The controller, the callbacks and the
-/// focus node are plumbing, so the focus knob only draws the focused look.
+/// typing then edits it (the controller lives in a [TextControllerHost]).
+/// Widgetbook rebuilds the use case on every knob change, so a typed text is
+/// lost then, and an autofocus field takes focus again: switch autofocus off
+/// to edit other knobs. The controller, the callbacks and the focus node are
+/// plumbing, so the focus knob only draws the focused look.
 WidgetbookUseCase _playground() {
   return WidgetbookUseCase(
     name: playgroundUseCaseName,
@@ -189,7 +191,10 @@ WidgetbookUseCase _playground() {
         label: 'enabled',
         initialValue: true,
       );
-      final autofocus = context.knobs.boolean(label: 'autofocus');
+      final autofocus = context.knobs.boolean(
+        label: 'autofocus',
+        description: 'Takes focus on every rebuild: turn it off to edit knobs',
+      );
       final focused = context.knobs.boolean(
         label: 'focused look',
         description: 'Draws the focused look without taking focus',
@@ -197,7 +202,6 @@ WidgetbookUseCase _playground() {
 
       return useCaseFrame(
         child: TextControllerHost(
-          key: ValueKey(text),
           text: text,
           builder: (context, controller) => _withFocus(
             focused,

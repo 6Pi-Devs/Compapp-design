@@ -73,9 +73,12 @@ const _maxCodeLength = 8;
 const _defaultCodeLength = 6;
 
 /// Every prop of [AppCodeInput] as a knob. The code knob is the initial code:
-/// typing then edits it (the controller lives in a [TextControllerHost], which
-/// starts over when the knob changes). The controller, the callbacks and the
-/// focus node are plumbing, so the focus knob only draws the focused cell.
+/// typing then edits it (the controller lives in a [TextControllerHost]).
+/// Widgetbook rebuilds the use case on every knob change, so typed digits are
+/// lost then, and an autofocus input takes focus again: switch autofocus off
+/// to edit other knobs. The controller, the callbacks and the focus node are
+/// plumbing, so the focus knob only draws the focused cell. Values read from
+/// the URL are clamped, so a hand-edited link cannot trip an assert.
 WidgetbookUseCase _playground() {
   return WidgetbookUseCase(
     name: playgroundUseCaseName,
@@ -85,13 +88,15 @@ WidgetbookUseCase _playground() {
         'label',
         context.sample(en: 'Reset code', es: 'Código de recuperación'),
       );
-      final length = context.knobs.int.slider(
-        label: 'length',
-        initialValue: _defaultCodeLength,
-        min: _minCodeLength,
-        max: _maxCodeLength,
-        divisions: _maxCodeLength - _minCodeLength,
-      );
+      final length = context.knobs.int
+          .slider(
+            label: 'length',
+            initialValue: _defaultCodeLength,
+            min: _minCodeLength,
+            max: _maxCodeLength,
+            divisions: _maxCodeLength - _minCodeLength,
+          )
+          .clamp(_minCodeLength, _maxCodeLength);
       final numeric = context.knobs.boolean(
         label: 'numeric',
         initialValue: true,
@@ -101,7 +106,10 @@ WidgetbookUseCase _playground() {
         null,
         description: 'Any text puts the input in its error look',
       );
-      final autofocus = context.knobs.boolean(label: 'autofocus');
+      final autofocus = context.knobs.boolean(
+        label: 'autofocus',
+        description: 'Takes focus on every rebuild: turn it off to edit knobs',
+      );
       final focused = context.knobs.boolean(
         label: 'focused look',
         description: 'Draws the focused cell without taking focus',
@@ -122,7 +130,6 @@ WidgetbookUseCase _playground() {
 
       return useCaseFrame(
         child: TextControllerHost(
-          key: ValueKey(code),
           text: code,
           builder: (context, controller) => focused
               ? FocusedNodeHost(

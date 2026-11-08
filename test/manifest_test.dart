@@ -22,9 +22,9 @@ const _requiredFields = [
 void main() {
   final entries = _loadEntries();
 
-  test('declares schema version 1', () {
+  test('declares schema version 2', () {
     final root = _readManifest();
-    expect(root[r'$schema-version'], 1);
+    expect(root[r'$schema-version'], 2);
   });
 
   test('every entry points to an existing file', () {

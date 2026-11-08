@@ -112,9 +112,11 @@ class _FocusedNodeHostState extends State<FocusedNodeHost> {
 }
 
 /// Holds a value a playground lets the user change by interaction (a switch
-/// flipped, a chip selected). A knob gives the [initial] value: when the knob
+/// flipped, a chip selected). A knob gives the [initial] value: when it
 /// changes, the value is reset to it, and in between the interaction drives
-/// the local state.
+/// the local state. Widgetbook keys a use case by the URL, so in the catalog
+/// any knob change rebuilds the use case and every state starts from the knob
+/// values again.
 class SeededState<T> extends StatefulWidget {
   const new({required this.initial, required this.builder, super.key});
 
