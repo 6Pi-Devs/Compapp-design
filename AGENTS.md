@@ -260,6 +260,7 @@ To add or update a golden (a new atom, or an intentional visual change):
 | `size.row`, `row-tall` | `AppSizes.row` (64), `rowTall` (72), both grow with their text: least height of a list row, `MemberRow`, and of one with a bar under its texts, `TaskRow` |
 | `size.beacon` | `AppSizes.beacon` (34): glyph tile or breathing ring of `ItemBeacon` |
 | `size.border-room` | `AppSizes.borderRoom` (1.5): border of a `RoomTile`, solid or dashed |
+| `size.ribbon` | `AppSizes.ribbon` (28, grows with its text): least height of an `EventRibbon` |
 | `size.border-emphasis`, `focus-ring` | `AppSizes.borderEmphasis` (2, selected, focus and error borders), `focusRing` (4, primary-soft ring around a focused field) |
 | `size.code-cell-width`, `code-cell-height` | `AppSizes.codeCellWidth` (56), `codeCellHeight` (60) |
 | `state-layer.*` | `AppStateLayers`: ink opacity over a fill when pressed (primary 12%, surface 8%, danger 16%) and the spinner track (35%) |

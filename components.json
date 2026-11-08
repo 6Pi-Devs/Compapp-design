@@ -439,6 +439,46 @@
         "Molecules/TaskRow/row-fading",
         "Molecules/TaskRow/row-stale"
       ]
+    },
+    {
+      "id": "event-ribbon",
+      "level": "molecule",
+      "class": "EventRibbon",
+      "playground": "Molecules/EventRibbon/playground",
+      "path": "molecules/event_ribbon.dart",
+      "props": [
+        { "name": "event", "type": "CalendarEventView", "required": true, "default": "id, kind (visit, overnight, absence, other) and the title to show" },
+        { "name": "semanticLabel", "type": "String", "required": true, "default": "spoken description with the dates the ribbon only draws by width" },
+        { "name": "continuesBefore", "type": "bool", "required": false, "default": "false; flat start edge, mirrored in right-to-left" },
+        { "name": "continuesAfter", "type": "bool", "required": false, "default": "false; flat end edge, mirrored in right-to-left" },
+        { "name": "compact", "type": "bool", "required": false, "default": "false; the glyph alone, for a cell too narrow for a title (about 44 wide). The title is one line with an ellipsis otherwise" }
+      ],
+      "variants": ["visit", "overnight", "absence", "other"],
+      "states": ["single", "continues-before", "continues-after", "continues-both", "compact"],
+      "semantics": "One container node named by semanticLabel (\"Absence, Luis, until Fri 6 Nov\"), not interactive; the glyph and the visible title add nothing of their own, and the compact form says the same with no title. The kind is told by its glyph and title, never by color alone, and a flat edge is only a shape, so the label says that the event goes on",
+      "key": "event.<eventId>",
+      "stories": [
+        "Molecules/EventRibbon/visit-single",
+        "Molecules/EventRibbon/visit-continues-before",
+        "Molecules/EventRibbon/visit-continues-after",
+        "Molecules/EventRibbon/visit-continues-both",
+        "Molecules/EventRibbon/visit-compact",
+        "Molecules/EventRibbon/overnight-single",
+        "Molecules/EventRibbon/overnight-continues-before",
+        "Molecules/EventRibbon/overnight-continues-after",
+        "Molecules/EventRibbon/overnight-continues-both",
+        "Molecules/EventRibbon/overnight-compact",
+        "Molecules/EventRibbon/absence-single",
+        "Molecules/EventRibbon/absence-continues-before",
+        "Molecules/EventRibbon/absence-continues-after",
+        "Molecules/EventRibbon/absence-continues-both",
+        "Molecules/EventRibbon/absence-compact",
+        "Molecules/EventRibbon/other-single",
+        "Molecules/EventRibbon/other-continues-before",
+        "Molecules/EventRibbon/other-continues-after",
+        "Molecules/EventRibbon/other-continues-both",
+        "Molecules/EventRibbon/other-compact"
+      ]
     }
   ]
 }

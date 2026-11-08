@@ -115,6 +115,9 @@ abstract final class AppSizes {
   /// Border of a room tile, solid or dashed (`size.border-room`).
   static const double borderRoom = 1.5;
 
+  /// Least height of an event ribbon (`size.ribbon`). It grows with its text.
+  static const double ribbon = 28;
+
   /// Every token by its JSON name, checked by the parity test.
   static const Map<String, double> values = {
     'target.min': minTarget,
@@ -153,5 +156,6 @@ abstract final class AppSizes {
     'size.row-tall': rowTall,
     'size.beacon': beacon,
     'size.border-room': borderRoom,
+    'size.ribbon': ribbon,
   };
 }

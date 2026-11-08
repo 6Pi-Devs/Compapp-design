@@ -73,4 +73,15 @@ void main() {
       expect(colors.pebbleAt(13), colors.pebbles[1]);
     });
   });
+
+  test('the named pebble accessors are the sky, apricot and sand pebbles', () {
+    for (final colors in [AppColors.light, AppColors.dark]) {
+      expect(colors.pebbleSky, colors.pebbles[1]);
+      expect(colors.pebbleApricot, colors.pebbles[2]);
+      expect(colors.pebbleSand, colors.pebbles[4]);
+      expect(AppColors.pebbleNames[1], 'sky');
+      expect(AppColors.pebbleNames[2], 'apricot');
+      expect(AppColors.pebbleNames[4], 'sand');
+    }
+  });
 }
