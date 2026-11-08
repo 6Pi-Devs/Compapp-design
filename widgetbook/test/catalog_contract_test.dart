@@ -12,7 +12,7 @@ final _pathPattern = RegExp(
 
 void main() {
   final stories = _manifestStories();
-  final useCases = collectUseCases(buildCatalog()).keys.toSet();
+  final useCases = collectFixedUseCases(buildCatalog()).keys.toSet();
 
   test('every manifest story has a use case', () {
     expect(
@@ -50,6 +50,30 @@ void main() {
             '$story: ${_splits(entry, story.split('/').last)}',
     ];
     expect(ambiguous, isEmpty);
+  });
+
+  group('playgrounds', () {
+    final playgrounds = collectPlaygrounds(buildCatalog()).keys.toList();
+    final declared = [
+      for (final entry in _manifestEntries()) entry['playground'] as String,
+    ];
+
+    test('the tree has exactly the playgrounds the manifest declares', () {
+      expect(playgrounds.toSet(), declared.toSet());
+      expect(playgrounds.length, declared.length, reason: 'no duplicates');
+    });
+
+    test('every component has exactly one playground, and it is no story', () {
+      final perComponent = <String, int>{};
+      for (final path in playgrounds) {
+        final component = path.split('/').take(2).join('/');
+        perComponent[component] = (perComponent[component] ?? 0) + 1;
+      }
+      expect(perComponent, {
+        for (final path in declared) path.split('/').take(2).join('/'): 1,
+      });
+      expect(stories.intersection(playgrounds.toSet()), isEmpty);
+    });
   });
 
   test('use case paths are <Level>/<Class>/<variant>-<state>', () {

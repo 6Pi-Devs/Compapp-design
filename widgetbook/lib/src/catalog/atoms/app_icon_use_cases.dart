@@ -1,12 +1,18 @@
 import 'package:compapp_design/compapp_design.dart';
+import 'package:compapp_design_widgetbook/src/catalog/use_case_paths.dart';
 import 'package:compapp_design_widgetbook/src/support/localized_sample.dart';
+import 'package:compapp_design_widgetbook/src/support/playground_knobs.dart';
+import 'package:compapp_design_widgetbook/src/support/story_support.dart';
 import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
 
 WidgetbookComponent buildAppIcon() {
   return WidgetbookComponent(
     name: 'AppIcon',
-    useCases: [WidgetbookUseCase(name: 'gallery-default', builder: _gallery)],
+    useCases: [
+      _playground(),
+      WidgetbookUseCase(name: 'gallery-default', builder: _gallery),
+    ],
   );
 }
 
@@ -40,5 +46,46 @@ Widget _gallery(BuildContext context) {
         ),
       ],
     ),
+  );
+}
+
+const _minIconSize = 8.0;
+const _maxIconSize = 96.0;
+
+/// Every prop of [AppIcon] as a knob. A null size, color or semantic label
+/// falls back to the ambient icon theme, or to a decorative icon.
+WidgetbookUseCase _playground() {
+  return WidgetbookUseCase(
+    name: playgroundUseCaseName,
+    builder: (context) {
+      final icon = context.enumKnob('icon', AppIcons.values);
+      final size = context.knobs.doubleOrNull
+          .slider(
+            label: 'size',
+            description: 'Null uses the size of the icon theme',
+            min: _minIconSize,
+            max: _maxIconSize,
+            defaultToNull: true,
+          )
+          ?.clamp(_minIconSize, _maxIconSize);
+      final color = context.knobs.colorOrNull(
+        label: 'color',
+        description: 'Null uses the color of the icon theme',
+        defaultToNull: true,
+      );
+      final semanticLabel = context.textKnobOrNull('semanticLabel', null);
+
+      return useCaseFrame(
+        child: Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: AppIcon(
+            icon,
+            size: size,
+            color: color,
+            semanticLabel: semanticLabel,
+          ),
+        ),
+      );
+    },
   );
 }

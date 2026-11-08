@@ -19,3 +19,30 @@ Map<String, WidgetbookUseCase> collectUseCases(
   }
   return useCases;
 }
+
+/// The name of the one knob use case every component has. It is a playground
+/// for interactive exploration, never an input of goldens or semantics tests.
+const playgroundUseCaseName = 'playground';
+
+/// Whether [path] (`Atoms/AppButton/playground`) is a playground.
+bool isPlaygroundPath(String path) =>
+    path.split('/').last == playgroundUseCaseName;
+
+/// The fixed use cases under [directories]: every one that is not a
+/// playground. They have no knobs, so they build outside Widgetbook, and they
+/// are the only inputs of goldens, semantics tests and the manifest contract.
+Map<String, WidgetbookUseCase> collectFixedUseCases(
+  List<WidgetbookNode> directories,
+) => {
+  for (final entry in collectUseCases(directories).entries)
+    if (!isPlaygroundPath(entry.key)) entry.key: entry.value,
+};
+
+/// The playgrounds under [directories]. They read knobs, so they only build
+/// inside a Widgetbook app.
+Map<String, WidgetbookUseCase> collectPlaygrounds(
+  List<WidgetbookNode> directories,
+) => {
+  for (final entry in collectUseCases(directories).entries)
+    if (isPlaygroundPath(entry.key)) entry.key: entry.value,
+};

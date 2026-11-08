@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'helpers/use_case_harness.dart';
 
 void main() {
-  final useCases = collectUseCases(buildCatalog());
+  final useCases = collectFixedUseCases(buildCatalog());
 
   for (final MapEntry(key: path, value: useCase) in useCases.entries) {
     for (final theme in themeVariants) {

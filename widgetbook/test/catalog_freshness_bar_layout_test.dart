@@ -27,7 +27,7 @@ void main() {
     await loader.load();
   });
 
-  final useCases = collectUseCases(buildCatalog());
+  final useCases = collectFixedUseCases(buildCatalog());
   for (final MapEntry(key: path, value: useCase) in useCases.entries) {
     if (!path.startsWith('Atoms/AppFreshnessBar/')) continue;
 

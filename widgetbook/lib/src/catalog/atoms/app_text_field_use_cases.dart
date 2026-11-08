@@ -1,5 +1,7 @@
 import 'package:compapp_design/compapp_design.dart';
+import 'package:compapp_design_widgetbook/src/catalog/use_case_paths.dart';
 import 'package:compapp_design_widgetbook/src/support/localized_sample.dart';
+import 'package:compapp_design_widgetbook/src/support/playground_knobs.dart';
 import 'package:compapp_design_widgetbook/src/support/story_support.dart';
 import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
@@ -15,6 +17,7 @@ WidgetbookComponent buildAppTextField() {
   return WidgetbookComponent(
     name: 'AppTextField',
     useCases: [
+      _playground(),
       for (final password in const [false, true]) ...[
         for (final state in _State.values)
           WidgetbookUseCase(
@@ -112,4 +115,115 @@ Widget _frame(BuildContext context, bool password, _State state) {
 Widget _withFocus(bool focused, Widget Function(FocusNode?) builder) {
   if (!focused) return builder(null);
   return FocusedNodeHost(builder: (context, node) => builder(node));
+}
+
+enum _Keyboard {
+  text(TextInputType.text),
+  email(TextInputType.emailAddress),
+  number(TextInputType.number),
+  phone(TextInputType.phone),
+  url(TextInputType.url);
+
+  new(this.type);
+
+  final TextInputType type;
+}
+
+enum _Autofill {
+  email(AutofillHints.email),
+  username(AutofillHints.username),
+  password(AutofillHints.password),
+  name(AutofillHints.name);
+
+  new(this.hint);
+
+  final String hint;
+}
+
+/// Every prop of [AppTextField] as a knob. The text knob is the initial text:
+/// typing then edits it (the controller lives in a [TextControllerHost]).
+/// Widgetbook rebuilds the use case on every knob change, so a typed text is
+/// lost then, and an autofocus field takes focus again: switch autofocus off
+/// to edit other knobs. The controller, the callbacks and the focus node are
+/// plumbing, so the focus knob only draws the focused look.
+WidgetbookUseCase _playground() {
+  return WidgetbookUseCase(
+    name: playgroundUseCaseName,
+    builder: (context) {
+      final text = context.textKnob('text', '');
+      final label = context.textKnob(
+        'label',
+        context.sample(en: 'Email', es: 'Correo'),
+      );
+      final hint = context.textKnobOrNull(
+        'hint',
+        context.sample(en: 'name@example.com', es: 'nombre@ejemplo.com'),
+      );
+      final helperText = context.textKnobOrNull(
+        'helperText',
+        context.sample(en: 'We never share it', es: 'Nunca lo compartimos'),
+      );
+      final errorText = context.textKnobOrNull(
+        'errorText',
+        null,
+        description: 'Any text puts the field in its error look',
+      );
+      final obscure = context.knobs.boolean(label: 'obscure');
+      final revealSemanticLabel = context.textKnobOrNull(
+        'revealSemanticLabel',
+        context.sample(en: 'Show password', es: 'Mostrar contraseña'),
+        description: 'The reveal toggle needs both semantic labels',
+      );
+      final concealSemanticLabel = context.textKnobOrNull(
+        'concealSemanticLabel',
+        context.sample(en: 'Hide password', es: 'Ocultar contraseña'),
+      );
+      final keyboard = context.enumKnobOrNull('keyboardType', _Keyboard.values);
+      final action = context.enumKnobOrNull(
+        'textInputAction',
+        TextInputAction.values,
+      );
+      final autofill = context.enumKnobOrNull(
+        'autofillHints',
+        _Autofill.values,
+      );
+      final enabled = context.knobs.boolean(
+        label: 'enabled',
+        initialValue: true,
+      );
+      final autofocus = context.knobs.boolean(
+        label: 'autofocus',
+        description: 'Takes focus on every rebuild: turn it off to edit knobs',
+      );
+      final focused = context.knobs.boolean(
+        label: 'focused look',
+        description: 'Draws the focused look without taking focus',
+      );
+
+      return useCaseFrame(
+        child: TextControllerHost(
+          text: text,
+          builder: (context, controller) => _withFocus(
+            focused,
+            (focusNode) => AppTextField(
+              label: label,
+              controller: controller,
+              hint: hint,
+              helperText: helperText,
+              errorText: errorText,
+              obscure: obscure,
+              revealSemanticLabel: revealSemanticLabel,
+              concealSemanticLabel: concealSemanticLabel,
+              keyboardType: keyboard?.type,
+              textInputAction: action,
+              autofillHints: autofill == null ? null : [autofill.hint],
+              enabled: enabled,
+              autofocus: autofocus,
+              focusNode: focusNode,
+            ),
+          ),
+        ),
+      );
+    },
+  );
 }

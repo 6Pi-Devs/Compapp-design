@@ -9,6 +9,7 @@ const _requiredFields = [
   'id',
   'level',
   'class',
+  'playground',
   'path',
   'props',
   'variants',
@@ -21,9 +22,9 @@ const _requiredFields = [
 void main() {
   final entries = _loadEntries();
 
-  test('declares schema version 1', () {
+  test('declares schema version 2', () {
     final root = _readManifest();
-    expect(root[r'$schema-version'], 1);
+    expect(root[r'$schema-version'], 2);
   });
 
   test('every entry points to an existing file', () {
@@ -91,6 +92,26 @@ void main() {
     expect(missing, isEmpty);
   });
 
+  test('every entry has one playground at <Level>/<Class>/playground', () {
+    final wrong = [
+      for (final entry in entries)
+        if (entry['playground'] !=
+            '${_folder(entry['level'] as String)}/${entry['class']}/playground')
+          '${entry['id']}: ${entry['playground']}',
+    ];
+    expect(wrong, isEmpty);
+  });
+
+  test('playgrounds are unique and are not stories', () {
+    final playgrounds = [for (final entry in entries) entry['playground']];
+    final stories = {
+      for (final entry in entries)
+        ...(entry['stories'] as List<dynamic>).cast<String>(),
+    };
+    expect(playgrounds.toSet().length, playgrounds.length);
+    expect(stories.intersection(playgrounds.toSet().cast<String>()), isEmpty);
+  });
+
   test('ids, classes and paths are unique', () {
     final ids = [for (final entry in entries) entry['id']];
     final classes = [for (final entry in entries) entry['class']];
@@ -104,6 +125,9 @@ void main() {
     );
   });
 }
+
+String _folder(String level) =>
+    '${level[0].toUpperCase()}${level.substring(1)}s';
 
 Map<String, dynamic> _readManifest() {
   final decoded = jsonDecode(File('components.json').readAsStringSync());
