@@ -257,6 +257,77 @@
         "Atoms/AppStatusDot/dot-busy",
         "Atoms/AppStatusDot/dot-unread"
       ]
+    },
+    {
+      "id": "app-badge",
+      "level": "atom",
+      "class": "AppBadge",
+      "path": "atoms/app_badge.dart",
+      "props": [
+        { "name": "count", "type": "int?", "required": false, "default": "AppBadge.count: the number, 99+ beyond 99" },
+        { "name": "label", "type": "String?", "required": false, "default": "AppBadge.label: a short text" },
+        { "name": "tone", "type": "AppBadgeTone", "required": false, "default": "primary for count, soft for label" },
+        { "name": "semanticLabel", "type": "String?", "required": false, "default": "replaces the visible text for assistive technology" }
+      ],
+      "variants": ["count", "overflow", "label"],
+      "states": ["primary", "busy", "soft"],
+      "semantics": "The visible number or label is read as it is. With semanticLabel the badge is one labeled node (\"3 unread\") and its text is excluded. Like any semantic child it merges into a parent that merges its children (a MergeSemantics row reads the row label and the badge label as one); under a parent that does not merge it is a node of its own. Text reaches 4.5:1 on every fill; the fill carries no meaning. Callers hide the badge at 0",
+      "key": "none",
+      "stories": [
+        "Atoms/AppBadge/count-primary",
+        "Atoms/AppBadge/count-busy",
+        "Atoms/AppBadge/count-soft",
+        "Atoms/AppBadge/overflow-primary",
+        "Atoms/AppBadge/overflow-busy",
+        "Atoms/AppBadge/overflow-soft",
+        "Atoms/AppBadge/label-primary",
+        "Atoms/AppBadge/label-busy",
+        "Atoms/AppBadge/label-soft"
+      ]
+    },
+    {
+      "id": "app-progress-ring",
+      "level": "atom",
+      "class": "AppProgressRing",
+      "path": "atoms/app_progress_ring.dart",
+      "props": [
+        { "name": "semanticLabel", "type": "String?", "required": true, "default": "null leaves the ring out of semantics" },
+        { "name": "value", "type": "double?", "required": false, "default": "null: in use with no known end, a breathing arc; 0 to 1 otherwise, clamped; must be finite" },
+        { "name": "tone", "type": "AppRingTone", "required": false, "default": "primary" },
+        { "name": "size", "type": "double", "required": false, "default": "AppSizes.ring (56); grows with a large label" },
+        { "name": "label", "type": "String?", "required": false, "default": "text in the middle" },
+        { "name": "semanticValue", "type": "String?", "required": false, "default": "required with a value, for example 11 of 15 done" }
+      ],
+      "variants": ["indeterminate", "determinate"],
+      "states": ["busy", "primary"],
+      "semantics": "With a semanticLabel the ring is one node: the label names what it measures and, with a value, semanticValue says how far it is (an in-use ring never has a value); the drawing and the middle label are excluded. Null excludes the ring. Like any semantic child it merges into a parent that merges its children. The arc breathes only when animations are enabled, and stands still at full opacity otherwise. A value that is not finite is drawn as 0",
+      "key": "none",
+      "stories": [
+        "Atoms/AppProgressRing/indeterminate-busy",
+        "Atoms/AppProgressRing/indeterminate-primary",
+        "Atoms/AppProgressRing/determinate-busy",
+        "Atoms/AppProgressRing/determinate-primary"
+      ]
+    },
+    {
+      "id": "app-freshness-bar",
+      "level": "atom",
+      "class": "AppFreshnessBar",
+      "path": "atoms/app_freshness_bar.dart",
+      "props": [
+        { "name": "ageDays", "type": "int", "required": true, "default": "calendar days since the task was last done, counted by the app in the home's time zone; zero or less is fresh" },
+        { "name": "semanticLabel", "type": "String?", "required": true, "default": "null leaves the bar out of semantics: the age text beside it says it" }
+      ],
+      "variants": ["bar"],
+      "states": ["fresh", "recent", "fading", "stale"],
+      "semantics": "Image named by semanticLabel with container: true when the label is non-empty (a node of its own under a parent that does not merge; it merges into a merging parent like any semantic child), else decorative and excluded because the age text beside it carries the meaning. It always sits beside that text in a fixed-width column and is never the only cue: the track is the sunken surface, so the end of the bar is not visible. The fill is 100, 85, 60 or 25 percent and no danger color is used",
+      "key": "none",
+      "stories": [
+        "Atoms/AppFreshnessBar/bar-fresh",
+        "Atoms/AppFreshnessBar/bar-recent",
+        "Atoms/AppFreshnessBar/bar-fading",
+        "Atoms/AppFreshnessBar/bar-stale"
+      ]
     }
   ]
 }
