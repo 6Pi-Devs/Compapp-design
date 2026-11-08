@@ -416,6 +416,29 @@
         "Molecules/RoomTile/tile-occupied",
         "Molecules/RoomTile/tile-free"
       ]
+    },
+    {
+      "id": "task-row",
+      "level": "molecule",
+      "class": "TaskRow",
+      "playground": "Molecules/TaskRow/playground",
+      "path": "molecules/task_row.dart",
+      "props": [
+        { "name": "task", "type": "TaskView", "required": true, "default": "id, title and ageDays (calendar days since it was last done, counted by the app in the home time zone)" },
+        { "name": "subtitle", "type": "String", "required": true, "default": "line under the title that says who did it last, when and where" },
+        { "name": "logAgainSemanticLabel", "type": "String", "required": true, "default": "name of the log button for assistive technology" },
+        { "name": "onLogAgain", "type": "VoidCallback", "required": true }
+      ],
+      "variants": ["row"],
+      "states": ["fresh", "recent", "fading", "stale"],
+      "semantics": "The title and the subtitle are one merged text node; the freshness bar is excluded because the subtitle says the age. The log control is its own focusable button named by logAgainSemanticLabel (\"Log Clean the kitchen again\"), activated by tap, Enter and Space. The row itself is not tappable. Calm: no danger color, never who is behind",
+      "key": "task.<taskId>, task.<taskId>.logAgain",
+      "stories": [
+        "Molecules/TaskRow/row-fresh",
+        "Molecules/TaskRow/row-recent",
+        "Molecules/TaskRow/row-fading",
+        "Molecules/TaskRow/row-stale"
+      ]
     }
   ]
 }

@@ -114,6 +114,7 @@
     "ring-stroke": { "$type": "dimension", "$value": "4px", "$description": "stroke of a progress ring, track and arc" },
     "freshness-bar": { "$type": "dimension", "$value": "4px", "$description": "height of the freshness bar" },
     "row": { "$type": "dimension", "$value": "64px", "$description": "least height of a list row such as a member row, it grows with its text" },
+    "row-tall": { "$type": "dimension", "$value": "72px", "$description": "least height of a list row with a bar under its texts, such as a task row, it grows with its text" },
     "beacon": { "$type": "dimension", "$value": "34px", "$description": "side of the glyph tile or of the breathing ring of an item beacon" },
     "border-room": { "$type": "dimension", "$value": "1.5px", "$description": "border of a room tile, solid or dashed" }
   },

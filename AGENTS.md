@@ -257,7 +257,7 @@ To add or update a golden (a new atom, or an intentional visual change):
 | `progress.ring-sweep`, `ring-breathe` | `AppProgress.ringSweep` (0.3 of the circle, the arc of an in-use ring), `ringBreatheOpacity` (0.4, lowest opacity while it breathes) |
 | `progress.freshness-*` | `AppProgress.freshnessFresh`, `Recent`, `Fading`, `Stale` (1, 0.85, 0.6, 0.25): how much of the freshness bar is filled. `maxAgeDays` (0, 2, 6) is the oldest age in calendar days of each tier |
 | `size.freshness-bar` | `AppSizes.freshnessBar` (4): height of `AppFreshnessBar` |
-| `size.row` | `AppSizes.row` (64, grows with its text): least height of a list row, `MemberRow` |
+| `size.row`, `row-tall` | `AppSizes.row` (64), `rowTall` (72), both grow with their text: least height of a list row, `MemberRow`, and of one with a bar under its texts, `TaskRow` |
 | `size.beacon` | `AppSizes.beacon` (34): glyph tile or breathing ring of `ItemBeacon` |
 | `size.border-room` | `AppSizes.borderRoom` (1.5): border of a `RoomTile`, solid or dashed |
 | `size.border-emphasis`, `focus-ring` | `AppSizes.borderEmphasis` (2, selected, focus and error borders), `focusRing` (4, primary-soft ring around a focused field) |

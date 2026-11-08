@@ -178,6 +178,7 @@ void main() {
       ('AppIcon', {'size': '0'}),
       ('MemberRow', {'joinOrder': '-1'}),
       ('MemberRow', {'semanticLabel': ''}),
+      ('TaskRow', {'logAgainSemanticLabel': '', 'ageDays': '-5'}),
       ('RoomTile', {'semanticLabel': '', 'occupants': '9', 'beacons': '9'}),
       ('ItemBeacon', {'semanticLabel': '', 'inUse': 'true'}),
     ]) {
@@ -235,6 +236,22 @@ void main() {
         tester.widget<RoomTile>(find.byType(RoomTile)).beacons,
         hasLength(3),
       );
+    });
+
+    testWidgets('a task row falls back to the sample label and clamps the '
+        'age', (tester) async {
+      await _open(
+        tester,
+        _pathOf('TaskRow'),
+        knobs: {'logAgainSemanticLabel': '', 'ageDays': '-5'},
+      );
+      var row = tester.widget<TaskRow>(find.byType(TaskRow));
+      expect(row.logAgainSemanticLabel, 'Log Clean the kitchen again');
+      expect(row.task.ageDays, 0);
+
+      await _open(tester, _pathOf('TaskRow'), knobs: {'ageDays': '99'});
+      row = tester.widget<TaskRow>(find.byType(TaskRow));
+      expect(row.task.ageDays, 30);
     });
 
     testWidgets('an item beacon falls back to the sample spoken label', (

@@ -465,6 +465,28 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       (t) => expect(_widget<RoomTile>(t).beacons, hasLength(2)),
     ),
   ],
+  'TaskRow': [
+    KnobCase(
+      'title',
+      'Zed',
+      (t) => expect(_widget<TaskRow>(t).task.title, 'Zed'),
+    ),
+    KnobCase(
+      'ageDays',
+      '9',
+      (t) => expect(_widget<TaskRow>(t).task.ageDays, 9),
+    ),
+    KnobCase(
+      'subtitle',
+      'Zed',
+      (t) => expect(_widget<TaskRow>(t).subtitle, 'Zed'),
+    ),
+    KnobCase(
+      'logAgainSemanticLabel',
+      'Zed',
+      (t) => expect(_widget<TaskRow>(t).logAgainSemanticLabel, 'Zed'),
+    ),
+  ],
   'AppFreshnessBar': [
     KnobCase(
       'ageDays',
