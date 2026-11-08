@@ -35,6 +35,7 @@ The Widgetbook catalog is its own Flutter package in `widgetbook/`. Run these fr
 | Install | `flutter pub get` |
 | Run the catalog | `flutter run -d chrome` |
 | Build check (CI does this, no deploy) | `flutter build web` |
+| Build as published (served under `/Compapp-design/`) | `flutter build web --release --base-href /Compapp-design/` (in Git Bash on Windows prefix it with `MSYS_NO_PATHCONV=1`) |
 | Analyze (must be clean) | `flutter analyze --fatal-infos` |
 | Test (use case contract, goldens, semantics) | `flutter test` |
 | Add or update a golden | Push and let CI render it, see [Golden tooling](#golden-tooling). `--update-goldens` refuses to write CI goldens off Linux |
@@ -255,6 +256,15 @@ A component theme sets colors, shapes, sizes and text styles only. It must not r
 | `surfaceTint` | transparent | No Material tint over surfaces |
 
 The sheet shadow uses the light ink color at 18% in both themes, so it darkens the page in dark mode too.
+
+## Catalog publishing
+
+`.github/workflows/widgetbook-pages.yml` publishes the catalog to `https://6pi-devs.github.io/Compapp-design/` with GitHub Pages. It runs on pushes to `main` that touch `lib/`, `widgetbook/`, `fonts/`, the pubspec files or the workflow itself, and on demand (`gh workflow run widgetbook-pages.yml --ref main`).
+
+- It fails closed: it only builds on `main`, and it waits for a successful `ci.yml` push run on the same commit before it deploys. A missing, cancelled or red run stops it.
+- `widgetbook/web/index.html` must keep `<base href="$FLUTTER_BASE_HREF">`: the workflow sets the sub-path with `--base-href`.
+- One-time repo setting: Settings, Pages, Build and deployment, Source: "GitHub Actions". Check it with `gh api repos/6Pi-Devs/Compapp-design/pages` (404 means Pages is not enabled yet).
+- Deploys do not create tags or releases: the catalog always shows `main`.
 
 ## Releases
 
