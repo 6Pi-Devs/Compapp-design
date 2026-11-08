@@ -1,0 +1,99 @@
+name: Widgetbook Pages
+
+# Publishes the Widgetbook catalog to https://6pi-devs.github.io/Compapp-design/
+# on every push to main that changes the catalog, and on demand. Pages must use
+# "GitHub Actions" as its source (Settings, Pages, Build and deployment).
+on:
+  push:
+    branches: [main]
+    paths:
+      - lib/**
+      - widgetbook/**
+      - fonts/**
+      - pubspec.yaml
+      - pubspec.lock
+      - .github/workflows/widgetbook-pages.yml
+  workflow_dispatch:
+
+# A deploy is never cut off mid-way: a newer one queues behind it.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - name: Require main
+        env:
+          REF: ${{ github.ref }}
+        run: |
+          if [ "$REF" != "refs/heads/main" ]; then
+            echo "::error::The catalog is published from main only (ran on $REF)."
+            exit 1
+          fi
+
+      # Fails closed: the deploy needs a successful ci.yml push run on this
+      # exact commit. It waits for a run that is still going, and stops when
+      # the run is missing, cancelled or red.
+      - name: Require a green CI run on this commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          run_id=""
+          for _ in $(seq 1 12); do
+            run_id="$(gh run list --workflow ci.yml --commit "$GITHUB_SHA" \
+              --event push --json databaseId --jq '.[0].databaseId // empty')"
+            [ -n "$run_id" ] && break
+            sleep 10
+          done
+          if [ -z "$run_id" ]; then
+            echo "::error::No ci.yml push run found for $GITHUB_SHA."
+            exit 1
+          fi
+          if ! gh run watch "$run_id" --exit-status --interval 20 >/dev/null; then
+            echo "::error::CI run $run_id on $GITHUB_SHA did not succeed."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v7
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version-file: pubspec.yaml
+          channel: stable
+          cache: true
+
+      - name: Install Widgetbook dependencies
+        working-directory: widgetbook
+        run: flutter pub get --enforce-lockfile
+
+      - name: Build Widgetbook
+        working-directory: widgetbook
+        run: flutter build web --release --base-href /Compapp-design/
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: widgetbook/build/web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

@@ -4,6 +4,8 @@ Design system for the [Compapp](https://github.com/6Pi-Devs/Compapp-app) Flutter
 
 The visual direction ("Living Floorplan") lives in the [Claude Design canvas](https://claude.ai/artifact/XRN3NJsKyxv3FgVhGgFPpo). Work is tracked in [Compapp-app#24](https://github.com/6Pi-Devs/Compapp-app/issues/24).
 
+**Catalog:** <https://6pi-devs.github.io/Compapp-design/>. It deploys on every push to `main` that touches the catalog (`lib/`, `widgetbook/`, `fonts/` or the pubspec files).
+
 ## Use it from the app
 
 The package is not published to pub.dev. The app depends on it through git, pinned to a release tag:
@@ -61,6 +63,8 @@ Use the addons to switch light and dark, English and Spanish, text scale and pho
 | Task | Command (in `widgetbook/`) |
 |------|----------------------------|
 | Test | `flutter test` |
+
+The published catalog is built by the `Widgetbook Pages` workflow (`flutter build web --release --base-href /Compapp-design/`). It waits for a green `ci.yml` run on the same commit before it deploys.
 
 The committed goldens are Linux renders: Linux CI is the only reference platform. On other operating systems a local run compares with a tolerance and cannot write CI goldens. To add or update one, push, let CI fail, then run `rm -rf widgetbook/test/goldens/ci && gh run download <run-id> -n ci-goldens -D widgetbook/test/goldens/ci` (the artifact holds every golden and `gh` will not overwrite files), review the images with `git status` and `git diff --stat`, and commit them. Never commit a golden rendered outside Linux. See [AGENTS.md](AGENTS.md) for the details.
 
