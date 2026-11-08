@@ -8,7 +8,7 @@ import 'package:flutter/widgets.dart';
 import 'helpers/use_case_harness.dart';
 
 void main() {
-  final useCases = collectUseCases(buildCatalog());
+  final useCases = collectFixedUseCases(buildCatalog());
 
   for (final MapEntry(key: path, value: useCase) in useCases.entries) {
     unawaited(

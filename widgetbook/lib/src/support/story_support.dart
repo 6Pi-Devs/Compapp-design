@@ -110,3 +110,39 @@ class _FocusedNodeHostState extends State<FocusedNodeHost> {
   @override
   Widget build(BuildContext context) => widget.builder(context, _node);
 }
+
+/// Holds a value a playground lets the user change by interaction (a switch
+/// flipped, a chip selected). A knob gives the [initial] value: when the knob
+/// changes, the value is reset to it, and in between the interaction drives
+/// the local state.
+class SeededState<T> extends StatefulWidget {
+  const new({required this.initial, required this.builder, super.key});
+
+  final T initial;
+  final Widget Function(
+    BuildContext context,
+    T value,
+    ValueChanged<T> onChanged,
+  )
+  builder;
+
+  @override
+  State<SeededState<T>> createState() => _SeededStateState<T>();
+}
+
+class _SeededStateState<T> extends State<SeededState<T>> {
+  late T _value = widget.initial;
+
+  @override
+  void didUpdateWidget(SeededState<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initial != widget.initial) _value = widget.initial;
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.builder(
+    context,
+    _value,
+    (value) => setState(() => _value = value),
+  );
+}

@@ -12,7 +12,7 @@ final _pathPattern = RegExp(
 
 void main() {
   final stories = _manifestStories();
-  final useCases = collectUseCases(buildCatalog()).keys.toSet();
+  final useCases = collectFixedUseCases(buildCatalog()).keys.toSet();
 
   test('every manifest story has a use case', () {
     expect(
