@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:compapp_design/src/tokens/app_colors.dart';
+import 'package:compapp_design/src/tokens/app_decor.dart';
 import 'package:compapp_design/src/tokens/app_motion.dart';
 import 'package:compapp_design/src/tokens/app_palette.dart';
 import 'package:compapp_design/src/tokens/app_progress.dart';
@@ -45,6 +46,7 @@ void main() {
       'size',
       'state-layer',
       'progress',
+      'decor',
     ]);
   });
 
@@ -248,6 +250,19 @@ void main() {
         AppStateLayers.values[name],
         valueOf(layers, name),
         reason: 'state-layer.$name',
+      );
+    }
+  });
+
+  test('decor matches AppDecor', () {
+    final decor = section('decor');
+
+    expect(AppDecor.values.keys.toSet(), names(decor));
+    for (final name in names(decor)) {
+      expect(
+        AppDecor.values[name],
+        valueOf(decor, name),
+        reason: 'decor.$name',
       );
     }
   });

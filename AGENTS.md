@@ -49,7 +49,7 @@ The root `flutter analyze` and `flutter test` skip `widgetbook/`, so run both pa
 lib/
   compapp_design.dart     barrel: the only import an app needs
   src/
-    tokens/               AppColors, AppSpacing, AppRadius, AppShadows, AppMotion, AppSizes, AppStateLayers, AppProgress, AppTypography (AppPalette is internal)
+    tokens/               AppColors, AppSpacing, AppRadius, AppShadows, AppMotion, AppSizes, AppStateLayers, AppProgress, AppDecor, AppTypography (AppPalette is internal)
     theme/                CompappTheme.light / dark
     models/               view models and shared enums (MemberView, RoomView, AppIcons)
     atoms/                single-purpose controls (AppButton, AppPebble, AppChip)
@@ -259,9 +259,11 @@ To add or update a golden (a new atom, or an intentional visual change):
 | `size.freshness-bar` | `AppSizes.freshnessBar` (4): height of `AppFreshnessBar` |
 | `size.row` | `AppSizes.row` (64, grows with its text): least height of a list row, `MemberRow` |
 | `size.beacon` | `AppSizes.beacon` (34): glyph tile or breathing ring of `ItemBeacon` |
+| `size.border-room` | `AppSizes.borderRoom` (1.5): border of a `RoomTile`, solid or dashed |
 | `size.border-emphasis`, `focus-ring` | `AppSizes.borderEmphasis` (2, selected, focus and error borders), `focusRing` (4, primary-soft ring around a focused field) |
 | `size.code-cell-width`, `code-cell-height` | `AppSizes.codeCellWidth` (56), `codeCellHeight` (60) |
 | `state-layer.*` | `AppStateLayers`: ink opacity over a fill when pressed (primary 12%, surface 8%, danger 16%) and the spinner track (35%) |
+| `decor.room-edge` | `AppDecor.roomEdge` (35%): glow ring of a home `RoomTile` and edge of an occupied one, a share of the presence-home or busy color. Decoration only, it carries no meaning |
 
 ### Component themes
 

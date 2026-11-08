@@ -387,6 +387,35 @@
         "Molecules/ItemBeacon/beacon-in-use",
         "Molecules/ItemBeacon/beacon-free"
       ]
+    },
+    {
+      "id": "room-tile",
+      "level": "molecule",
+      "class": "RoomTile",
+      "playground": "Molecules/RoomTile/playground",
+      "path": "molecules/room_tile.dart",
+      "props": [
+        { "name": "room", "type": "RoomView", "required": true, "default": "id and name" },
+        { "name": "state", "type": "RoomTileState", "required": true, "default": "home, away, occupied or free" },
+        { "name": "caption", "type": "String", "required": true, "default": "line under the name that says the state in words" },
+        { "name": "semanticLabel", "type": "String", "required": true, "default": "spoken description of the whole tile" },
+        { "name": "occupants", "type": "List<MemberView>", "required": false, "default": "empty; drawn as s36 pebbles at the end of the footer line, wrapped under the beacons and start-aligned when they do not fit on one line" },
+        { "name": "beacons", "type": "List<Widget>", "required": false, "default": "empty; pinned at the bottom start, wrapping onto more lines, each its own button" }
+      ],
+      "variants": ["tile"],
+      "states": ["home", "away", "occupied", "free"],
+      "semantics": "One container node named by semanticLabel (\"Bathroom, occupied by Carlos, 12 minutes\"), not interactive; the name, caption, lock and pebbles add nothing of their own. Each beacon stays its own focusable button, a child of that node. The state is also said by the caption, never by color or outline alone",
+      "key": "floorplan.room.<roomId>, roomTile.pebble.<memberId>",
+      "notes": [
+        "Not interactive: no onTap yet. The FloorplanMap organism needs one, and a tappable tile around its beacon buttons needs its own semantics design.",
+        "The contract states archived and draw are not drawn: the board shows neither, and the floorplan hides archived rooms. The RoomDrawBoard organism draws the tile in its draw form."
+      ],
+      "stories": [
+        "Molecules/RoomTile/tile-home",
+        "Molecules/RoomTile/tile-away",
+        "Molecules/RoomTile/tile-occupied",
+        "Molecules/RoomTile/tile-free"
+      ]
     }
   ]
 }

@@ -108,6 +108,9 @@ abstract final class AppSizes {
   /// (`size.beacon`).
   static const double beacon = 34;
 
+  /// Border of a room tile, solid or dashed (`size.border-room`).
+  static const double borderRoom = 1.5;
+
   /// Every token by its JSON name, checked by the parity test.
   static const Map<String, double> values = {
     'target.min': minTarget,
@@ -144,5 +147,6 @@ abstract final class AppSizes {
     'size.freshness-bar': freshnessBar,
     'size.row': row,
     'size.beacon': beacon,
+    'size.border-room': borderRoom,
   };
 }
