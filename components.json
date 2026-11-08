@@ -192,6 +192,71 @@
         "Atoms/AppCodeInput/digits-filled",
         "Atoms/AppCodeInput/digits-error"
       ]
+    },
+    {
+      "id": "app-pebble",
+      "level": "atom",
+      "class": "AppPebble",
+      "path": "atoms/app_pebble.dart",
+      "props": [
+        { "name": "initials", "type": "String", "required": true },
+        { "name": "joinOrder", "type": "int", "required": true, "default": "stable join sequence, not a list index; picks the color through AppColors.pebbleAt, wrapping after six" },
+        { "name": "semanticLabel", "type": "String", "required": true },
+        { "name": "size", "type": "AppPebbleSize", "required": false, "default": "s44" },
+        { "name": "status", "type": "AppPebbleStatus", "required": false, "default": "home; away draws its badge only from s44 up" },
+        { "name": "isYou", "type": "bool", "required": false, "default": "false" },
+        { "name": "isAdmin", "type": "bool", "required": false, "default": "false; the key badge is drawn only from s44 up" }
+      ],
+      "variants": ["s28", "s36", "s44", "s56", "s72"],
+      "states": ["home", "away", "invited", "you", "admin"],
+      "semantics": "One image node named by semanticLabel (required, not empty), which holds the whole description (name, you, admin, away); the initials, the badges and the outline are excluded. A node of its own under a parent that does not merge; under a parent that merges its children (a MergeSemantics row) its label joins the row's. Status and role are drawn as shapes: moon badge (away), dashed outline without fill (invited), key badge (admin), inset dark ring (you). The away and admin badges are drawn only from s44 up: on s28 and s36 they are left out, so say them in semanticLabel and in the text next to the pebble. The away badge hangs at the bottom trailing corner and the admin key at the top trailing corner (the board puts the key at the bottom too, where it would cover the status badge). The pebble is always a square: exactly its side at text scale 1, growing continuously with larger text. Two initials up to MW fit at every size; wider pairs (WW) grow s28 and s36 by a pixel or two. From s44 up the side reserves room for the badge squares in every state, so pebbles of a size stay equal. On s44+ a badge may cover the tip of an accent or a descender on two-letter initials; capitals are never covered",
+      "key": "pebble.<accountId>, pebble.badge.away, pebble.badge.admin",
+      "stories": [
+        "Atoms/AppPebble/s28-home",
+        "Atoms/AppPebble/s28-away",
+        "Atoms/AppPebble/s28-invited",
+        "Atoms/AppPebble/s28-you",
+        "Atoms/AppPebble/s28-admin",
+        "Atoms/AppPebble/s36-home",
+        "Atoms/AppPebble/s36-away",
+        "Atoms/AppPebble/s36-invited",
+        "Atoms/AppPebble/s36-you",
+        "Atoms/AppPebble/s36-admin",
+        "Atoms/AppPebble/s44-home",
+        "Atoms/AppPebble/s44-away",
+        "Atoms/AppPebble/s44-invited",
+        "Atoms/AppPebble/s44-you",
+        "Atoms/AppPebble/s44-admin",
+        "Atoms/AppPebble/s56-home",
+        "Atoms/AppPebble/s56-away",
+        "Atoms/AppPebble/s56-invited",
+        "Atoms/AppPebble/s56-you",
+        "Atoms/AppPebble/s56-admin",
+        "Atoms/AppPebble/s72-home",
+        "Atoms/AppPebble/s72-away",
+        "Atoms/AppPebble/s72-invited",
+        "Atoms/AppPebble/s72-you",
+        "Atoms/AppPebble/s72-admin"
+      ]
+    },
+    {
+      "id": "app-status-dot",
+      "level": "atom",
+      "class": "AppStatusDot",
+      "path": "atoms/app_status_dot.dart",
+      "props": [
+        { "name": "status", "type": "AppDotStatus", "required": true }
+      ],
+      "variants": ["dot"],
+      "states": ["home", "away", "busy", "unread"],
+      "semantics": "Decorative and excluded from semantics: the dot has no label. It always sits next to the text that names the status and is never the only cue (home and busy differ only by hue), so it must never stand alone",
+      "key": "none",
+      "stories": [
+        "Atoms/AppStatusDot/dot-home",
+        "Atoms/AppStatusDot/dot-away",
+        "Atoms/AppStatusDot/dot-busy",
+        "Atoms/AppStatusDot/dot-unread"
+      ]
     }
   ]
 }

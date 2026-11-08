@@ -14,7 +14,9 @@
     "busy": { "$type": "color", "$value": "#9A5A0E", "$extensions": { "mode": { "dark": "#F0B866" } } },
     "busy-soft": { "$type": "color", "$value": "#F6D9A8", "$extensions": { "mode": { "dark": "#4A3416" } } },
     "danger": { "$type": "color", "$value": "#B3261E", "$extensions": { "mode": { "dark": "#F2B8B5" } } },
-    "danger-soft": { "$type": "color", "$value": "#F6D5D2", "$extensions": { "mode": { "dark": "#5C1F1B" } } }
+    "danger-soft": { "$type": "color", "$value": "#F6D5D2", "$extensions": { "mode": { "dark": "#5C1F1B" } } },
+    "on-presence-away": { "$type": "color", "$value": "#FFFFFF", "$extensions": { "mode": { "dark": "#0E1A12" } }, "$description": "glyph on an away badge, on the presence-away fill" },
+    "on-pebble": { "$type": "color", "$value": "#1C2B22", "$extensions": { "mode": { "dark": "#1C2B22" } }, "$description": "initials on a pebble: the pebble colors are pastel in both themes, so the text stays dark in both" }
   },
   "pebble": {
     "sage": { "$type": "color", "$value": "#BFE0C6" },
@@ -36,6 +38,12 @@
     "body": { "$type": "typography", "$value": { "fontFamily": "Instrument Sans", "fontWeight": 400, "fontSize": "15px", "lineHeight": "22px" } },
     "label": { "$type": "typography", "$value": { "fontFamily": "Instrument Sans", "fontWeight": 600, "fontSize": "13px", "lineHeight": "16px", "letterSpacing": "0.2px" } },
     "label-lg": { "$type": "typography", "$value": { "fontFamily": "Instrument Sans", "fontWeight": 600, "fontSize": "15px", "lineHeight": "22px" } },
+    "pebble-xs": { "$type": "typography", "$value": { "fontFamily": "Instrument Sans", "fontWeight": 600, "fontSize": "12px", "lineHeight": "12px" } },
+    "pebble-xs-pair": { "$type": "typography", "$value": { "fontFamily": "Instrument Sans", "fontWeight": 600, "fontSize": "10px", "lineHeight": "10px" } },
+    "pebble-sm": { "$type": "typography", "$value": { "fontFamily": "Instrument Sans", "fontWeight": 600, "fontSize": "14px", "lineHeight": "14px" } },
+    "pebble-md": { "$type": "typography", "$value": { "fontFamily": "Instrument Sans", "fontWeight": 600, "fontSize": "15px", "lineHeight": "12px" } },
+    "pebble-lg": { "$type": "typography", "$value": { "fontFamily": "Instrument Sans", "fontWeight": 600, "fontSize": "20px", "lineHeight": "20px" } },
+    "pebble-xl": { "$type": "typography", "$value": { "fontFamily": "Bricolage Grotesque", "fontWeight": 600, "fontSize": "28px", "lineHeight": "28px" } },
     "caption": { "$type": "typography", "$value": { "fontFamily": "Instrument Sans", "fontWeight": 400, "fontSize": "12px", "lineHeight": "16px" } }
   },
   "space": {
@@ -84,7 +92,18 @@
     "dash": { "$type": "dimension", "$value": "4px", "$description": "dash of a dashed 1px border, scales with the border width" },
     "dash-gap": { "$type": "dimension", "$value": "3px", "$description": "gap of a dashed 1px border, scales with the border width" },
     "code-cell-width": { "$type": "dimension", "$value": "56px", "$description": "width of one code input cell, cells shrink to share a narrow column" },
-    "code-cell-height": { "$type": "dimension", "$value": "60px", "$description": "height of one code input cell" }
+    "code-cell-height": { "$type": "dimension", "$value": "60px", "$description": "height of one code input cell" },
+    "pebble-xs": { "$type": "dimension", "$value": "28px", "$description": "side of the smallest pebble" },
+    "pebble-sm": { "$type": "dimension", "$value": "36px", "$description": "side of a small pebble" },
+    "pebble-md": { "$type": "dimension", "$value": "44px", "$description": "side of a medium pebble" },
+    "pebble-lg": { "$type": "dimension", "$value": "56px", "$description": "side of a large pebble" },
+    "pebble-xl": { "$type": "dimension", "$value": "72px", "$description": "side of the largest pebble, its initials use font.pebble-xl" },
+    "pebble-badge": { "$type": "dimension", "$value": "20px", "$description": "side of the away and admin badges, drawn on a medium pebble and up" },
+    "pebble-badge-glyph": { "$type": "dimension", "$value": "11px", "$description": "glyph inside pebble-badge" },
+    "pebble-badge-offset": { "$type": "dimension", "$value": "4px", "$description": "how far a pebble badge hangs outside the pebble" },
+    "border-dashed": { "$type": "dimension", "$value": "1.5px", "$description": "border of an invited pebble, drawn dashed" },
+    "dot": { "$type": "dimension", "$value": "8px", "$description": "status dot beside a label" },
+    "dot-unread": { "$type": "dimension", "$value": "10px", "$description": "unread dot, a little larger than dot" }
   },
   "state-layer": {
     "pressed-primary": { "$type": "number", "$value": 0.12, "$description": "ink over a primary fill when pressed" },
