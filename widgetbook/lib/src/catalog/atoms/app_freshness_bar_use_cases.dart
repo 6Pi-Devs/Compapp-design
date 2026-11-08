@@ -1,5 +1,7 @@
 import 'package:compapp_design/compapp_design.dart';
+import 'package:compapp_design_widgetbook/src/catalog/use_case_paths.dart';
 import 'package:compapp_design_widgetbook/src/support/localized_sample.dart';
+import 'package:compapp_design_widgetbook/src/support/playground_knobs.dart';
 import 'package:compapp_design_widgetbook/src/support/story_support.dart';
 import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
@@ -19,6 +21,7 @@ WidgetbookComponent buildAppFreshnessBar() {
   return WidgetbookComponent(
     name: 'AppFreshnessBar',
     useCases: [
+      _playground(),
       for (final (freshness, daysAgo) in const [
         (AppFreshness.fresh, 0),
         (AppFreshness.recent, 1),
@@ -57,3 +60,42 @@ String _age(BuildContext context, int daysAgo) => switch (daysAgo) {
   1 => context.sample(en: 'yesterday', es: 'ayer'),
   _ => context.sample(en: '$daysAgo days ago', es: 'hace $daysAgo días'),
 };
+
+const _maxPlaygroundAgeDays = 30;
+
+/// Every prop of [AppFreshnessBar] as a knob, beside the text that names the
+/// age, as on the Atoms board.
+WidgetbookUseCase _playground() {
+  return WidgetbookUseCase(
+    name: playgroundUseCaseName,
+    builder: (context) {
+      final ageDays = context.knobs.int.slider(
+        label: 'ageDays',
+        description: 'Calendar days since the task was last done',
+        max: _maxPlaygroundAgeDays,
+        divisions: _maxPlaygroundAgeDays,
+      );
+      final semanticLabel = context.textKnobOrNull(
+        'semanticLabel',
+        context.sample(en: 'Done today', es: 'Hecho hoy'),
+      );
+
+      return useCaseFrame(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: _barWidth,
+              child: AppFreshnessBar(
+                ageDays: ageDays,
+                semanticLabel: semanticLabel,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Text(context.sample(en: '$ageDays days', es: '$ageDays días')),
+          ],
+        ),
+      );
+    },
+  );
+}

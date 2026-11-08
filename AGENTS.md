@@ -130,18 +130,39 @@ The analyzer enforces the Dart 3.13 shorthand. Write `const new(this.x)` for the
 
 ### Widgetbook and golden tests
 
-- One use case per variant x state listed in the manifest, no more, no fewer.
+- One fixed use case per variant x state listed in the manifest, no more, no fewer, plus exactly one `playground` per component (see [Playgrounds](#playgrounds)).
 - Use case names follow `<Level>/<Class>/<variant>-<state>` (`Atoms/AppButton/primary-disabled`). The manifest `stories`, the Widgetbook tree and the golden file names use the same string.
-- A use case is a plain builder with fixed props, no knobs. The same builder feeds the Widgetbook tree and the tests, so the catalog and the goldens cannot drift.
+- A fixed use case is a plain builder with fixed props, no knobs. The same builder feeds the Widgetbook tree and the tests, so the catalog and the goldens cannot drift. Knobs live only in the `playground`.
 - The tree is written by hand in `widgetbook/lib/src/catalog/` (`catalog.dart` composes `atoms.dart`, one file of use cases per atom). There is no `widgetbook_generator` and no `build_runner`: generated files are never committed, and an explicit tree is easier for agents to read.
 - Strings in use cases come in English and Spanish: `context.sample(en: ..., es: ...)` picks one by the locale the Widgetbook localization addon sets. Goldens render `en` only.
 - Three generic tests in `widgetbook/test/` loop over the catalog, so a new atom is covered without touching them:
-  - `catalog_contract_test.dart`: the use case paths equal the union of every manifest `stories` entry, in both directions, follow the naming pattern, and each manifest entry has exactly one story per variant x state.
-  - `catalog_goldens_test.dart`: one golden per use case, named after its path, holding four scenarios (light and dark, text scale 1.0 and 2.0).
-  - `catalog_semantics_test.dart`: every use case, light and dark, meets `androidTapTargetGuideline`, `iOSTapTargetGuideline`, `labeledTapTargetGuideline` and `textContrastGuideline`.
+  - `catalog_contract_test.dart`: the fixed use case paths equal the union of every manifest `stories` entry, in both directions, follow the naming pattern, and each manifest entry has exactly one story per variant x state. The playgrounds in the tree equal the manifest `playground` paths, one per component.
+  - `catalog_goldens_test.dart`: one golden per fixed use case, named after its path, holding four scenarios (light and dark, text scale 1.0 and 2.0).
+  - `catalog_semantics_test.dart`: every fixed use case, light and dark, meets `androidTapTargetGuideline`, `iOSTapTargetGuideline`, `labeledTapTargetGuideline` and `textContrastGuideline`.
 - States a static builder cannot reach by gesture are rendered deterministically without a test-only prop on the component, so every golden scenario shows them. Buttons take Material's `statesController` holding `WidgetState.pressed` or `WidgetState.focused` (`StatesControllerHost`). Fields and the code input take a `FocusNode` that reports focus (`FocusedNodeHost`), because only one widget can really hold the primary focus and the four scenarios of a golden render side by side. Spinners freeze under `FrozenMotion` (`MediaQuery.disableAnimations`), so `pumpAndSettle` can finish. The helpers live in `widgetbook/lib/src/support/story_support.dart`.
 - alchemist draws the text of an editable field as blocks, so a golden never proves its text color: component widget tests read the painted pixel instead.
 - Widgetbook shows light and dark (`CompappTheme`), `en` and `es`, text scale and phone viewports through addons.
+
+#### Playgrounds
+
+Every component has one extra use case named `playground` (`Atoms/AppButton/playground`), built with Widgetbook knobs for every public prop, so the catalog can be explored by hand. It is the only use case with knobs and it is never a golden.
+
+| Prop | Knob |
+|------|------|
+| Enum | `context.enumKnob` (dropdown), `enumKnobOrNull` for a nullable one |
+| `bool` | `context.knobs.boolean` |
+| Number | a slider limited to the valid range (story-only bounds are named constants), for example ring value 0 to 1 with an "in use" toggle, `ageDays` 0 to 30, `joinOrder`, code length |
+| `String` | `context.textKnob` with the `context.sample` English or Spanish text as default, `textKnobOrNull` for `String?` |
+| Nullable callback | an "enabled" boolean: null means disabled |
+| `AppIcons` | `enumKnob` over `AppIcons.values` |
+| Controller, `FocusNode`, `WidgetStatesController`, callbacks | plumbing: the story owns them. A knob forces the look instead ("focused look", "forced state") |
+
+Rules:
+
+- A knob is the initial value. Stateful atoms stay interactive: typing, toggling and selecting drive local state, held by `SeededState` (switch value, chip selected) or `TextControllerHost` (text), which start over when their knob changes. Never wire a knob straight to a value the user can also change.
+- A playground reads knobs, so it only builds inside a Widgetbook app. Goldens, the semantics test, the freshness bar layout test and the contract use `collectFixedUseCases`, which leaves playgrounds out, and `playground_paths_test.dart` fails if one of those files goes back to `collectUseCases`.
+- `catalog_playgrounds_test.dart` opens every playground in a real Widgetbook app (`CatalogApp(initialRoute: ...)` with `path`, `preview` and `knobs` query parameters), checks that the component builds with its default knobs and in the full catalog with the knobs panel, and changes knob values through the URL and through `WidgetbookState.updateQueryField`.
+- Show a rule, do not hide a knob: the pebble badges draw from s44 up, so the badge knobs stay and have no effect below it.
 
 #### Golden tooling
 
@@ -167,11 +188,12 @@ To add or update a golden (a new atom, or an intentional visual change):
 
 ### Add a component
 
-1. Add its entry to `components.json` first (level, class, path, props, variants, states, semantics, key, stories).
+1. Add its entry to `components.json` first (level, class, playground, path, props, variants, states, semantics, key, stories). `playground` is `<Level>/<Class>/playground`.
 2. Create `lib/src/<level>/<name>.dart` following the [Import rules](#import-rules). Export it from the barrel.
 3. Add `widgetbook/lib/src/catalog/atoms/<name>_use_cases.dart` with one use case per variant x state, and register it in `atoms.dart`. The goldens and the semantics test pick it up on their own.
-4. Push, let CI render the Linux golden, download the `ci-goldens` artifact, review the new PNGs and commit them (see [Golden tooling](#golden-tooling)).
-5. Run the [Definition of Done](#definition-of-done) checklist.
+4. In the same file add the `playground` use case with a knob for every prop (see [Playgrounds](#playgrounds)). The playground smoke test picks it up on its own.
+5. Push, let CI render the Linux golden, download the `ci-goldens` artifact, review the new PNGs and commit them (see [Golden tooling](#golden-tooling)).
+6. Run the [Definition of Done](#definition-of-done) checklist.
 
 ## Tokens
 
@@ -315,7 +337,7 @@ Code explains itself through names. Keep comments rare.
 - [ ] Import rules respected, names follow [Naming](#naming)
 - [ ] No `Color(0x...)` outside `lib/src/tokens/`, no magic numbers, no hardcoded strings
 - [ ] `components.json` entry added or updated, manifest test green
-- [ ] Use cases for every variant x state, CI goldens committed, `widgetbook` analyze and test green
+- [ ] Use cases for every variant x state plus one `playground` with a knob for every prop, CI goldens committed, `widgetbook` analyze and test green
 - [ ] Tokens changed in JSON and Dart together, parity test green
 - [ ] Format check (as CI) clean and `flutter analyze --fatal-infos` reports 0 issues
 - [ ] No generated files committed

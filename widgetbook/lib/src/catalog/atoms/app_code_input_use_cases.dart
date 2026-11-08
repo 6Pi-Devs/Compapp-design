@@ -1,5 +1,7 @@
 import 'package:compapp_design/compapp_design.dart';
+import 'package:compapp_design_widgetbook/src/catalog/use_case_paths.dart';
 import 'package:compapp_design_widgetbook/src/support/localized_sample.dart';
+import 'package:compapp_design_widgetbook/src/support/playground_knobs.dart';
 import 'package:compapp_design_widgetbook/src/support/story_support.dart';
 import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
@@ -12,6 +14,7 @@ WidgetbookComponent buildAppCodeInput() {
   return WidgetbookComponent(
     name: 'AppCodeInput',
     useCases: [
+      _playground(),
       WidgetbookUseCase(
         name: 'digits-empty',
         builder: (context) => _frame(context, ''),
@@ -62,5 +65,72 @@ Widget _frame(
           ? FocusedNodeHost(builder: (context, node) => input(controller, node))
           : input(controller, null),
     ),
+  );
+}
+
+const _minCodeLength = 1;
+const _maxCodeLength = 8;
+const _defaultCodeLength = 6;
+
+/// Every prop of [AppCodeInput] as a knob. The code knob is the initial code:
+/// typing then edits it (the controller lives in a [TextControllerHost], which
+/// starts over when the knob changes). The controller, the callbacks and the
+/// focus node are plumbing, so the focus knob only draws the focused cell.
+WidgetbookUseCase _playground() {
+  return WidgetbookUseCase(
+    name: playgroundUseCaseName,
+    builder: (context) {
+      final code = context.textKnob('code', '');
+      final label = context.textKnob(
+        'label',
+        context.sample(en: 'Reset code', es: 'Código de recuperación'),
+      );
+      final length = context.knobs.int.slider(
+        label: 'length',
+        initialValue: _defaultCodeLength,
+        min: _minCodeLength,
+        max: _maxCodeLength,
+        divisions: _maxCodeLength - _minCodeLength,
+      );
+      final numeric = context.knobs.boolean(
+        label: 'numeric',
+        initialValue: true,
+      );
+      final errorText = context.textKnobOrNull(
+        'errorText',
+        null,
+        description: 'Any text puts the input in its error look',
+      );
+      final autofocus = context.knobs.boolean(label: 'autofocus');
+      final focused = context.knobs.boolean(
+        label: 'focused look',
+        description: 'Draws the focused cell without taking focus',
+      );
+
+      Widget input(TextEditingController controller, FocusNode? focusNode) {
+        return AppCodeInput(
+          label: label,
+          controller: controller,
+          focusNode: focusNode,
+          length: length,
+          numeric: numeric,
+          errorText: errorText,
+          autofocus: autofocus,
+          onCompleted: (_) {},
+        );
+      }
+
+      return useCaseFrame(
+        child: TextControllerHost(
+          key: ValueKey(code),
+          text: code,
+          builder: (context, controller) => focused
+              ? FocusedNodeHost(
+                  builder: (context, node) => input(controller, node),
+                )
+              : input(controller, null),
+        ),
+      );
+    },
   );
 }

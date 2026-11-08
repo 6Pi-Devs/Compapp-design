@@ -1,5 +1,7 @@
 import 'package:compapp_design/compapp_design.dart';
+import 'package:compapp_design_widgetbook/src/catalog/use_case_paths.dart';
 import 'package:compapp_design_widgetbook/src/support/localized_sample.dart';
+import 'package:compapp_design_widgetbook/src/support/playground_knobs.dart';
 import 'package:compapp_design_widgetbook/src/support/story_support.dart';
 import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
@@ -14,6 +16,7 @@ WidgetbookComponent buildAppPebble() {
   return WidgetbookComponent(
     name: 'AppPebble',
     useCases: [
+      _playground(),
       for (final size in AppPebbleSize.values)
         for (final state in _PebbleState.values)
           WidgetbookUseCase(
@@ -80,4 +83,58 @@ Widget _pebble(BuildContext context, AppPebbleSize size, _PebbleState state) {
       ),
     ),
   };
+}
+
+const _maxJoinOrder = 11;
+
+/// Every prop of [AppPebble] as a knob. The away and admin badges only draw
+/// from s44 up, so below it those knobs change nothing: that is the rule, not
+/// a broken knob.
+WidgetbookUseCase _playground() {
+  return WidgetbookUseCase(
+    name: playgroundUseCaseName,
+    builder: (context) {
+      final size = context.enumKnob(
+        'size',
+        AppPebbleSize.values,
+        initial: AppPebbleSize.s44,
+      );
+      final status = context.enumKnob(
+        'status',
+        AppPebbleStatus.values,
+        description: 'The away badge draws from s44 up',
+      );
+      final isYou = context.knobs.boolean(label: 'isYou');
+      final isAdmin = context.knobs.boolean(
+        label: 'isAdmin',
+        description: 'The admin badge draws from s44 up',
+      );
+      final initials = context.textKnob('initials', 'A');
+      final joinOrder = context.knobs.int.slider(
+        label: 'joinOrder',
+        description: 'Picks the pebble color, cycling through the palette',
+        max: _maxJoinOrder,
+        divisions: _maxJoinOrder,
+      );
+      final semanticLabel = context.textKnob(
+        'semanticLabel',
+        context.sample(en: 'Ana', es: 'Ana'),
+      );
+
+      return useCaseFrame(
+        child: Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: AppPebble(
+            initials: initials,
+            joinOrder: joinOrder,
+            size: size,
+            status: status,
+            isYou: isYou,
+            isAdmin: isAdmin,
+            semanticLabel: semanticLabel,
+          ),
+        ),
+      );
+    },
+  );
 }

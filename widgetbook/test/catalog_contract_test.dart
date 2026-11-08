@@ -52,6 +52,39 @@ void main() {
     expect(ambiguous, isEmpty);
   });
 
+  group('playgrounds', () {
+    final playgrounds = collectPlaygrounds(buildCatalog()).keys.toList();
+    final declared = [
+      for (final entry in _manifestEntries()) entry['playground'] as String,
+    ];
+
+    test('the tree has exactly the playgrounds the manifest declares', () {
+      expect(playgrounds.toSet(), declared.toSet());
+      expect(playgrounds.length, declared.length, reason: 'no duplicates');
+    });
+
+    test('every component has one playground, and it is not a story', () {
+      final wrong = [
+        for (final entry in _manifestEntries())
+          if (playgrounds
+                  .where(
+                    (path) => path.startsWith(
+                      '${(entry['playground'] as String).split('/').take(2).join('/')}/',
+                    ),
+                  )
+                  .length !=
+              1)
+            '${entry['id']}: not exactly one playground',
+      ];
+      expect(wrong, isEmpty);
+      expect(stories.intersection(playgrounds.toSet()), isEmpty);
+    });
+
+    test('a playground is not part of the variant x state rule', () {
+      expect(useCases.where(isPlaygroundPath), isEmpty);
+    });
+  });
+
   test('use case paths are <Level>/<Class>/<variant>-<state>', () {
     expect(useCases.where((path) => !_pathPattern.hasMatch(path)), isEmpty);
   });

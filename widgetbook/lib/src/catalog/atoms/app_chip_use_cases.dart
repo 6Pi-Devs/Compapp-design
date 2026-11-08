@@ -1,5 +1,7 @@
 import 'package:compapp_design/compapp_design.dart';
+import 'package:compapp_design_widgetbook/src/catalog/use_case_paths.dart';
 import 'package:compapp_design_widgetbook/src/support/localized_sample.dart';
+import 'package:compapp_design_widgetbook/src/support/playground_knobs.dart';
 import 'package:compapp_design_widgetbook/src/support/story_support.dart';
 import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
@@ -10,6 +12,7 @@ WidgetbookComponent buildAppChip() {
   return WidgetbookComponent(
     name: 'AppChip',
     useCases: [
+      _playground(),
       for (final kind in AppChipKind.values) ...[
         WidgetbookUseCase(
           name: '${kind.name}-default',
@@ -67,5 +70,41 @@ Widget _frame(
         onTap: enabled ? () {} : null,
       ),
     ),
+  );
+}
+
+/// Every prop of [AppChip] as a knob. The selected knob is the initial value:
+/// tapping the chip then toggles it (see [SeededState]).
+WidgetbookUseCase _playground() {
+  return WidgetbookUseCase(
+    name: playgroundUseCaseName,
+    builder: (context) {
+      final label = context.textKnob(
+        'label',
+        context.sample(en: 'Kitchen', es: 'Cocina'),
+      );
+      final kind = context.enumKnob('kind', AppChipKind.values);
+      final selected = context.knobs.boolean(label: 'selected');
+      final enabled = context.knobs.boolean(
+        label: 'enabled',
+        description: 'A null onTap disables the chip',
+        initialValue: true,
+      );
+
+      return useCaseFrame(
+        child: Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: SeededState<bool>(
+            initial: selected,
+            builder: (context, value, onChanged) => AppChip(
+              label: label,
+              kind: kind,
+              selected: value,
+              onTap: enabled ? () => onChanged(!value) : null,
+            ),
+          ),
+        ),
+      );
+    },
   );
 }

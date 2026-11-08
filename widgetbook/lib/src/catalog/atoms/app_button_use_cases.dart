@@ -1,5 +1,7 @@
 import 'package:compapp_design/compapp_design.dart';
+import 'package:compapp_design_widgetbook/src/catalog/use_case_paths.dart';
 import 'package:compapp_design_widgetbook/src/support/localized_sample.dart';
+import 'package:compapp_design_widgetbook/src/support/playground_knobs.dart';
 import 'package:compapp_design_widgetbook/src/support/story_support.dart';
 import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
@@ -25,6 +27,7 @@ WidgetbookComponent buildAppButton() {
   return WidgetbookComponent(
     name: 'AppButton',
     useCases: [
+      _playground(),
       for (final (name, variant, size) in _variants) ...[
         WidgetbookUseCase(
           name: '$name-default',
@@ -104,5 +107,72 @@ Widget _frame(
         ),
       ],
     ),
+  );
+}
+
+enum _ForcedState {
+  none({}),
+  pressed({WidgetState.pressed}),
+  focused({WidgetState.focused});
+
+  new(this.states);
+
+  final Set<WidgetState> states;
+}
+
+/// Every prop of [AppButton] as a knob. The forced state holds a Material
+/// state in a states controller, since a knob cannot press or focus a button.
+WidgetbookUseCase _playground() {
+  return WidgetbookUseCase(
+    name: playgroundUseCaseName,
+    builder: (context) {
+      final label = context.textKnob(
+        'label',
+        context.sample(en: 'Send request', es: 'Enviar solicitud'),
+      );
+      final enabled = context.knobs.boolean(
+        label: 'enabled',
+        description: 'A null onPressed disables the button',
+        initialValue: true,
+      );
+      final variant = context.enumKnob('variant', AppButtonVariant.values);
+      final size = context.enumKnobOrNull(
+        'size',
+        AppButtonSize.values,
+        description: 'Null uses the default of the variant',
+      );
+      final icon = context.enumKnobOrNull('icon', AppIcons.values);
+      final loading = context.knobs.boolean(label: 'loading');
+      final semanticLabel = context.textKnobOrNull('semanticLabel', null);
+      final loadingSemanticLabel = context.textKnobOrNull(
+        'loadingSemanticLabel',
+        context.sample(en: 'Loading', es: 'Cargando'),
+      );
+      final forced = context.enumKnob('forced state', _ForcedState.values);
+
+      return useCaseFrame(
+        child: StatesControllerHost(
+          key: ValueKey(forced),
+          states: forced.states,
+          builder: (context, controller) => Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AppButton(
+                label: label,
+                variant: variant,
+                size: size,
+                icon: icon,
+                onPressed: enabled ? () {} : null,
+                loading: loading,
+                semanticLabel: semanticLabel,
+                loadingSemanticLabel: loadingSemanticLabel,
+                statesController: controller,
+              ),
+            ],
+          ),
+        ),
+      );
+    },
   );
 }

@@ -58,7 +58,7 @@ flutter pub get
 flutter run -d chrome
 ```
 
-Use the addons to switch light and dark, English and Spanish, text scale and phone viewports. The same use cases drive the golden and accessibility tests:
+Use the addons to switch light and dark, English and Spanish, text scale and phone viewports. Every component has a `playground` use case with a knob for each prop, to try it by hand. The other use cases are fixed (one per variant x state) and drive the golden and accessibility tests:
 
 | Task | Command (in `widgetbook/`) |
 |------|----------------------------|

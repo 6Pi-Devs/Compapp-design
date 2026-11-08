@@ -1,5 +1,7 @@
 import 'package:compapp_design/compapp_design.dart';
+import 'package:compapp_design_widgetbook/src/catalog/use_case_paths.dart';
 import 'package:compapp_design_widgetbook/src/support/localized_sample.dart';
+import 'package:compapp_design_widgetbook/src/support/playground_knobs.dart';
 import 'package:compapp_design_widgetbook/src/support/story_support.dart';
 import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
@@ -10,6 +12,7 @@ WidgetbookComponent buildAppStatusDot() {
   return WidgetbookComponent(
     name: 'AppStatusDot',
     useCases: [
+      _playground(),
       for (final status in AppDotStatus.values)
         WidgetbookUseCase(
           name: 'dot-${status.name}',
@@ -37,3 +40,27 @@ String _label(BuildContext context, AppDotStatus status) => switch (status) {
   AppDotStatus.busy => context.sample(en: 'Busy', es: 'Ocupado'),
   AppDotStatus.unread => context.sample(en: 'Unread', es: 'Sin leer'),
 };
+
+/// Every prop of [AppStatusDot] as a knob, beside the text that names it.
+WidgetbookUseCase _playground() {
+  return WidgetbookUseCase(
+    name: playgroundUseCaseName,
+    builder: (context) {
+      final status = context.enumKnob('status', AppDotStatus.values);
+
+      return useCaseFrame(
+        child: Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AppStatusDot(status: status),
+              const SizedBox(width: AppSpacing.sm),
+              Text(_label(context, status)),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}

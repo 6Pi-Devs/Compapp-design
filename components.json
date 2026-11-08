@@ -5,6 +5,7 @@
       "id": "app-button",
       "level": "atom",
       "class": "AppButton",
+      "playground": "Atoms/AppButton/playground",
       "path": "atoms/app_button.dart",
       "props": [
         { "name": "label", "type": "String", "required": true },
@@ -63,6 +64,7 @@
       "id": "app-icon",
       "level": "atom",
       "class": "AppIcon",
+      "playground": "Atoms/AppIcon/playground",
       "path": "atoms/app_icon.dart",
       "props": [
         { "name": "icon", "type": "AppIcons", "required": true },
@@ -80,6 +82,7 @@
       "id": "app-chip",
       "level": "atom",
       "class": "AppChip",
+      "playground": "Atoms/AppChip/playground",
       "path": "atoms/app_chip.dart",
       "props": [
         { "name": "label", "type": "String", "required": true },
@@ -107,6 +110,7 @@
       "id": "app-switch",
       "level": "atom",
       "class": "AppSwitch",
+      "playground": "Atoms/AppSwitch/playground",
       "path": "atoms/app_switch.dart",
       "props": [
         { "name": "value", "type": "bool", "required": true },
@@ -128,6 +132,7 @@
       "id": "app-text-field",
       "level": "atom",
       "class": "AppTextField",
+      "playground": "Atoms/AppTextField/playground",
       "path": "atoms/app_text_field.dart",
       "props": [
         { "name": "label", "type": "String", "required": true },
@@ -170,6 +175,7 @@
       "id": "app-code-input",
       "level": "atom",
       "class": "AppCodeInput",
+      "playground": "Atoms/AppCodeInput/playground",
       "path": "atoms/app_code_input.dart",
       "props": [
         { "name": "label", "type": "String", "required": true },
@@ -197,6 +203,7 @@
       "id": "app-pebble",
       "level": "atom",
       "class": "AppPebble",
+      "playground": "Atoms/AppPebble/playground",
       "path": "atoms/app_pebble.dart",
       "props": [
         { "name": "initials", "type": "String", "required": true },
@@ -243,6 +250,7 @@
       "id": "app-status-dot",
       "level": "atom",
       "class": "AppStatusDot",
+      "playground": "Atoms/AppStatusDot/playground",
       "path": "atoms/app_status_dot.dart",
       "props": [
         { "name": "status", "type": "AppDotStatus", "required": true }
@@ -262,6 +270,7 @@
       "id": "app-badge",
       "level": "atom",
       "class": "AppBadge",
+      "playground": "Atoms/AppBadge/playground",
       "path": "atoms/app_badge.dart",
       "props": [
         { "name": "count", "type": "int?", "required": false, "default": "AppBadge.count: the number, 99+ beyond 99" },
@@ -289,6 +298,7 @@
       "id": "app-progress-ring",
       "level": "atom",
       "class": "AppProgressRing",
+      "playground": "Atoms/AppProgressRing/playground",
       "path": "atoms/app_progress_ring.dart",
       "props": [
         { "name": "semanticLabel", "type": "String?", "required": true, "default": "null leaves the ring out of semantics" },
@@ -313,6 +323,7 @@
       "id": "app-freshness-bar",
       "level": "atom",
       "class": "AppFreshnessBar",
+      "playground": "Atoms/AppFreshnessBar/playground",
       "path": "atoms/app_freshness_bar.dart",
       "props": [
         { "name": "ageDays", "type": "int", "required": true, "default": "calendar days since the task was last done, counted by the app in the home's time zone; zero or less is fresh" },

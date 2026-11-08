@@ -5,11 +5,17 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:widgetbook/widgetbook.dart';
 
 class CatalogApp extends StatelessWidget {
-  const new({super.key});
+  const new({this.initialRoute = '/', super.key});
+
+  /// The route Widgetbook opens at: `/` for the catalog, or one with `path`,
+  /// `preview` and `knobs` query parameters to open a use case with knob
+  /// values, as the tests do.
+  final String initialRoute;
 
   @override
   Widget build(BuildContext context) {
     return Widgetbook.material(
+      initialRoute: initialRoute,
       directories: buildCatalog(),
       addons: [
         MaterialThemeAddon(
