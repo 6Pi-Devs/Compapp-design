@@ -196,6 +196,17 @@ void main() {
       ('AppNavBar', {'destinations': '9'}),
       ('ActivityRow', {'semanticLabel': ''}),
       (
+        'KnockButton',
+        {
+          'label': '',
+          'cooldown': 'true',
+          'remaining': 'NaN',
+          'cooldownLabel': '',
+          'remainingLabel': '',
+          'cooldownSemanticLabel': '',
+        },
+      ),
+      (
         'PresenceSwitch',
         {'semanticLabel': '', 'homeLabel': '', 'awayLabel': ''},
       ),
@@ -309,6 +320,32 @@ void main() {
       expect(switcher.semanticLabel, 'Your presence');
       expect(switcher.homeLabel, "I'm home");
       expect(switcher.awayLabel, "I'm out");
+    });
+
+    testWidgets('a knock button falls back to the sample texts and keeps '
+        'the share in range', (tester) async {
+      await _open(
+        tester,
+        _pathOf('KnockButton'),
+        knobs: {
+          'label': '',
+          'cooldown': 'true',
+          'remaining': '7',
+          'cooldownLabel': '',
+          'remainingLabel': '',
+          'cooldownSemanticLabel': '',
+        },
+      );
+
+      final button = tester.widget<KnockButton>(find.byType(KnockButton));
+      expect(button.label, "Who's home?");
+      expect(button.cooldown!.label, 'Asked');
+      expect(button.cooldown!.remainingLabel, '11 min');
+      expect(
+        button.cooldown!.semanticLabel,
+        "Asked who's home. You can ask again in 11 minutes",
+      );
+      expect(button.cooldown!.ringValue, 1);
     });
 
     testWidgets('an item beacon falls back to the sample spoken label', (

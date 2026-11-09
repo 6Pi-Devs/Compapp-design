@@ -152,6 +152,13 @@ abstract final class AppSizes {
   /// (`size.presence-control`). Both grow with their text.
   static const double presenceControl = 64;
 
+  /// Least width of the knock button (`size.knock-width`). It grows with its
+  /// text.
+  static const double knockWidth = 96;
+
+  /// Side of the ring of the knock button while it waits (`size.knock-ring`).
+  static const double knockRing = 24;
+
   /// Every token by its JSON name, checked by the parity test.
   static const Map<String, double> values = {
     'target.min': minTarget,
@@ -200,5 +207,7 @@ abstract final class AppSizes {
     'size.ribbon': ribbon,
     'size.activity-tile': activityTile,
     'size.presence-control': presenceControl,
+    'size.knock-width': knockWidth,
+    'size.knock-ring': knockRing,
   };
 }
