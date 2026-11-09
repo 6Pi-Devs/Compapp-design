@@ -178,6 +178,14 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       (t) => expect(_widget<AppTextField>(t).enableSuggestions, isFalse),
     ),
     KnobCase(
+      'textCapitalization',
+      'words',
+      (t) => expect(
+        _widget<AppTextField>(t).textCapitalization,
+        TextCapitalization.words,
+      ),
+    ),
+    KnobCase(
       'readOnly',
       'true',
       (t) => expect(_widget<AppTextField>(t).readOnly, isTrue),

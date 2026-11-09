@@ -45,6 +45,7 @@ class AppTextField extends StatefulWidget {
     this.keyboardType,
     this.autocorrect,
     this.enableSuggestions,
+    this.textCapitalization = TextCapitalization.none,
     this.textInputAction,
     this.autofillHints,
     this.enabled = true,
@@ -76,6 +77,10 @@ class AppTextField extends StatefulWidget {
 
   /// Null means off for [obscure] text, on otherwise.
   final bool? enableSuggestions;
+
+  /// How the keyboard capitalizes what is typed, for example
+  /// [TextCapitalization.words] for a name.
+  final TextCapitalization textCapitalization;
   final TextInputAction? textInputAction;
   final Iterable<String>? autofillHints;
 
@@ -169,6 +174,7 @@ class _AppTextFieldState extends State<AppTextField> {
         smartQuotesType: plainTyping ? SmartQuotesType.disabled : null,
         smartDashesType: plainTyping ? SmartDashesType.disabled : null,
         keyboardType: keyboardType,
+        textCapitalization: widget.textCapitalization,
         textInputAction: widget.textInputAction,
         autofillHints: widget.autofillHints,
         onChanged: widget.onChanged,

@@ -146,6 +146,7 @@
         { "name": "keyboardType", "type": "TextInputType?", "required": false },
         { "name": "autocorrect", "type": "bool?", "required": false, "default": "off for obscure, email and url keyboards; on otherwise" },
         { "name": "enableSuggestions", "type": "bool?", "required": false, "default": "off for obscure; on otherwise" },
+        { "name": "textCapitalization", "type": "TextCapitalization", "required": false, "default": "none" },
         { "name": "textInputAction", "type": "TextInputAction?", "required": false },
         { "name": "autofillHints", "type": "Iterable<String>?", "required": false },
         { "name": "enabled", "type": "bool", "required": false, "default": "true" },
