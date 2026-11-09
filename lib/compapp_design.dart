@@ -33,6 +33,7 @@ export 'src/molecules/app_empty_state.dart';
 export 'src/molecules/app_nav_bar.dart';
 export 'src/molecules/app_snackbar.dart';
 export 'src/molecules/app_top_bar.dart';
+export 'src/molecules/code_card.dart';
 export 'src/molecules/event_ribbon.dart';
 export 'src/molecules/item_beacon.dart';
 export 'src/molecules/knock_button.dart';

@@ -625,6 +625,34 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       also: {'cooldown': 'true'},
     ),
   ],
+  'CodeCard': [
+    KnobCase(
+      'code',
+      '0000 1111',
+      (t) => expect(_widget<CodeCard>(t).code, '0000 1111'),
+    ),
+    KnobCase('label', 'Zed', (t) => expect(_widget<CodeCard>(t).label, 'Zed')),
+    KnobCase(
+      'copyLabel',
+      'Zed',
+      (t) => expect(_widget<CodeCard>(t).copyLabel, 'Zed'),
+    ),
+    KnobCase(
+      'copiedLabel',
+      'Zed',
+      (t) => expect(_widget<CodeCard>(t).copiedLabel, 'Zed'),
+    ),
+    KnobCase(
+      'shareLabel',
+      'Zed',
+      (t) => expect(_widget<CodeCard>(t).shareLabel, 'Zed'),
+    ),
+    KnobCase(
+      'copied',
+      'true',
+      (t) => expect(_widget<CodeCard>(t).copied, isTrue),
+    ),
+  ],
   'AppFreshnessBar': [
     KnobCase(
       'ageDays',

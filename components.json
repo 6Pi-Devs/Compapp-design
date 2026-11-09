@@ -94,6 +94,9 @@
       "states": ["default", "selected", "disabled"],
       "semantics": "Button named by its label with a selected state; the check shown when selected is decorative",
       "key": "chip.<kind>.<id>",
+      "notes": [
+        "A dashed outline is drawn by a private copy in AppChip, RoomTile, CodeCard and AppEmptyState (a border in three, a painter in the fourth). Planned follow-up: one shared helper in an internal lib/src/foundation/ folder importable from atoms and molecules and left out of the manifest."
+      ],
       "stories": [
         "Atoms/AppChip/room-default",
         "Atoms/AppChip/room-selected",
@@ -408,7 +411,8 @@
       "key": "floorplan.room.<roomId>, roomTile.pebble.<memberId>",
       "notes": [
         "Not interactive: no onTap yet. The FloorplanMap organism needs one, and a tappable tile around its beacon buttons needs its own semantics design.",
-        "The contract states archived and draw are not drawn: the board shows neither, and the floorplan hides archived rooms. The RoomDrawBoard organism draws the tile in its draw form."
+        "The contract states archived and draw are not drawn: the board shows neither, and the floorplan hides archived rooms. The RoomDrawBoard organism draws the tile in its draw form.",
+        "A dashed outline is drawn by a private copy in AppChip, RoomTile, CodeCard and AppEmptyState (a border in three, a painter in the fourth). Planned follow-up: one shared helper in an internal lib/src/foundation/ folder importable from atoms and molecules and left out of the manifest."
       ],
       "stories": [
         "Molecules/RoomTile/tile-home",
@@ -574,6 +578,9 @@
       "states": ["default"],
       "semantics": "One group: the title and the body are a single text node read together, followed by the action as a focusable button named by its label (44 drawn, 48 hit area). The dashed plan motif is decorative and excluded. The copy never blames anyone. Content is centered and wraps with large text instead of clipping, so at large text it can be taller than the screen: it must sit in a scrollable screen",
       "key": "emptyState.<part> (motif, title, body, action)",
+      "notes": [
+        "A dashed outline is drawn by a private copy in AppChip, RoomTile, CodeCard and AppEmptyState (a border in three, a painter in the fourth). Planned follow-up: one shared helper in an internal lib/src/foundation/ folder importable from atoms and molecules and left out of the manifest."
+      ],
       "stories": [
         "Molecules/AppEmptyState/with-action-default",
         "Molecules/AppEmptyState/without-action-default"
@@ -684,6 +691,38 @@
       "stories": [
         "Molecules/KnockButton/button-ready",
         "Molecules/KnockButton/button-cooldown"
+      ]
+    },
+    {
+      "id": "code-card",
+      "level": "molecule",
+      "class": "CodeCard",
+      "playground": "Molecules/CodeCard/playground",
+      "path": "molecules/code_card.dart",
+      "props": [
+        { "name": "code", "type": "String", "required": true, "default": "the code as shown, already grouped by the app (\"4829 1736\"); it wraps at the spaces and always reads left to right" },
+        { "name": "label", "type": "String", "required": true, "default": "caption over the code, which also names it for assistive technology (\"Your personal code\")" },
+        { "name": "copyLabel", "type": "String", "required": true, "default": "label of the copy button" },
+        { "name": "copiedLabel", "type": "String", "required": true, "default": "label of the copy button once copied" },
+        { "name": "shareLabel", "type": "String", "required": true, "default": "label of the share button" },
+        { "name": "copied", "type": "bool", "required": false, "default": "false; true shows copiedLabel and a check on the copy button. The app must announce the copy too, for example with an AppSnackbar" },
+        { "name": "onCopy", "type": "VoidCallback", "required": true, "default": "the app does the clipboard" },
+        { "name": "onShare", "type": "VoidCallback", "required": true, "default": "the app does the share sheet" }
+      ],
+      "variants": ["card"],
+      "states": ["default", "copied"],
+      "semantics": "The code is one node named by label whose value is the code spelled out character by character; the visible texts add nothing. Copy and share are their own focusable buttons named by their visible labels, activated by tap, Enter and Space. The card is not interactive. Copied is a label and a check, never color alone",
+      "key": "account.code, account.code.value, account.code.copy, account.code.share",
+      "notes": [
+        "The contract lists code, onCopy and onShare. Every visible string is a prop, so label, copyLabel, copiedLabel and shareLabel are added, with copied for the state the app sets.",
+        "Board gaps: the board's buttons have no glyphs and these show the copy, check and share ones; the buttons are AppButton secondary, 52 tall with a radius of 16, where the board draws 48 and 12; the card radius is radius.sm (10) where the board draws 12.",
+        "The buttons stack at large text, which the board's two-column grid cannot. The dashed edge is decoration in the hairline color, as on RoomTile, because the card is not a control.",
+        "The equal-halves-or-stacked layout (_EqualPair here, _ThumbPair in PresenceSwitch) is a private render object duplicated in two molecules. A dashed outline is also a private copy here, in AppChip, RoomTile and AppEmptyState. Planned follow-up: an internal lib/src/foundation/ folder importable from atoms and molecules and left out of the manifest.",
+        "A code that is not grouped (eight digits with no space) is one word: at 2.0x it can be wider than the card and is cut inside the word. The app groups it."
+      ],
+      "stories": [
+        "Molecules/CodeCard/card-default",
+        "Molecules/CodeCard/card-copied"
       ]
     }
   ]
