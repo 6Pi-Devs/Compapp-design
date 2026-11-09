@@ -178,6 +178,8 @@ void main() {
       ('AppIcon', {'size': '0'}),
       ('MemberRow', {'joinOrder': '-1'}),
       ('MemberRow', {'semanticLabel': ''}),
+      ('TaskRow', {'logAgainSemanticLabel': '', 'ageDays': '-5'}),
+      ('RoomTile', {'semanticLabel': '', 'occupants': '9', 'beacons': '9'}),
       ('ItemBeacon', {'semanticLabel': '', 'inUse': 'true'}),
     ]) {
       testWidgets('$component $knobs', (tester) async {
@@ -215,6 +217,41 @@ void main() {
       await _open(tester, _pathOf('MemberRow'), knobs: {'joinOrder': '99'});
       row = tester.widget<MemberRow>(find.byType(MemberRow));
       expect(row.member.joinOrder, 11);
+    });
+
+    testWidgets('a room tile falls back to the sample label and clamps its '
+        'counts', (tester) async {
+      await _open(
+        tester,
+        _pathOf('RoomTile'),
+        knobs: {'semanticLabel': '', 'occupants': '9', 'beacons': '-4'},
+      );
+      final tile = tester.widget<RoomTile>(find.byType(RoomTile));
+      expect(tile.semanticLabel, "Ana's room, Ana is home");
+      expect(tile.occupants, hasLength(3));
+      expect(tile.beacons, isEmpty);
+
+      await _open(tester, _pathOf('RoomTile'), knobs: {'beacons': '9'});
+      expect(
+        tester.widget<RoomTile>(find.byType(RoomTile)).beacons,
+        hasLength(3),
+      );
+    });
+
+    testWidgets('a task row falls back to the sample label and clamps the '
+        'age', (tester) async {
+      await _open(
+        tester,
+        _pathOf('TaskRow'),
+        knobs: {'logAgainSemanticLabel': '', 'ageDays': '-5'},
+      );
+      var row = tester.widget<TaskRow>(find.byType(TaskRow));
+      expect(row.logAgainSemanticLabel, 'Log Clean the kitchen again');
+      expect(row.task.ageDays, 0);
+
+      await _open(tester, _pathOf('TaskRow'), knobs: {'ageDays': '99'});
+      row = tester.widget<TaskRow>(find.byType(TaskRow));
+      expect(row.task.ageDays, 30);
     });
 
     testWidgets('an item beacon falls back to the sample spoken label', (

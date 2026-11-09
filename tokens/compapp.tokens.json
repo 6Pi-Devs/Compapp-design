@@ -114,7 +114,9 @@
     "ring-stroke": { "$type": "dimension", "$value": "4px", "$description": "stroke of a progress ring, track and arc" },
     "freshness-bar": { "$type": "dimension", "$value": "4px", "$description": "height of the freshness bar" },
     "row": { "$type": "dimension", "$value": "64px", "$description": "least height of a list row such as a member row, it grows with its text" },
-    "beacon": { "$type": "dimension", "$value": "34px", "$description": "side of the glyph tile or of the breathing ring of an item beacon" }
+    "row-tall": { "$type": "dimension", "$value": "72px", "$description": "least height of a list row with a bar under its texts, such as a task row, it grows with its text" },
+    "beacon": { "$type": "dimension", "$value": "34px", "$description": "side of the glyph tile or of the breathing ring of an item beacon" },
+    "border-room": { "$type": "dimension", "$value": "1.5px", "$description": "border of a room tile, solid or dashed" }
   },
   "state-layer": {
     "pressed-primary": { "$type": "number", "$value": 0.12, "$description": "ink over a primary fill when pressed" },
@@ -129,5 +131,8 @@
     "freshness-recent": { "$type": "number", "$value": 0.85, "$description": "fill of a task done one or two days ago", "$extensions": { "maxAgeDays": 2 } },
     "freshness-fading": { "$type": "number", "$value": 0.6, "$description": "fill of a task done three to six days ago", "$extensions": { "maxAgeDays": 6 } },
     "freshness-stale": { "$type": "number", "$value": 0.25, "$description": "fill of a task done a week or more ago" }
+  },
+  "decor": {
+    "room-edge": { "$type": "number", "$value": 0.35, "$description": "glow ring of a room whose owner is home and edge of an occupied room, as a share of their color" }
   }
 }

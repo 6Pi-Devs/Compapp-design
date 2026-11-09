@@ -433,6 +433,60 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       (t) => expect(_widget<ItemBeacon>(t).semanticLabel, 'Zed'),
     ),
   ],
+  'RoomTile': [
+    KnobCase(
+      'name',
+      'Zed',
+      (t) => expect(_widget<RoomTile>(t).room.name, 'Zed'),
+    ),
+    KnobCase(
+      'state',
+      'occupied',
+      (t) => expect(_widget<RoomTile>(t).state, RoomTileState.occupied),
+    ),
+    KnobCase(
+      'caption',
+      'Zed',
+      (t) => expect(_widget<RoomTile>(t).caption, 'Zed'),
+    ),
+    KnobCase(
+      'semanticLabel',
+      'Zed',
+      (t) => expect(_widget<RoomTile>(t).semanticLabel, 'Zed'),
+    ),
+    KnobCase(
+      'occupants',
+      '2',
+      (t) => expect(_widget<RoomTile>(t).occupants, hasLength(2)),
+    ),
+    KnobCase(
+      'beacons',
+      '2',
+      (t) => expect(_widget<RoomTile>(t).beacons, hasLength(2)),
+    ),
+  ],
+  'TaskRow': [
+    KnobCase(
+      'title',
+      'Zed',
+      (t) => expect(_widget<TaskRow>(t).task.title, 'Zed'),
+    ),
+    KnobCase(
+      'ageDays',
+      '9',
+      (t) => expect(_widget<TaskRow>(t).task.ageDays, 9),
+    ),
+    KnobCase(
+      'subtitle',
+      'Zed',
+      (t) => expect(_widget<TaskRow>(t).subtitle, 'Zed'),
+    ),
+    KnobCase(
+      'logAgainSemanticLabel',
+      'Zed',
+      (t) => expect(_widget<TaskRow>(t).logAgainSemanticLabel, 'Zed'),
+    ),
+  ],
   'AppFreshnessBar': [
     KnobCase(
       'ageDays',

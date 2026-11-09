@@ -104,9 +104,16 @@ abstract final class AppSizes {
   /// Least height of a list row (`size.row`). It grows with its text.
   static const double row = 64;
 
+  /// Least height of a list row with a bar under its texts, such as a task
+  /// row (`size.row-tall`). It grows with its text.
+  static const double rowTall = 72;
+
   /// Side of the glyph tile or the breathing ring of an item beacon
   /// (`size.beacon`).
   static const double beacon = 34;
+
+  /// Border of a room tile, solid or dashed (`size.border-room`).
+  static const double borderRoom = 1.5;
 
   /// Every token by its JSON name, checked by the parity test.
   static const Map<String, double> values = {
@@ -143,6 +150,8 @@ abstract final class AppSizes {
     'size.ring-stroke': ringStroke,
     'size.freshness-bar': freshnessBar,
     'size.row': row,
+    'size.row-tall': rowTall,
     'size.beacon': beacon,
+    'size.border-room': borderRoom,
   };
 }
