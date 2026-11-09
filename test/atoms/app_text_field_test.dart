@@ -32,6 +32,7 @@ AppTextField _field(
   TextInputType? keyboardType,
   bool? autocorrect,
   bool? enableSuggestions,
+  TextCapitalization textCapitalization = TextCapitalization.none,
   bool readOnly = false,
 }) {
   return AppTextField(
@@ -49,6 +50,7 @@ AppTextField _field(
     keyboardType: keyboardType,
     autocorrect: autocorrect,
     enableSuggestions: enableSuggestions,
+    textCapitalization: textCapitalization,
     readOnly: readOnly,
   );
 }
@@ -785,9 +787,48 @@ void main() {
     });
   });
 
+  group('text capitalization', () {
+    TextCapitalization capitalizationOf(WidgetTester tester) =>
+        tester.widget<TextField>(_input).textCapitalization;
+
+    testWidgets('is none by default', (tester) async {
+      await tester.pumpWidget(
+        _host(AppTextField(label: 'Name', controller: controller)),
+      );
+
+      expect(capitalizationOf(tester), TextCapitalization.none);
+    });
+
+    testWidgets('passes an explicit value to the TextField', (tester) async {
+      await tester.pumpWidget(
+        _host(_field(controller, textCapitalization: TextCapitalization.words)),
+      );
+
+      expect(capitalizationOf(tester), TextCapitalization.words);
+    });
+
+    testWidgets('still applies to an obscure field', (tester) async {
+      await tester.pumpWidget(
+        _host(
+          _field(
+            controller,
+            obscure: true,
+            textCapitalization: TextCapitalization.characters,
+          ),
+        ),
+      );
+
+      final field = tester.widget<TextField>(_input);
+      expect(field.obscureText, isTrue);
+      expect(field.textCapitalization, TextCapitalization.characters);
+    });
+  });
+
   group('read only', () {
     testWidgets('is off by default', (tester) async {
-      await tester.pumpWidget(_host(_field(controller)));
+      await tester.pumpWidget(
+        _host(AppTextField(label: 'Email', controller: controller)),
+      );
 
       expect(tester.widget<TextField>(_input).readOnly, isFalse);
     });

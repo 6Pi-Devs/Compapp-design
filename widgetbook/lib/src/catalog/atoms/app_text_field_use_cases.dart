@@ -187,6 +187,11 @@ WidgetbookUseCase _playground() {
         label: 'enableSuggestions',
         description: 'Unset is off for obscure text, on otherwise',
       );
+      final capitalization = context.enumKnob(
+        'textCapitalization',
+        TextCapitalization.values,
+        initial: TextCapitalization.none,
+      );
       final action = context.enumKnobOrNull(
         'textInputAction',
         TextInputAction.values,
@@ -229,6 +234,7 @@ WidgetbookUseCase _playground() {
               keyboardType: keyboard?.type,
               autocorrect: autocorrect,
               enableSuggestions: enableSuggestions,
+              textCapitalization: capitalization,
               textInputAction: action,
               autofillHints: autofill == null ? null : [autofill.hint],
               enabled: enabled,
