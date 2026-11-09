@@ -624,4 +624,16 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       (t) => expect(_widget<AppNavBar>(t).destinations[0].semanticLabel, 'Zed'),
     ),
   ],
+  'SheetHeader': [
+    KnobCase(
+      'title',
+      'Zed',
+      (t) => expect(_widget<SheetHeader>(t).title, 'Zed'),
+    ),
+    KnobCase(
+      'closeLabel',
+      'Zed',
+      (t) => expect(_widget<SheetHeader>(t).closeLabel, 'Zed'),
+    ),
+  ],
 };

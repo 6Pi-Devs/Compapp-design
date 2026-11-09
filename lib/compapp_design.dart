@@ -29,6 +29,7 @@ export 'src/molecules/event_ribbon.dart';
 export 'src/molecules/item_beacon.dart';
 export 'src/molecules/member_row.dart';
 export 'src/molecules/room_tile.dart';
+export 'src/molecules/sheet_header.dart';
 export 'src/molecules/task_row.dart';
 export 'src/theme/compapp_theme.dart';
 export 'src/tokens/app_colors.dart';

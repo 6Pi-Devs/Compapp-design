@@ -19,7 +19,11 @@ const _leastHeight = 40.0;
 /// The least width of the molecules that fill their column, by class name.
 /// It is an explicit minimum for each of them: the narrow ones (a beacon
 /// that is free, a compact ribbon) are narrow on purpose and have none.
-const _leastWidthOf = <String, double>{'AppTopBar': 300, 'AppNavBar': 300};
+const _leastWidthOf = <String, double>{
+  'AppTopBar': 300,
+  'AppNavBar': 300,
+  'SheetHeader': 300,
+};
 
 /// Lays every molecule use case out the way the goldens do, with the real
 /// fonts, and checks that each of the four scenarios (light and dark, text

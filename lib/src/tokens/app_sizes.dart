@@ -33,6 +33,13 @@ abstract final class AppSizes {
   /// (`size.nav-plate-padding`).
   static const double navPlatePadding = 14;
 
+  /// Width of the drag handle of a sheet (`size.sheet-handle-width`).
+  static const double sheetHandleWidth = 40;
+
+  /// Height of the drag handle of a sheet, drawn as a pill
+  /// (`size.sheet-handle-height`).
+  static const double sheetHandleHeight = 4;
+
   /// Selected, focused and error borders, spinner stroke
   /// (`size.border-emphasis`).
   static const double borderEmphasis = 2;
@@ -142,6 +149,8 @@ abstract final class AppSizes {
     'size.glyph-action': glyphAction,
     'size.glyph-nav': glyphNav,
     'size.nav-plate-padding': navPlatePadding,
+    'size.sheet-handle-width': sheetHandleWidth,
+    'size.sheet-handle-height': sheetHandleHeight,
     'size.border-emphasis': borderEmphasis,
     'size.focus-ring': focusRing,
     'size.spinner-md': spinnerMd,

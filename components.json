@@ -537,6 +537,26 @@
         "Molecules/AppNavBar/calendar-default",
         "Molecules/AppNavBar/calendar-badge"
       ]
+    },
+    {
+      "id": "sheet-header",
+      "level": "molecule",
+      "class": "SheetHeader",
+      "playground": "Molecules/SheetHeader/playground",
+      "path": "molecules/sheet_header.dart",
+      "props": [
+        { "name": "title", "type": "String", "required": true },
+        { "name": "onClose", "type": "VoidCallback", "required": true },
+        { "name": "closeLabel", "type": "String", "required": true, "default": "spoken name of the close button" }
+      ],
+      "variants": ["default"],
+      "states": ["default", "long-title"],
+      "semantics": "The header is its own semantics group: under a Card or a list item the title stays a heading node of its own, read before the close button, and the button stays a button. The close button is a focusable button named by closeLabel, which is never empty, 44 drawn with a 48 hit area. The drag handle is decorative and excluded from semantics. A long title wraps and the header grows while the close button stays at the top end; the layout mirrors in right-to-left text. The title is centered on the 48 hit area of the close button (15 below the handle, board 12)",
+      "key": "sheet.<part> (title, close, handle)",
+      "stories": [
+        "Molecules/SheetHeader/default-default",
+        "Molecules/SheetHeader/default-long-title"
+      ]
     }
   ]
 }
