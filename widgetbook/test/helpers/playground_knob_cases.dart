@@ -587,4 +587,41 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       expect(bar.onAction, isNull);
     }, also: {'form': 'pushed'}),
   ],
+  'AppNavBar': [
+    KnobCase(
+      'destinations',
+      '3',
+      (t) => expect(_widget<AppNavBar>(t).destinations, hasLength(3)),
+    ),
+    KnobCase(
+      'selectedIndex',
+      '2',
+      (t) => expect(_widget<AppNavBar>(t).selectedIndex, 2),
+    ),
+    KnobCase(
+      'semanticLabel',
+      'Zed',
+      (t) => expect(_widget<AppNavBar>(t).semanticLabel, 'Zed'),
+    ),
+    KnobCase(
+      'icon',
+      'oven',
+      (t) => expect(_widget<AppNavBar>(t).destinations[0].icon, AppIcons.oven),
+    ),
+    KnobCase(
+      'label',
+      'Zed',
+      (t) => expect(_widget<AppNavBar>(t).destinations[0].label, 'Zed'),
+    ),
+    KnobCase(
+      'badgeCount',
+      '42',
+      (t) => expect(_widget<AppNavBar>(t).destinations[0].badgeCount, 42),
+    ),
+    KnobCase(
+      'destinationSemanticLabel',
+      'Zed',
+      (t) => expect(_widget<AppNavBar>(t).destinations[0].semanticLabel, 'Zed'),
+    ),
+  ],
 };

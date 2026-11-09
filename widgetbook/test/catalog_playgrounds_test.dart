@@ -186,6 +186,12 @@ void main() {
       ('AppTopBar', {'accountLabel': ''}),
       ('AppTopBar', {'activityLabel': ''}),
       ('AppTopBar', {'backLabel': '', 'form': 'pushed'}),
+      ('AppNavBar', {'selectedIndex': '9'}),
+      ('AppNavBar', {'selectedIndex': '4', 'destinations': '2'}),
+      ('AppNavBar', {'badgeCount': '-3'}),
+      ('AppNavBar', {'label': ''}),
+      ('AppNavBar', {'destinationSemanticLabel': ''}),
+      ('AppNavBar', {'destinations': '9'}),
     ]) {
       testWidgets('$component $knobs', (tester) async {
         await _open(tester, _pathOf(component), knobs: knobs);

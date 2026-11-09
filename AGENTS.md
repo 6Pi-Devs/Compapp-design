@@ -100,6 +100,7 @@ The analyzer enforces the Dart 3.13 shorthand. Write `const new(this.x)` for the
 | Keys | Stable `Key('<scope>.<thing>.<id>')` pattern, copied from the manifest, for example `Key('floorplan.room.<roomId>')`. The id comes from a prop, never from list position. |
 | Motion | Respect `MediaQuery.disableAnimations`. Durations and curves come from `AppMotion`. |
 | Calm | Danger colors only in destructive flows. Never show who is behind on a task. |
+| Text scale | Text grows with the system text scale and is never clamped, so layouts wrap and grow. The one exception is `AppNavBar`: its labels and badge counts stop growing at 1.3, as the labels of Material's `NavigationBar` do (`_kMaxLabelTextScaleFactor` in `flutter/lib/src/material/navigation_bar.dart`, which says a bottom bar loses its usability at larger sizes), because four columns of a phone cannot hold a word at 2.0. The semantics keep the full label. A new exception needs the same written reason here. |
 | Contrast and targets | Text contrast at least 4.5:1. The boundary of an interactive component (field border, switch off track outline, chip and outlined button border, empty code cell) is `colorScheme.outline` (ink-muted) so it keeps 3:1 against the page (WCAG 1.4.11); `outlineVariant` (line) is for decorative hairlines only. Hit area at least `AppSizes.minTarget` (48), drawn size at least `AppSizes.minDrawn` (44). |
 
 ### Manifest
@@ -244,6 +245,7 @@ To add or update a golden (a new atom, or an intentional visual change):
 | `size.control-md`, `control-lg` | `AppSizes.controlMd` (44), `controlLg` (52): heights of buttons, chips and fields |
 | `size.glyph-md`, `glyph-lg` | `AppSizes.glyphMd` (16), `glyphLg` (18): icon or spinner beside a label |
 | `size.glyph-action`, `glyph-nav` | `AppSizes.glyphAction` (20), `glyphNav` (22): icon of a top bar action or a sheet close, and of a navigation destination or the back arrow |
+| `size.nav-plate-padding` | `AppSizes.navPlatePadding` (14): horizontal padding of the plate behind a navigation icon |
 | `size.spinner-md`, `spinner-lg` | `AppSizes.spinnerMd` (12), `spinnerLg` (13.5): the ring of a spinner, drawn in a glyph box |
 | `size.dash`, `dash-gap` | `AppSizes.dash` (4), `dashGap` (3): dash pattern of a 1 px dashed border, scaled by the border width |
 | `size.pebble-xs` to `pebble-xl` | `AppSizes.pebbleXs` to `pebbleXl` (28, 36, 44, 56, 72): sides of `AppPebble` |
@@ -253,6 +255,7 @@ To add or update a golden (a new atom, or an intentional visual change):
 | `size.dot`, `dot-unread` | `AppSizes.dot` (8), `dotUnread` (10): `AppStatusDot` |
 | `size.badge-count`, `badge-count-padding`, `badge-label-radius` | `AppSizes.badgeCount` (18, smallest side), `badgeCountPadding` (5), `badgeLabelRadius` (8): `AppBadge` |
 | `font.badge-count`, `badge-label` | `AppTypography.badgeCount` (11, 600, 18 line), `badgeLabel` (12, 600, 16 line): text of `AppBadge` |
+| `font.nav-label` | `AppTypography.navLabel` (600, 12/16): label under a navigation icon |
 | `font.ring-label` | `AppTypography.ringLabel` (600, 15, line height equal to size): label in the middle of `AppProgressRing` |
 | `size.ring`, `ring-stroke` | `AppSizes.ring` (56, grows with a large label), `ringStroke` (4): `AppProgressRing` |
 | `progress.ring-sweep`, `ring-breathe` | `AppProgress.ringSweep` (0.3 of the circle, the arc of an in-use ring), `ringBreatheOpacity` (0.4, lowest opacity while it breathes) |
