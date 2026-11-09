@@ -79,7 +79,8 @@
   "motion": {
     "presence": { "$type": "duration", "$value": "600ms", "$extensions": { "curve": "easeOut" } },
     "in-use": { "$type": "duration", "$value": "4000ms", "$extensions": { "curve": "easeInOut", "repeat": true } },
-    "spin": { "$type": "duration", "$value": "1000ms", "$extensions": { "curve": "linear", "repeat": true } }
+    "spin": { "$type": "duration", "$value": "1000ms", "$extensions": { "curve": "linear", "repeat": true } },
+    "snackbar": { "$type": "duration", "$value": "200ms", "$extensions": { "curve": "easeOut" } }
   },
   "target": {
     "min": { "$type": "dimension", "$value": "48px", "$extensions": { "drawn": "44px" } }
@@ -129,7 +130,7 @@
   },
   "state-layer": {
     "pressed-primary": { "$type": "number", "$value": 0.12, "$description": "ink over a primary fill when pressed" },
-    "pressed-secondary": { "$type": "number", "$value": 0.08, "$description": "ink over a surface fill when pressed" },
+    "pressed-secondary": { "$type": "number", "$value": 0.08, "$description": "ink over a surface fill when pressed; a control on the inverse surface, such as a snackbar action, reuses it for hover and focus over its own soft primary" },
     "pressed-danger": { "$type": "number", "$value": 0.16, "$description": "ink over a danger fill when pressed" },
     "spinner-track": { "$type": "number", "$value": 0.35, "$description": "track of a spinner drawn on a solid fill" }
   },
@@ -143,5 +144,8 @@
   },
   "decor": {
     "room-edge": { "$type": "number", "$value": 0.35, "$description": "glow ring of a room whose owner is home and edge of an occupied room, as a share of their color" }
+  },
+  "opacity": {
+    "disabled-inverse-label": { "$type": "number", "$value": 0.65, "$description": "label drawn on the inverse surface, such as a snackbar action, when its control is disabled; 4.5:1 in both themes" }
   }
 }

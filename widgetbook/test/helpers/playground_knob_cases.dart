@@ -658,4 +658,31 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       (t) => expect(_widget<AppEmptyState>(t).onAction, isNull),
     ),
   ],
+  'AppSnackbar': [
+    KnobCase(
+      'tone',
+      'error',
+      (t) => expect(_widget<AppSnackbar>(t).tone, SnackTone.error),
+    ),
+    KnobCase(
+      'message',
+      'Zed',
+      (t) => expect(_widget<AppSnackbar>(t).message, 'Zed'),
+    ),
+    KnobCase(
+      'actionLabel',
+      'Zed',
+      (t) => expect(_widget<AppSnackbar>(t).actionLabel, 'Zed'),
+    ),
+    KnobCase(
+      'actionEnabled',
+      'false',
+      (t) => expect(_widget<AppSnackbar>(t).onAction, isNull),
+    ),
+    KnobCase(
+      'visible',
+      'false',
+      (t) => expect(_widget<AppSnackbar>(t).visible, isFalse),
+    ),
+  ],
 };

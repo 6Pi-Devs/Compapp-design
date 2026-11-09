@@ -4,8 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:path_parsing/path_parsing.dart';
 
 void main() {
-  test('defines the 30 glyphs of the Atoms board', () {
-    expect(AppIcons.values, hasLength(30));
+  test('defines the glyphs of the canvas boards, alert included', () {
+    expect(AppIcons.values, hasLength(31));
+    expect(AppIcons.values.map((icon) => icon.name), contains('alert'));
   });
 
   test('every glyph has its own path data', () {

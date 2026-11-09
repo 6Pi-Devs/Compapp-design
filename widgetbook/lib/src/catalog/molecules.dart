@@ -1,5 +1,6 @@
 import 'package:compapp_design_widgetbook/src/catalog/molecules/app_empty_state_use_cases.dart';
 import 'package:compapp_design_widgetbook/src/catalog/molecules/app_nav_bar_use_cases.dart';
+import 'package:compapp_design_widgetbook/src/catalog/molecules/app_snackbar_use_cases.dart';
 import 'package:compapp_design_widgetbook/src/catalog/molecules/app_top_bar_use_cases.dart';
 import 'package:compapp_design_widgetbook/src/catalog/molecules/event_ribbon_use_cases.dart';
 import 'package:compapp_design_widgetbook/src/catalog/molecules/item_beacon_use_cases.dart';
@@ -20,4 +21,5 @@ List<WidgetbookComponent> buildMolecules() => [
   buildAppNavBar(),
   buildSheetHeader(),
   buildAppEmptyState(),
+  buildAppSnackbar(),
 ];

@@ -1,6 +1,8 @@
 /// The stroke glyphs of `AppIcon`, drawn on a 24 px grid.
 ///
-/// The name of each value is the glyph name on the canvas Atoms board.
+/// The name of each value is the glyph name on the canvas boards. [alert] is
+/// on the Atoms board (the error mark of a text field) and on the Molecules
+/// board (the error snackbar).
 enum AppIcons {
   floorplan(
     'M6.5 3.5H17.5A3 3 0 0 1 20.5 6.5V17.5A3 3 0 0 1 17.5 20.5H6.5 '
@@ -116,6 +118,12 @@ enum AppIcons {
     'M2.5 12 '
     'S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z '
     'M15 12A3 3 0 1 1 9 12A3 3 0 1 1 15 12Z',
+  ),
+
+  /// A circle with an exclamation mark: the error mark of a text field on the
+  /// Atoms board and of the error snackbar on the Molecules board.
+  alert(
+    'M20.5 12A8.5 8.5 0 1 1 3.5 12A8.5 8.5 0 1 1 20.5 12ZM12 8v4.5M12 16h.01',
   );
 
   new(this.pathData, {this.matchTextDirection = false});

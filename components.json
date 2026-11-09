@@ -578,6 +578,30 @@
         "Molecules/AppEmptyState/with-action-default",
         "Molecules/AppEmptyState/without-action-default"
       ]
+    },
+    {
+      "id": "app-snackbar",
+      "level": "molecule",
+      "class": "AppSnackbar",
+      "playground": "Molecules/AppSnackbar/playground",
+      "path": "molecules/app_snackbar.dart",
+      "props": [
+        { "name": "message", "type": "String", "required": true },
+        { "name": "tone", "type": "SnackTone", "required": false, "default": "info" },
+        { "name": "actionLabel", "type": "String?", "required": false, "default": "null or empty leaves the action out" },
+        { "name": "onAction", "type": "VoidCallback?", "required": false, "default": "null disables the action" },
+        { "name": "visible", "type": "bool", "required": false, "default": "true; changing it plays the enter or the exit over motion.snackbar, at once under disableAnimations" }
+      ],
+      "variants": ["info", "error"],
+      "states": ["default", "with-action"],
+      "semantics": "A live region named by message (never empty), announced once when it appears; the glyph and the text are excluded. The action is a focusable button named by actionLabel after the message (44 drawn, 48 hit area, light focus ring, an overlay of the soft primary, a dimmer disabled state); an action wider than a quarter of the bar moves under the message, end-aligned, as Material does, so the message keeps its words whole at 2.0. The tone is a glyph (check or circled exclamation mark), never color alone and never a danger color. No timer: the app decides when to show and dismiss it by flipping visible. After the exit the bar takes no space and leaves the semantics and the focus order, and while it leaves the action cannot take focus",
+      "key": "snackbar.<part> (message, icon, action)",
+      "stories": [
+        "Molecules/AppSnackbar/info-default",
+        "Molecules/AppSnackbar/info-with-action",
+        "Molecules/AppSnackbar/error-default",
+        "Molecules/AppSnackbar/error-with-action"
+      ]
     }
   ]
 }

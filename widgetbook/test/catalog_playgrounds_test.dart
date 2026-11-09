@@ -191,6 +191,7 @@ void main() {
       ('AppNavBar', {'badgeCount': '-3'}),
       ('AppNavBar', {'label': ''}),
       ('SheetHeader', {'closeLabel': ''}),
+      ('AppSnackbar', {'message': ''}),
       ('AppNavBar', {'destinationSemanticLabel': ''}),
       ('AppNavBar', {'destinations': '9'}),
     ]) {
