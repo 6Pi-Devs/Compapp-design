@@ -194,6 +194,7 @@ void main() {
       ('AppSnackbar', {'message': ''}),
       ('AppNavBar', {'destinationSemanticLabel': ''}),
       ('AppNavBar', {'destinations': '9'}),
+      ('ActivityRow', {'semanticLabel': ''}),
     ]) {
       testWidgets('$component $knobs', (tester) async {
         await _open(tester, _pathOf(component), knobs: knobs);
@@ -275,6 +276,17 @@ void main() {
       expect(
         tester.widget<EventRibbon>(find.byType(EventRibbon)).semanticLabel,
         'Visit, Marta, Saturday',
+      );
+    });
+
+    testWidgets('an activity row falls back to the sample spoken label', (
+      tester,
+    ) async {
+      await _open(tester, _pathOf('ActivityRow'), knobs: {'semanticLabel': ''});
+
+      expect(
+        tester.widget<ActivityRow>(find.byType(ActivityRow)).semanticLabel,
+        'Unread. Carlos finished your washer',
       );
     });
 

@@ -602,6 +602,34 @@
         "Molecules/AppSnackbar/error-default",
         "Molecules/AppSnackbar/error-with-action"
       ]
+    },
+    {
+      "id": "activity-row",
+      "level": "molecule",
+      "class": "ActivityRow",
+      "playground": "Molecules/ActivityRow/playground",
+      "path": "molecules/activity_row.dart",
+      "props": [
+        { "name": "entry", "type": "ActivityView", "required": true, "default": "id, glyph (icon), tone (neutral or busy), text (a list of runs, each with a strong flag, in the word order of the language) and meta (muted line under it)" },
+        { "name": "unread", "type": "bool", "required": true, "default": "unread: a dot at the end of the row" },
+        { "name": "semanticLabel", "type": "String", "required": true, "default": "spoken description of the entry: it says whether the entry is unread (\"Unread. Carlos finished your washer\") and holds the visible text in the same words (WCAG 2.5.3)" },
+        { "name": "onTap", "type": "VoidCallback", "required": true }
+      ],
+      "variants": ["neutral", "busy"],
+      "states": ["unread", "read"],
+      "semantics": "One focusable button named by semanticLabel, activated by tap, Enter and Space. The tile, the texts and the unread dot add nothing of their own, so nothing is said twice. Unread is a shape (the dot) and is in the spoken label, never color alone. Calm: busy is amber, never a danger color, never who is behind",
+      "key": "activity.<entryId>",
+      "notes": [
+        "Board gaps: the tile glyph is 18 (size.glyph-lg) where the board draws 20, and the tile corner is radius.sm (10) where the board draws 12.",
+        "Board gaps: the row is 64 tall with 12 of padding where the board draws 68 with 14, and the 2 px between the message and the meta line is not drawn. None of 14, 2 or 68 is a token, and a row that is 64 like the member row keeps the list rhythm.",
+        "The line is a list of runs (ActivityText with a strong flag) so the bold part can sit anywhere, as in 'Room draw: you got Bedroom 1'."
+      ],
+      "stories": [
+        "Molecules/ActivityRow/neutral-unread",
+        "Molecules/ActivityRow/neutral-read",
+        "Molecules/ActivityRow/busy-unread",
+        "Molecules/ActivityRow/busy-read"
+      ]
     }
   ]
 }
