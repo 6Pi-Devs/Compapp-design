@@ -50,6 +50,8 @@ void main() {
       'test/catalog_semantics_test.dart',
       'test/catalog_freshness_bar_layout_test.dart',
       'test/catalog_contract_test.dart',
+      'test/catalog_text_contrast_test.dart',
+      'test/catalog_molecules_layout_test.dart',
     ]) {
       // Only code counts: a comment may name the function it warns about.
       final source = File(file)

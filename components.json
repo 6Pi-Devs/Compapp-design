@@ -343,6 +343,50 @@
         "Atoms/AppFreshnessBar/bar-fading",
         "Atoms/AppFreshnessBar/bar-stale"
       ]
+    },
+    {
+      "id": "member-row",
+      "level": "molecule",
+      "class": "MemberRow",
+      "playground": "Molecules/MemberRow/playground",
+      "path": "molecules/member_row.dart",
+      "props": [
+        { "name": "member", "type": "MemberView", "required": true, "default": "name, initials, joinOrder, status, isYou, isAdmin and the spoken description (semanticLabel)" },
+        { "name": "subtitle", "type": "String?", "required": false, "default": "second line under the name" },
+        { "name": "trailing", "type": "String?", "required": false, "default": "text at the end of the row; a status dot sits before it (none while invited)" }
+      ],
+      "variants": ["row"],
+      "states": ["home", "away", "invited", "you"],
+      "semantics": "One merged node, not interactive: member.semanticLabel (it names the member and says you, admin and away), then the subtitle, then the trailing text. The visible name, the pebble and the dot add nothing of their own, so nothing is said twice",
+      "key": "member.<accountId>",
+      "stories": [
+        "Molecules/MemberRow/row-home",
+        "Molecules/MemberRow/row-away",
+        "Molecules/MemberRow/row-invited",
+        "Molecules/MemberRow/row-you"
+      ]
+    },
+    {
+      "id": "item-beacon",
+      "level": "molecule",
+      "class": "ItemBeacon",
+      "playground": "Molecules/ItemBeacon/playground",
+      "path": "molecules/item_beacon.dart",
+      "props": [
+        { "name": "item", "type": "ItemView", "required": true, "default": "id, name and the appliance glyph" },
+        { "name": "inUse", "type": "bool", "required": true, "default": "in use: glyph in a breathing busy ring and a busy status text; free: glyph on a sunken tile and a muted one" },
+        { "name": "statusLabel", "type": "String", "required": true, "default": "status line under the name: the time in use, or that it is free" },
+        { "name": "semanticLabel", "type": "String", "required": true, "default": "replaces the visible texts for assistive technology" },
+        { "name": "onTap", "type": "VoidCallback", "required": true }
+      ],
+      "variants": ["beacon"],
+      "states": ["in-use", "free"],
+      "semantics": "One focusable button named by semanticLabel (\"Washer, in use by Carlos, 34 minutes\"), activated by tap, Enter and Space; the ring, the glyph and the visible texts add nothing of their own. Drawn at least 44 tall, hit area at least 48",
+      "key": "floorplan.item.<itemId>",
+      "stories": [
+        "Molecules/ItemBeacon/beacon-in-use",
+        "Molecules/ItemBeacon/beacon-free"
+      ]
     }
   ]
 }
