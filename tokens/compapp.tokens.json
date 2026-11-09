@@ -94,6 +94,8 @@
     "nav-plate-padding": { "$type": "dimension", "$value": "14px", "$description": "horizontal padding of the plate behind a navigation icon" },
     "sheet-handle-width": { "$type": "dimension", "$value": "40px", "$description": "width of the drag handle of a sheet" },
     "sheet-handle-height": { "$type": "dimension", "$value": "4px", "$description": "height of the drag handle of a sheet, drawn as a pill" },
+    "empty-motif-width": { "$type": "dimension", "$value": "80px", "$description": "width of the dashed plan motif of an empty state" },
+    "empty-motif-height": { "$type": "dimension", "$value": "60px", "$description": "height of the dashed plan motif of an empty state" },
     "border-emphasis": { "$type": "dimension", "$value": "2px", "$description": "selected, focused and error borders, spinner stroke" },
     "focus-ring": { "$type": "dimension", "$value": "4px", "$description": "primary-soft ring around a focused field" },
     "spinner-md": { "$type": "dimension", "$value": "12px", "$description": "ring of a spinner beside a medium label, drawn in a glyph-md box" },

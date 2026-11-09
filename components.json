@@ -557,6 +557,27 @@
         "Molecules/SheetHeader/default-default",
         "Molecules/SheetHeader/default-long-title"
       ]
+    },
+    {
+      "id": "app-empty-state",
+      "level": "molecule",
+      "class": "AppEmptyState",
+      "playground": "Molecules/AppEmptyState/playground",
+      "path": "molecules/app_empty_state.dart",
+      "props": [
+        { "name": "title", "type": "String", "required": true },
+        { "name": "body", "type": "String", "required": true },
+        { "name": "actionLabel", "type": "String?", "required": false, "default": "null or empty leaves the action out" },
+        { "name": "onAction", "type": "VoidCallback?", "required": false, "default": "null disables the action" }
+      ],
+      "variants": ["with-action", "without-action"],
+      "states": ["default"],
+      "semantics": "One group: the title and the body are a single text node read together, followed by the action as a focusable button named by its label (44 drawn, 48 hit area). The dashed plan motif is decorative and excluded. The copy never blames anyone. Content is centered and wraps with large text instead of clipping, so at large text it can be taller than the screen: it must sit in a scrollable screen",
+      "key": "emptyState.<part> (motif, title, body, action)",
+      "stories": [
+        "Molecules/AppEmptyState/with-action-default",
+        "Molecules/AppEmptyState/without-action-default"
+      ]
     }
   ]
 }

@@ -247,6 +247,7 @@ To add or update a golden (a new atom, or an intentional visual change):
 | `size.glyph-action`, `glyph-nav` | `AppSizes.glyphAction` (20), `glyphNav` (22): icon of a top bar action or a sheet close, and of a navigation destination or the back arrow |
 | `size.nav-plate-padding` | `AppSizes.navPlatePadding` (14): horizontal padding of the plate behind a navigation icon |
 | `size.sheet-handle-width`, `sheet-handle-height` | `AppSizes.sheetHandleWidth` (40), `sheetHandleHeight` (4): drag handle of a sheet |
+| `size.empty-motif-width`, `empty-motif-height` | `AppSizes.emptyMotifWidth` (80), `emptyMotifHeight` (60): dashed plan motif of `AppEmptyState` |
 | `size.spinner-md`, `spinner-lg` | `AppSizes.spinnerMd` (12), `spinnerLg` (13.5): the ring of a spinner, drawn in a glyph box |
 | `size.dash`, `dash-gap` | `AppSizes.dash` (4), `dashGap` (3): dash pattern of a 1 px dashed border, scaled by the border width |
 | `size.pebble-xs` to `pebble-xl` | `AppSizes.pebbleXs` to `pebbleXl` (28, 36, 44, 56, 72): sides of `AppPebble` |

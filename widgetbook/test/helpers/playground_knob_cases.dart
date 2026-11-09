@@ -636,4 +636,26 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       (t) => expect(_widget<SheetHeader>(t).closeLabel, 'Zed'),
     ),
   ],
+  'AppEmptyState': [
+    KnobCase(
+      'title',
+      'Zed',
+      (t) => expect(_widget<AppEmptyState>(t).title, 'Zed'),
+    ),
+    KnobCase(
+      'body',
+      'Zed',
+      (t) => expect(_widget<AppEmptyState>(t).body, 'Zed'),
+    ),
+    KnobCase(
+      'actionLabel',
+      'Zed',
+      (t) => expect(_widget<AppEmptyState>(t).actionLabel, 'Zed'),
+    ),
+    KnobCase(
+      'actionEnabled',
+      'false',
+      (t) => expect(_widget<AppEmptyState>(t).onAction, isNull),
+    ),
+  ],
 };
