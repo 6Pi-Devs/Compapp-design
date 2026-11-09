@@ -127,7 +127,8 @@
     "beacon": { "$type": "dimension", "$value": "34px", "$description": "side of the glyph tile or of the breathing ring of an item beacon" },
     "border-room": { "$type": "dimension", "$value": "1.5px", "$description": "border of a room tile, solid or dashed" },
     "ribbon": { "$type": "dimension", "$value": "28px", "$description": "least height of an event ribbon, it grows with its text" },
-    "activity-tile": { "$type": "dimension", "$value": "40px", "$description": "side of the glyph tile of an activity row" }
+    "activity-tile": { "$type": "dimension", "$value": "40px", "$description": "side of the glyph tile of an activity row" },
+    "presence-control": { "$type": "dimension", "$value": "64px", "$description": "least height of the presence switch and of the knock button beside it, they grow with their text" }
   },
   "state-layer": {
     "pressed-primary": { "$type": "number", "$value": 0.12, "$description": "ink over a primary fill when pressed" },

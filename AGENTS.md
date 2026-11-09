@@ -269,6 +269,7 @@ To add or update a golden (a new atom, or an intentional visual change):
 | `size.border-room` | `AppSizes.borderRoom` (1.5): border of a `RoomTile`, solid or dashed |
 | `size.ribbon` | `AppSizes.ribbon` (28, grows with its text): least height of an `EventRibbon` |
 | `size.activity-tile` | `AppSizes.activityTile` (40): glyph tile of `ActivityRow` |
+| `size.presence-control` | `AppSizes.presenceControl` (64, grows with its text): least height of `PresenceSwitch` and `KnockButton` |
 | `size.border-emphasis`, `focus-ring` | `AppSizes.borderEmphasis` (2, selected, focus and error borders), `focusRing` (4, primary-soft ring around a focused field) |
 | `size.code-cell-width`, `code-cell-height` | `AppSizes.codeCellWidth` (56), `codeCellHeight` (60) |
 | `state-layer.*` | `AppStateLayers`: ink opacity over a fill when pressed (primary 12%, surface 8%, danger 16%) and the spinner track (35%). The surface ink of `pressed-secondary` is reused for the hover and focus of a snackbar action over its own soft primary |

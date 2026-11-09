@@ -148,6 +148,10 @@ abstract final class AppSizes {
   /// Side of the glyph tile of an activity row (`size.activity-tile`).
   static const double activityTile = 40;
 
+  /// Least height of the presence switch, and of the knock button beside it
+  /// (`size.presence-control`). Both grow with their text.
+  static const double presenceControl = 64;
+
   /// Every token by its JSON name, checked by the parity test.
   static const Map<String, double> values = {
     'target.min': minTarget,
@@ -195,5 +199,6 @@ abstract final class AppSizes {
     'size.border-room': borderRoom,
     'size.ribbon': ribbon,
     'size.activity-tile': activityTile,
+    'size.presence-control': presenceControl,
   };
 }

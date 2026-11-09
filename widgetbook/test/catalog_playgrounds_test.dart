@@ -195,6 +195,10 @@ void main() {
       ('AppNavBar', {'destinationSemanticLabel': ''}),
       ('AppNavBar', {'destinations': '9'}),
       ('ActivityRow', {'semanticLabel': ''}),
+      (
+        'PresenceSwitch',
+        {'semanticLabel': '', 'homeLabel': '', 'awayLabel': ''},
+      ),
     ]) {
       testWidgets('$component $knobs', (tester) async {
         await _open(tester, _pathOf(component), knobs: knobs);
@@ -290,6 +294,23 @@ void main() {
       );
     });
 
+    testWidgets('a presence switch falls back to the sample texts', (
+      tester,
+    ) async {
+      await _open(
+        tester,
+        _pathOf('PresenceSwitch'),
+        knobs: {'semanticLabel': '', 'homeLabel': '', 'awayLabel': ''},
+      );
+
+      final switcher = tester.widget<PresenceSwitch>(
+        find.byType(PresenceSwitch),
+      );
+      expect(switcher.semanticLabel, 'Your presence');
+      expect(switcher.homeLabel, "I'm home");
+      expect(switcher.awayLabel, "I'm out");
+    });
+
     testWidgets('an item beacon falls back to the sample spoken label', (
       tester,
     ) async {
@@ -364,6 +385,31 @@ void main() {
       await _setKnob(tester, find.byType(AppSwitch), 'value', 'true');
 
       expect(tester.widget<AppSwitch>(find.byType(AppSwitch)).value, isTrue);
+    });
+
+    testWidgets('a presence switch changes side when tapped', (tester) async {
+      await _open(tester, _pathOf('PresenceSwitch'));
+      Presence value() =>
+          tester.widget<PresenceSwitch>(find.byType(PresenceSwitch)).value;
+      expect(value(), Presence.home);
+
+      await tester.tap(find.byKey(const Key('presence.switch.away')));
+      await tester.pump(const Duration(milliseconds: 100));
+
+      expect(value(), Presence.away);
+    });
+
+    testWidgets('a presence switch knob set before any tap shows at once', (
+      tester,
+    ) async {
+      await _open(tester, _pathOf('PresenceSwitch'));
+
+      await _setKnob(tester, find.byType(PresenceSwitch), 'value', 'away');
+
+      expect(
+        tester.widget<PresenceSwitch>(find.byType(PresenceSwitch)).value,
+        Presence.away,
+      );
     });
 
     testWidgets('a chip selects when tapped', (tester) async {

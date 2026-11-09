@@ -630,6 +630,35 @@
         "Molecules/ActivityRow/busy-unread",
         "Molecules/ActivityRow/busy-read"
       ]
+    },
+    {
+      "id": "presence-switch",
+      "level": "molecule",
+      "class": "PresenceSwitch",
+      "playground": "Molecules/PresenceSwitch/playground",
+      "path": "molecules/presence_switch.dart",
+      "props": [
+        { "name": "value", "type": "Presence", "required": true, "default": "home or away: the selected side" },
+        { "name": "onChanged", "type": "ValueChanged<Presence>", "required": true, "default": "called with the other side only; choosing the selected side does nothing" },
+        { "name": "homeLabel", "type": "String", "required": true, "default": "label of the home side" },
+        { "name": "awayLabel", "type": "String", "required": true, "default": "label of the away side" },
+        { "name": "semanticLabel", "type": "String", "required": true, "default": "name of the group for assistive technology (\"Your presence\")" }
+      ],
+      "variants": ["switch"],
+      "states": ["home", "away"],
+      "semantics": "A radio group named by semanticLabel with two toggle buttons (homeLabel, awayLabel), exactly one checked and in a mutually exclusive group, each focusable and activated by tap, Enter and Space. The glyphs and the second drawing of each face (see notes) add nothing. The selected side is the only one under a filled thumb (3:1 against the track) and both sides have their own glyph and label, so the state is never color alone",
+      "key": "presence.switch, presence.switch.home, presence.switch.away",
+      "notes": [
+        "Board gaps: the board builds the sides from two AppButtons with a fill each, but the away side is filled with presence-away and AppButton has no variant for it, so the sides are Material TextButtons under one filled thumb that slides.",
+        "Board gaps: the track gets a 1 px outline border the board does not draw, so it keeps 3:1 against the page and a card. With it the sides are 54 tall where the board draws 56 (64 minus 4 and 4), and their corner is 11 where the board draws 12.",
+        "While the thumb slides every label and glyph is drawn twice, in the muted ink clipped to what is outside the thumb and in the on-color clipped to the thumb, so no color is blended and every pixel reads on every frame. At rest each face is drawn once. The second drawing is excluded from semantics, pointer and focus. The thumb jumps when animations are off. Each face sets its own text style, so a line limit, an italic or an underline around the switch does not change a label while the thumb slides.",
+        "The contract names a Presence type: it is a new two-value enum (home, away) because MemberStatus also has invited.",
+        "The equal-halves-or-stacked layout (_ThumbPair here, _EqualPair in CodeCard) is a private render object duplicated in two molecules. Planned follow-up: an internal lib/src/foundation/ folder importable from atoms and molecules and left out of the manifest."
+      ],
+      "stories": [
+        "Molecules/PresenceSwitch/switch-home",
+        "Molecules/PresenceSwitch/switch-away"
+      ]
     }
   ]
 }
