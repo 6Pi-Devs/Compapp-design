@@ -16,6 +16,11 @@ import 'helpers/use_case_harness.dart';
 const _leastWidth = 100.0;
 const _leastHeight = 40.0;
 
+/// The least width of the molecules that fill their column, by class name.
+/// It is an explicit minimum for each of them: the narrow ones (a beacon
+/// that is free, a compact ribbon) are narrow on purpose and have none.
+const _leastWidthOf = <String, double>{'AppTopBar': 300};
+
 /// Lays every molecule use case out the way the goldens do, with the real
 /// fonts, and checks that each of the four scenarios (light and dark, text
 /// scale 1.0 and 2.0) draws the molecule at a visible size and overflows
@@ -65,6 +70,21 @@ void main() {
         final size = tester.getSize(scenarios.at(i));
         expect(size.width, greaterThanOrEqualTo(_leastWidth), reason: '$i');
         expect(size.height, greaterThanOrEqualTo(_leastHeight), reason: '$i');
+      }
+      final className = path.split('/')[1];
+      final least = _leastWidthOf[className];
+      if (least != null) {
+        final molecules = find.byWidgetPredicate(
+          (widget) => widget.runtimeType.toString() == className,
+        );
+        expect(molecules, findsNWidgets(4), reason: className);
+        for (var i = 0; i < 4; i++) {
+          expect(
+            tester.getSize(molecules.at(i)).width,
+            greaterThanOrEqualTo(least),
+            reason: '$className in scenario $i',
+          );
+        }
       }
       expect(tester.takeException(), isNull, reason: 'no overflow');
     });

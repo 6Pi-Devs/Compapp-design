@@ -22,6 +22,7 @@ export 'src/models/member_view.dart';
 export 'src/models/room_tile_state.dart';
 export 'src/models/room_view.dart';
 export 'src/models/task_view.dart';
+export 'src/molecules/app_top_bar.dart';
 export 'src/molecules/event_ribbon.dart';
 export 'src/molecules/item_beacon.dart';
 export 'src/molecules/member_row.dart';
