@@ -1,3 +1,4 @@
+import 'package:compapp_design_widgetbook/src/catalog/molecules/event_ribbon_use_cases.dart';
 import 'package:compapp_design_widgetbook/src/catalog/molecules/item_beacon_use_cases.dart';
 import 'package:compapp_design_widgetbook/src/catalog/molecules/member_row_use_cases.dart';
 import 'package:compapp_design_widgetbook/src/catalog/molecules/room_tile_use_cases.dart';
@@ -10,4 +11,5 @@ List<WidgetbookComponent> buildMolecules() => [
   buildItemBeacon(),
   buildRoomTile(),
   buildTaskRow(),
+  buildEventRibbon(),
 ];

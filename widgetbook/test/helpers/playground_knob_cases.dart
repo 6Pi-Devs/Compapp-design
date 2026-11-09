@@ -487,6 +487,39 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       (t) => expect(_widget<TaskRow>(t).logAgainSemanticLabel, 'Zed'),
     ),
   ],
+  'EventRibbon': [
+    KnobCase(
+      'kind',
+      'absence',
+      (t) =>
+          expect(_widget<EventRibbon>(t).event.kind, CalendarEventKind.absence),
+    ),
+    KnobCase(
+      'title',
+      'Zed',
+      (t) => expect(_widget<EventRibbon>(t).event.title, 'Zed'),
+    ),
+    KnobCase(
+      'semanticLabel',
+      'Zed',
+      (t) => expect(_widget<EventRibbon>(t).semanticLabel, 'Zed'),
+    ),
+    KnobCase(
+      'continuesBefore',
+      'true',
+      (t) => expect(_widget<EventRibbon>(t).continuesBefore, isTrue),
+    ),
+    KnobCase(
+      'continuesAfter',
+      'true',
+      (t) => expect(_widget<EventRibbon>(t).continuesAfter, isTrue),
+    ),
+    KnobCase(
+      'compact',
+      'true',
+      (t) => expect(_widget<EventRibbon>(t).compact, isTrue),
+    ),
+  ],
   'AppFreshnessBar': [
     KnobCase(
       'ageDays',

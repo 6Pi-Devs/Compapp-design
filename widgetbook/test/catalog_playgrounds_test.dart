@@ -178,6 +178,7 @@ void main() {
       ('AppIcon', {'size': '0'}),
       ('MemberRow', {'joinOrder': '-1'}),
       ('MemberRow', {'semanticLabel': ''}),
+      ('EventRibbon', {'semanticLabel': '', 'kind': 'other'}),
       ('TaskRow', {'logAgainSemanticLabel': '', 'ageDays': '-5'}),
       ('RoomTile', {'semanticLabel': '', 'occupants': '9', 'beacons': '9'}),
       ('ItemBeacon', {'semanticLabel': '', 'inUse': 'true'}),
@@ -252,6 +253,17 @@ void main() {
       await _open(tester, _pathOf('TaskRow'), knobs: {'ageDays': '99'});
       row = tester.widget<TaskRow>(find.byType(TaskRow));
       expect(row.task.ageDays, 30);
+    });
+
+    testWidgets('an event ribbon falls back to the sample spoken label', (
+      tester,
+    ) async {
+      await _open(tester, _pathOf('EventRibbon'), knobs: {'semanticLabel': ''});
+
+      expect(
+        tester.widget<EventRibbon>(find.byType(EventRibbon)).semanticLabel,
+        'Visit, Marta, Saturday',
+      );
     });
 
     testWidgets('an item beacon falls back to the sample spoken label', (

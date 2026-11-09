@@ -90,6 +90,15 @@ class AppColors extends ThemeExtension<AppColors> {
   /// The pebble colour of the member at [joinOrder], wrapping around.
   Color pebbleAt(int joinOrder) => pebbles[joinOrder % pebbles.length];
 
+  /// The `sky` pebble colour, which the visit ribbon of the calendar uses.
+  Color get pebbleSky => pebbles[pebbleNames.indexOf('sky')];
+
+  /// The `apricot` pebble colour, which the overnight ribbon uses.
+  Color get pebbleApricot => pebbles[pebbleNames.indexOf('apricot')];
+
+  /// The `sand` pebble colour, which the ribbon of any other event uses.
+  Color get pebbleSand => pebbles[pebbleNames.indexOf('sand')];
+
   @override
   AppColors copyWith({
     Color? presenceHome,
