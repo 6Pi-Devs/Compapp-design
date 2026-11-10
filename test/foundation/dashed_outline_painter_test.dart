@@ -33,6 +33,13 @@ void main() {
       }
     });
 
+    test('needs a positive width', () {
+      expect(
+        () => DashedOutlinePainter(color: _color, radius: 8, width: 0),
+        throwsAssertionError,
+      );
+    });
+
     test('draws with the width it is given', () {
       final paints = _paints(
         const DashedOutlinePainter(color: _color, radius: 8, width: 3),

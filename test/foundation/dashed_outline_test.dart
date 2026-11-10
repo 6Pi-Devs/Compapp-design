@@ -111,6 +111,16 @@ void main() {
       }
     });
 
+    test('needs a positive width', () {
+      final outline = RRect.fromRectAndRadius(
+        const Rect.fromLTWH(0, 0, 100, 50),
+        Radius.zero,
+      );
+
+      expect(() => _draw(outline, width: 0), throwsAssertionError);
+      expect(() => _draw(outline, width: -1), throwsAssertionError);
+    });
+
     test('leaves a gap between two segments', () {
       final drawn = _draw(
         RRect.fromRectAndRadius(

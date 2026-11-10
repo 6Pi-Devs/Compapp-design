@@ -9,7 +9,7 @@ class DashedOutlinePainter extends CustomPainter {
     required this.color,
     required this.radius,
     this.width = AppSizes.borderDashed,
-  });
+  }) : assert(width > 0, 'A dashed outline needs a positive stroke width.');
 
   final Color color;
   final double radius;

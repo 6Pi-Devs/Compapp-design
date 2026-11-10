@@ -373,6 +373,49 @@ void main() {
     });
   });
 
+  group('shape animation', () {
+    /// The border the chip's Material is drawing this frame, which is not the
+    /// `shape` it was given while the shape animates to a new one.
+    ShapeBorder drawnShape(WidgetTester tester) {
+      final clipper = tester
+          .widget<PhysicalShape>(
+            find.descendant(
+              of: find.byType(FilterChip),
+              matching: find.byType(PhysicalShape),
+            ),
+          )
+          .clipper;
+      return (clipper as ShapeBorderClipper).shape;
+    }
+
+    testWidgets('an item chip stays dashed while it is toggled', (
+      tester,
+    ) async {
+      Widget chip({required bool selected}) => _host(
+        AppChip(
+          label: 'Washer',
+          kind: AppChipKind.item,
+          selected: selected,
+          onTap: () {},
+        ),
+      );
+
+      await tester.pumpWidget(chip(selected: false));
+      await tester.pumpWidget(chip(selected: true));
+
+      for (final milliseconds in [10, 40, 50, 100]) {
+        await tester.pump(Duration(milliseconds: milliseconds));
+        expect(
+          drawnShape(tester),
+          isA<DashedBorder>(),
+          reason: 'after $milliseconds more ms',
+        );
+      }
+      await tester.pumpAndSettle();
+      expect(drawnShape(tester), isA<DashedBorder>());
+    });
+  });
+
   group('taps', () {
     testWidgets('calls onTap', (tester) async {
       var taps = 0;

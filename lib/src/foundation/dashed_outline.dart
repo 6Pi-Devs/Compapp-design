@@ -8,12 +8,17 @@ import 'package:flutter/painting.dart';
 ///
 /// [outline] is the path of the stroke centre, so a caller that wants the
 /// stroke inside its box deflates the box by half of [width] first.
+///
+/// [width] must be positive: a dash and a gap are multiples of it, so a zero
+/// width has no pattern to repeat. A release build draws nothing for it.
 void paintDashedOutline(
   Canvas canvas,
   RRect outline, {
   required Color color,
   required double width,
 }) {
+  assert(width > 0, 'A dashed outline needs a positive stroke width.');
+  if (width <= 0) return;
   final path = Path()..addRRect(outline);
   final paint = Paint()
     ..color = color

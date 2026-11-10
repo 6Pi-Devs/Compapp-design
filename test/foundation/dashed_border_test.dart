@@ -84,6 +84,73 @@ void main() {
       expect(scaled.borderRadius, _radius * 2);
     });
 
+    test('stays dashed while it animates to or from another border', () {
+      const thin = DashedBorder(borderRadius: _radius, side: BorderSide());
+      const thick = DashedBorder(
+        borderRadius: BorderRadius.all(Radius.circular(4)),
+        side: BorderSide(width: 3),
+      );
+      const solid = RoundedRectangleBorder(borderRadius: _radius, side: _side);
+
+      final between = ShapeBorder.lerp(thin, thick, 0.5);
+      final fromSolid = thin.lerpFrom(solid, 0.5);
+      final toSolid = thin.lerpTo(solid, 0.5);
+
+      expect(between, isA<DashedBorder>());
+      expect((between! as DashedBorder).side.width, 2);
+      expect(
+        (between as DashedBorder).borderRadius,
+        const BorderRadius.all(Radius.circular(8)),
+      );
+      expect(fromSolid, isA<DashedBorder>());
+      expect(toSolid, isA<DashedBorder>());
+      expect(_paints(between).length, greaterThan(8));
+    });
+
+    test('draws nothing for a zero width instead of looping forever', () {
+      final paints = _paints(
+        const DashedBorder(
+          borderRadius: _radius,
+          side: BorderSide(color: Color(0xFF123456), width: 0),
+        ),
+      );
+
+      expect(paints, isEmpty);
+    });
+
+    test('follows the stroke align: inside, centred or outside the box', () {
+      Rect bounds(double align) => _dashes(
+        DashedBorder(
+          side: BorderSide(
+            color: const Color(0xFF123456),
+            width: 2,
+            strokeAlign: align,
+          ),
+        ),
+      ).reduce((a, b) => a.expandToInclude(b));
+
+      void expectBounds(double align, Rect expected) {
+        final actual = bounds(align);
+        expect(actual.left, moreOrLessEquals(expected.left, epsilon: 1e-3));
+        expect(actual.top, moreOrLessEquals(expected.top, epsilon: 1e-3));
+        expect(actual.right, moreOrLessEquals(expected.right, epsilon: 1e-3));
+        expect(actual.bottom, moreOrLessEquals(expected.bottom, epsilon: 1e-3));
+      }
+
+      expectBounds(
+        BorderSide.strokeAlignInside,
+        const Rect.fromLTRB(1, 1, 119, 59),
+      );
+      expectBounds(
+        BorderSide.strokeAlignCenter,
+        const Rect.fromLTRB(0, 0, 120, 60),
+      );
+      expectBounds(
+        BorderSide.strokeAlignOutside,
+        const Rect.fromLTRB(-1, -1, 121, 61),
+      );
+    });
+
     test('stays inside its box: the outer edge of the stroke touches it', () {
       final dashes = _dashes(
         const DashedBorder(
