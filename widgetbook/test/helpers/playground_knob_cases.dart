@@ -567,6 +567,28 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       (t) => expect(_widget<ActivityRow>(t).semanticLabel, endsWith('Zed')),
     ),
   ],
+  'PresenceSwitch': [
+    KnobCase(
+      'value',
+      'away',
+      (t) => expect(_widget<PresenceSwitch>(t).value, Presence.away),
+    ),
+    KnobCase(
+      'homeLabel',
+      'Zed',
+      (t) => expect(_widget<PresenceSwitch>(t).homeLabel, 'Zed'),
+    ),
+    KnobCase(
+      'awayLabel',
+      'Zed',
+      (t) => expect(_widget<PresenceSwitch>(t).awayLabel, 'Zed'),
+    ),
+    KnobCase(
+      'semanticLabel',
+      'Zed',
+      (t) => expect(_widget<PresenceSwitch>(t).semanticLabel, 'Zed'),
+    ),
+  ],
   'AppFreshnessBar': [
     KnobCase(
       'ageDays',
