@@ -873,4 +873,112 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       (t) => expect(_widget<ActivityList>(t).view.emptyBody, 'Zed'),
     ),
   ],
+  'PresencePanel': [
+    KnobCase(
+      'homeMembers',
+      '3',
+      (t) => expect(_widget<PresencePanel>(t).view.home.entries, hasLength(3)),
+    ),
+    KnobCase(
+      'awayMembers',
+      '3',
+      (t) => expect(_widget<PresencePanel>(t).view.away.entries, hasLength(3)),
+    ),
+    KnobCase(
+      'invitedMembers',
+      '2',
+      (t) =>
+          expect(_widget<PresencePanel>(t).view.invited?.entries, hasLength(2)),
+    ),
+    KnobCase(
+      'homeTitle',
+      'Zed',
+      (t) => expect(_widget<PresencePanel>(t).view.home.title, 'Zed'),
+    ),
+    KnobCase(
+      'awayTitle',
+      'Zed',
+      (t) => expect(_widget<PresencePanel>(t).view.away.title, 'Zed'),
+    ),
+    KnobCase(
+      'invitedTitle',
+      'Zed',
+      (t) => expect(_widget<PresencePanel>(t).view.invited?.title, 'Zed'),
+      also: {'invitedMembers': '1'},
+    ),
+    KnobCase(
+      'emptyHomeLabel',
+      'Zed',
+      (t) => expect(_widget<PresencePanel>(t).view.home.emptyLabel, 'Zed'),
+      also: {'homeMembers': '0'},
+    ),
+    KnobCase(
+      'awayEmptyLabel',
+      'Zed',
+      (t) => expect(_widget<PresencePanel>(t).view.away.emptyLabel, 'Zed'),
+      also: {'awayMembers': '0'},
+    ),
+    KnobCase(
+      'invitedEmptyLabel',
+      'Zed',
+      (t) => expect(_widget<PresencePanel>(t).view.invited?.emptyLabel, 'Zed'),
+    ),
+    KnobCase(
+      'knockLabel',
+      'Zed',
+      (t) => expect(_widget<PresencePanel>(t).view.broadcast.knockLabel, 'Zed'),
+    ),
+    KnobCase(
+      'message',
+      'Zed',
+      (t) => expect(_widget<PresencePanel>(t).view.broadcast.message, 'Zed'),
+    ),
+    KnobCase(
+      'hint',
+      'Zed',
+      (t) => expect(_widget<PresencePanel>(t).view.broadcast.hint, 'Zed'),
+    ),
+    KnobCase(
+      'cooldown',
+      'true',
+      (t) =>
+          expect(_widget<PresencePanel>(t).view.broadcast.cooldown, isNotNull),
+    ),
+    KnobCase(
+      'remaining',
+      '0.4',
+      (t) => expect(
+        _widget<PresencePanel>(t).view.broadcast.cooldown?.remaining,
+        0.4,
+      ),
+      also: {'cooldown': 'true'},
+    ),
+    KnobCase(
+      'cooldownLabel',
+      'Zed',
+      (t) => expect(
+        _widget<PresencePanel>(t).view.broadcast.cooldown?.label,
+        'Zed',
+      ),
+      also: {'cooldown': 'true'},
+    ),
+    KnobCase(
+      'remainingLabel',
+      'Zed',
+      (t) => expect(
+        _widget<PresencePanel>(t).view.broadcast.cooldown?.remainingLabel,
+        'Zed',
+      ),
+      also: {'cooldown': 'true'},
+    ),
+    KnobCase(
+      'cooldownSemanticLabel',
+      'Zed',
+      (t) => expect(
+        _widget<PresencePanel>(t).view.broadcast.cooldown?.semanticLabel,
+        'Zed',
+      ),
+      also: {'cooldown': 'true'},
+    ),
+  ],
 };

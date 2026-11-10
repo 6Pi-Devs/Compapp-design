@@ -751,6 +751,35 @@
         "Organisms/ActivityList/list-all-read",
         "Organisms/ActivityList/list-empty"
       ]
+    },
+    {
+      "id": "presence-panel",
+      "level": "organism",
+      "class": "PresencePanel",
+      "playground": "Organisms/PresencePanel/playground",
+      "path": "organisms/presence_panel.dart",
+      "props": [
+        { "name": "view", "type": "PresenceView", "required": true, "default": "home and away groups and an optional invited group (each a PresenceGroup: a title, PresenceEntry rows with a MemberView, subtitle and trailing text, and an optional label for when it is empty), and the broadcast (PresenceBroadcast: the label of the button, the optional KnockCooldown, an optional message and hint)" },
+        { "name": "onKnock", "type": "VoidCallback", "required": true, "default": "called by a tap on the button while the home can be asked" }
+      ],
+      "variants": ["panel"],
+      "states": ["ready", "cooldown", "everyone-away"],
+      "semantics": "A container holding one container per group and one for the asking part. Each group is a heading node, then a list node whose items each hold one merged MemberRow node (the member's spoken label, then the subtitle and the trailing text, so the visible name, the pebble and the dot add nothing). The asking part is the KnockButton's single node (ready: a button named by its label; waiting: the same node disabled and named by the cooldown sentence), then one merged node with the message and the hint. A group with no members says its empty label in place of the list, and one with neither is left out. Away and invited are told by words, a dot or ring and the pebble, never color alone. Calm: it says where people are, never who is behind or who did not answer",
+      "key": "presence.panel (also presence.section.<home|away|invited>, presence.card.<home|away|invited>, presence.empty.<home|away|invited>, presence.item.<memberId> on the list item of a member, member.<memberId> on the row, presence.broadcast, presence.message, presence.hint, and presence.knock on the button)",
+      "notes": [
+        "The brief for this slice named PresenceSwitch for the person using the app. The board and the contract do not: the contract is PresenceView and onKnock with no callback for a change of presence, and the board draws only the members and the knock card. The panel therefore has no switch: the person is one of the members (MemberView.isYou) and the app places the PresenceSwitch molecule on its own screen.",
+        "The contract lists PresenceView(home, away, invited, broadcast). The board draws no headings and only a home and an away member, while the contract says the sections are headers: each group has a title shown as a heading. The everyone-away state has no drawing on the board: it is the home group with no members and an empty label in place of its rows.",
+        "Board gaps: the board draws a 48 ring with the minutes inside and the words beside it, and the panel uses the KnockButton molecule (a 24 ring with 'Asked' and the time left, inside its own sunken button) with the message and the hint beside it, wrapping under it at large text. Rows are MemberRow (64 tall) where the board draws 60, and a 1 px hairline in the line color (the flat elevation token) separates rows, with no inset. The gap between cards is 12 as on the board; the board draws no headings, so the heading and its 8 of space are new.",
+        "The words beside the button are a Wrap child, not an expanded one, so they sit beside the button only when they fit whole and otherwise go under it: a long word is never cut. The button and the words sit in a card with 12 of padding (spacing.sm plus spacing.xs, as in ActivityRow).",
+        "The heading (a 13/600 muted text) is a private copy here and in ActivityList, because an organism may not import another. Planned follow-up: a SectionHeader molecule, then both organisms use it.",
+        "It is a plain column, not a scrollable: put it in the scrollable of the screen. A member must be in one group only and in the group of their status (home, away or invited), and asserts check both in debug builds. The groups are keyed, so a member's node survives another group gaining its first member.",
+        "Semantics use Flutter's list and listItem roles on the card and its items. How a given screen reader announces them, and the change of the button from ready to waiting, is not verified on a device."
+      ],
+      "stories": [
+        "Organisms/PresencePanel/panel-ready",
+        "Organisms/PresencePanel/panel-cooldown",
+        "Organisms/PresencePanel/panel-everyone-away"
+      ]
     }
   ]
 }

@@ -211,6 +211,33 @@ void main() {
         },
       ),
       (
+        'PresencePanel',
+        {
+          'homeMembers': '-3',
+          'awayMembers': '99',
+          'invitedMembers': '99',
+          'homeTitle': '',
+          'awayTitle': '',
+          'invitedTitle': '',
+          'knockLabel': '',
+          'cooldown': 'true',
+          'remaining': 'NaN',
+          'cooldownLabel': '',
+          'remainingLabel': '',
+          'cooldownSemanticLabel': '',
+        },
+      ),
+      (
+        'PresencePanel',
+        {
+          'homeMembers': '0',
+          'awayMembers': '0',
+          'emptyHomeLabel': '',
+          'awayEmptyLabel': 'Nobody away',
+          'invitedEmptyLabel': 'Nobody invited',
+        },
+      ),
+      (
         'ActivityList',
         {
           'unreadEntries': '0',
