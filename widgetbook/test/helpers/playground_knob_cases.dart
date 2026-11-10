@@ -818,4 +818,59 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       (t) => expect(_widget<AppSnackbar>(t).visible, isFalse),
     ),
   ],
+  'ActivityList': [
+    KnobCase(
+      'unreadEntries',
+      '1',
+      (t) => expect(_widget<ActivityList>(t).view.unread, hasLength(1)),
+    ),
+    KnobCase(
+      'earlierEntries',
+      '3',
+      (t) => expect(_widget<ActivityList>(t).view.earlier, hasLength(3)),
+    ),
+    KnobCase(
+      'moreUnread',
+      '5',
+      (t) => expect(
+        _widget<ActivityList>(t).view.unreadCount,
+        _widget<ActivityList>(t).view.unread.length + 5,
+      ),
+    ),
+    KnobCase(
+      'unreadPrefix',
+      'Zed',
+      (t) => expect(_widget<ActivityList>(t).view.unreadPrefix, 'Zed'),
+    ),
+    KnobCase(
+      'unreadTitle',
+      'Zed',
+      (t) => expect(_widget<ActivityList>(t).view.unreadTitle, 'Zed'),
+    ),
+    KnobCase(
+      'unreadSemanticLabel',
+      'Zed',
+      (t) => expect(_widget<ActivityList>(t).view.unreadSemanticLabel, 'Zed'),
+    ),
+    KnobCase(
+      'earlierTitle',
+      'Zed',
+      (t) => expect(_widget<ActivityList>(t).view.earlierTitle, 'Zed'),
+    ),
+    KnobCase(
+      'markAllReadLabel',
+      'Zed',
+      (t) => expect(_widget<ActivityList>(t).view.markAllReadLabel, 'Zed'),
+    ),
+    KnobCase(
+      'emptyTitle',
+      'Zed',
+      (t) => expect(_widget<ActivityList>(t).view.emptyTitle, 'Zed'),
+    ),
+    KnobCase(
+      'emptyBody',
+      'Zed',
+      (t) => expect(_widget<ActivityList>(t).view.emptyBody, 'Zed'),
+    ),
+  ],
 };

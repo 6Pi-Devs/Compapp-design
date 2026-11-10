@@ -722,6 +722,35 @@
         "Molecules/CodeCard/card-default",
         "Molecules/CodeCard/card-copied"
       ]
+    },
+    {
+      "id": "activity-list",
+      "level": "organism",
+      "class": "ActivityList",
+      "playground": "Organisms/ActivityList/playground",
+      "path": "organisms/activity_list.dart",
+      "props": [
+        { "name": "view", "type": "ActivityListView", "required": true, "default": "unread and earlier entries (each an ActivityEntry: an ActivityView and its spoken label, unread by the list it sits in), unreadCount (the number the badge shows, at least the unread entries listed, and the app's spoken heading must use the same number), unreadPrefix (the word put before the spoken label of every unread entry), the two headings, the spoken first heading with the count in words, the label of the mark-all action, and the title and body of the empty state" },
+        { "name": "onOpen", "type": "ValueChanged<String>", "required": true, "default": "called with the id of the tapped entry" },
+        { "name": "onMarkAllRead", "type": "VoidCallback", "required": true, "default": "called by the ghost action beside the first heading, which only shows while something is unread" }
+      ],
+      "variants": ["list"],
+      "states": ["new-and-earlier", "all-read", "empty"],
+      "semantics": "A container holding one container per group. Each group is a heading node (the first says the count in words, 'New, 2 unread'), then a list node whose items are single button nodes named by the entry's spoken label, with the view's unreadPrefix before it for the unread ones only, so nothing is said twice; the mark-all action is a button named by its visible label. The badge, the dividers and the card add nothing. A group with no entries is left out and both empty is an AppEmptyState with no action. Unread is the dot, the count and the spoken prefix, never color alone. The groups are keyed, so focus and the node of a row survive the first group appearing or leaving, and when the action is pressed with focus on it and the app takes it away, even after an await, focus moves to the second heading (only if that heading is mounted, and not if focus went elsewhere in between; a rebuild with the same view does not cancel it), and that heading draws a 2 px ink ring around itself while it has focus (it paints nothing otherwise). Calm: no danger color, never who is behind. ActivityList.sliver has the same tree",
+      "key": "activity.list, in both the list and the empty state, and a sliver in the sliver form, as is activity.card.<unread|earlier> there, so getRect does not apply to them (also activity.group.<unread|earlier> on a heading, activity.card.<unread|earlier>, activity.markAllRead, activity.empty, activity.item.<entryId> on the list item of a row, and activity.<entryId> on the row)",
+      "notes": [
+        "The contract lists ActivityListView(unread, earlier) and the board draws bare 'New' and 'Earlier' headings. The contract also asks for the unread count in the header and for onMarkAllRead, which the board does not place: the count is an AppBadge beside the first heading and the action is a ghost AppButton at the end of its line, wrapping under the heading at large text. Where the action sits is a design choice to confirm with the board's owner.",
+        "Board gaps: the rows are ActivityRow (64 tall, 40 tile, radius.sm) where the board draws a 36 tile at 12 of padding. The card has radius.md (16) as the board and 4 of padding all round (spacing.xs) so the focus ring of a row, drawn outside its shape, is not cut, which the board does not have. The gap between a heading, its card and the next group is 8 as on the board. The Earlier card is filled with the surface like the New one, where the board draws it with a border only. The dividers are 1 px hairlines in the line color between rows (the flat elevation token, which wins over the board's sunken color), with no inset.",
+        "Unread is not a field of the entry: it is the list the entry sits in, so an entry cannot be both, and the list adds unreadPrefix to the spoken label of the unread ones, so an earlier entry can never say it. The badge counts unreadCount, which is more than the entries listed when the app pages. The ids of both lists must be unique, an assert checks it in debug builds.",
+        "Two forms, one class. ActivityList(...) is a box: a plain column that builds every row it gets (200 rows took 2.2 s, 3000 took 25.6 s), for a short list inside a ListView, a SingleChildScrollView or a SliverToBoxAdapter. ActivityList.sliver(...) is a static method that returns the sliver form (SliverMainAxisGroup, DecoratedSliver and SliverList.builder with the same data, callbacks, looks and semantics), for the 90 days feed directly in a CustomScrollView: with 1000 entries it builds about 7 rows at the top and 8 at the end. It is a method and not a constructor because a sliver cannot be a box widget, and it adds no class to the manifest. The sliver looks the same, so it has no use case of its own.",
+        "The heading (a 13/600 muted text that may carry a badge and an action) is a private copy here and in PresencePanel, because an organism may not import another. Planned follow-up: a SectionHeader molecule, then both organisms use it.",
+        "Semantics use Flutter's list and listItem roles on the card and its items. How a given screen reader announces them is not verified on a device."
+      ],
+      "stories": [
+        "Organisms/ActivityList/list-new-and-earlier",
+        "Organisms/ActivityList/list-all-read",
+        "Organisms/ActivityList/list-empty"
+      ]
     }
   ]
 }

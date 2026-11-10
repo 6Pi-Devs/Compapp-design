@@ -196,6 +196,30 @@ void main() {
       ('AppNavBar', {'destinations': '9'}),
       ('ActivityRow', {'semanticLabel': ''}),
       (
+        'ActivityList',
+        {
+          'unreadEntries': '-3',
+          'earlierEntries': '99',
+          'moreUnread': '-4',
+          'unreadPrefix': '',
+          'unreadTitle': '',
+          'unreadSemanticLabel': '',
+          'earlierTitle': '',
+          'markAllReadLabel': '',
+          'emptyTitle': '',
+          'emptyBody': '',
+        },
+      ),
+      (
+        'ActivityList',
+        {
+          'unreadEntries': '0',
+          'earlierEntries': '0',
+          'emptyTitle': '',
+          'emptyBody': '',
+        },
+      ),
+      (
         'CodeCard',
         {
           'code': '',
