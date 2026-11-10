@@ -234,6 +234,7 @@ To add or update a golden (a new atom, or an intentional visual change):
 | `color.on-pebble` | `AppColors.onPebble`: initials and ring on a pebble. Dark in both themes, because the pebble colors are pastel in both |
 | `font.display`, `headline`, `title` | `TextTheme.displayMedium`, `headlineSmall`, `titleLarge` |
 | `font.body-lg`, `body`, `label`, `caption` | `TextTheme.bodyLarge`, `bodyMedium`, `labelLarge`, `bodySmall` |
+| `font.code` | `AppTypography.code` (Bricolage 600, 34, line 40, 4 px tracking, `opsz` 34): the code of `CodeCard`. No `TextTheme` slot |
 | `font.label-lg` | `AppTypography.labelLg` (15/22, 600). No `TextTheme` slot: the button themes use it for their label |
 | `space.xs` to `xxl` | `AppSpacing.xs`, `sm`, `md`, `lg`, `xl`, `xxl` (4, 8, 16, 24, 32, 48) |
 | `radius.xs` to `lg`, `radius.pebble` | `AppRadius.xs`, `sm`, `md`, `lg`, `AppRadius.pebble(size)` |

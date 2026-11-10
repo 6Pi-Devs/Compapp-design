@@ -196,6 +196,16 @@ void main() {
       ('AppNavBar', {'destinations': '9'}),
       ('ActivityRow', {'semanticLabel': ''}),
       (
+        'CodeCard',
+        {
+          'code': '',
+          'label': '',
+          'copyLabel': '',
+          'copiedLabel': '',
+          'shareLabel': '',
+        },
+      ),
+      (
         'KnockButton',
         {
           'label': '',
@@ -348,6 +358,27 @@ void main() {
       expect(button.cooldown!.ringValue, 1);
     });
 
+    testWidgets('a code card falls back to the sample texts', (tester) async {
+      await _open(
+        tester,
+        _pathOf('CodeCard'),
+        knobs: {
+          'code': '',
+          'label': '',
+          'copyLabel': '',
+          'copiedLabel': '',
+          'shareLabel': '',
+        },
+      );
+
+      final card = tester.widget<CodeCard>(find.byType(CodeCard));
+      expect(card.code, '4829 1736');
+      expect(card.label, 'Your personal code');
+      expect(card.copyLabel, 'Copy');
+      expect(card.copiedLabel, 'Copied');
+      expect(card.shareLabel, 'Share');
+    });
+
     testWidgets('an item beacon falls back to the sample spoken label', (
       tester,
     ) async {
@@ -447,6 +478,20 @@ void main() {
         tester.widget<PresenceSwitch>(find.byType(PresenceSwitch)).value,
         Presence.away,
       );
+    });
+
+    testWidgets('a code card shows copied when its copy button is tapped', (
+      tester,
+    ) async {
+      await _open(tester, _pathOf('CodeCard'));
+      bool copied() => tester.widget<CodeCard>(find.byType(CodeCard)).copied;
+      expect(copied(), isFalse);
+
+      await tester.tap(find.byKey(const Key('account.code.copy')));
+      await tester.pump();
+
+      expect(copied(), isTrue);
+      expect(find.text('Copied'), findsOneWidget);
     });
 
     testWidgets('a chip selects when tapped', (tester) async {
