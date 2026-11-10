@@ -33,6 +33,21 @@ abstract final class AppSizes {
   /// (`size.nav-plate-padding`).
   static const double navPlatePadding = 14;
 
+  /// Width of the drag handle of a sheet (`size.sheet-handle-width`).
+  static const double sheetHandleWidth = 40;
+
+  /// Height of the drag handle of a sheet, drawn as a pill
+  /// (`size.sheet-handle-height`).
+  static const double sheetHandleHeight = 4;
+
+  /// Width of the dashed plan motif of an empty state
+  /// (`size.empty-motif-width`).
+  static const double emptyMotifWidth = 80;
+
+  /// Height of the dashed plan motif of an empty state
+  /// (`size.empty-motif-height`).
+  static const double emptyMotifHeight = 60;
+
   /// Selected, focused and error borders, spinner stroke
   /// (`size.border-emphasis`).
   static const double borderEmphasis = 2;
@@ -142,6 +157,10 @@ abstract final class AppSizes {
     'size.glyph-action': glyphAction,
     'size.glyph-nav': glyphNav,
     'size.nav-plate-padding': navPlatePadding,
+    'size.sheet-handle-width': sheetHandleWidth,
+    'size.sheet-handle-height': sheetHandleHeight,
+    'size.empty-motif-width': emptyMotifWidth,
+    'size.empty-motif-height': emptyMotifHeight,
     'size.border-emphasis': borderEmphasis,
     'size.focus-ring': focusRing,
     'size.spinner-md': spinnerMd,

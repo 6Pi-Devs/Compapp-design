@@ -537,6 +537,71 @@
         "Molecules/AppNavBar/calendar-default",
         "Molecules/AppNavBar/calendar-badge"
       ]
+    },
+    {
+      "id": "sheet-header",
+      "level": "molecule",
+      "class": "SheetHeader",
+      "playground": "Molecules/SheetHeader/playground",
+      "path": "molecules/sheet_header.dart",
+      "props": [
+        { "name": "title", "type": "String", "required": true },
+        { "name": "onClose", "type": "VoidCallback", "required": true },
+        { "name": "closeLabel", "type": "String", "required": true, "default": "spoken name of the close button" }
+      ],
+      "variants": ["default"],
+      "states": ["default", "long-title"],
+      "semantics": "The header is its own semantics group: under a Card or a list item the title stays a heading node of its own, read before the close button, and the button stays a button. The close button is a focusable button named by closeLabel, which is never empty, 44 drawn with a 48 hit area. The drag handle is decorative and excluded from semantics. A long title wraps and the header grows while the close button stays at the top end; the layout mirrors in right-to-left text. The title is centered on the 48 hit area of the close button (15 below the handle, board 12)",
+      "key": "sheet.<part> (title, close, handle)",
+      "stories": [
+        "Molecules/SheetHeader/default-default",
+        "Molecules/SheetHeader/default-long-title"
+      ]
+    },
+    {
+      "id": "app-empty-state",
+      "level": "molecule",
+      "class": "AppEmptyState",
+      "playground": "Molecules/AppEmptyState/playground",
+      "path": "molecules/app_empty_state.dart",
+      "props": [
+        { "name": "title", "type": "String", "required": true },
+        { "name": "body", "type": "String", "required": true },
+        { "name": "actionLabel", "type": "String?", "required": false, "default": "null or empty leaves the action out" },
+        { "name": "onAction", "type": "VoidCallback?", "required": false, "default": "null disables the action" }
+      ],
+      "variants": ["with-action", "without-action"],
+      "states": ["default"],
+      "semantics": "One group: the title and the body are a single text node read together, followed by the action as a focusable button named by its label (44 drawn, 48 hit area). The dashed plan motif is decorative and excluded. The copy never blames anyone. Content is centered and wraps with large text instead of clipping, so at large text it can be taller than the screen: it must sit in a scrollable screen",
+      "key": "emptyState.<part> (motif, title, body, action)",
+      "stories": [
+        "Molecules/AppEmptyState/with-action-default",
+        "Molecules/AppEmptyState/without-action-default"
+      ]
+    },
+    {
+      "id": "app-snackbar",
+      "level": "molecule",
+      "class": "AppSnackbar",
+      "playground": "Molecules/AppSnackbar/playground",
+      "path": "molecules/app_snackbar.dart",
+      "props": [
+        { "name": "message", "type": "String", "required": true },
+        { "name": "tone", "type": "SnackTone", "required": false, "default": "info" },
+        { "name": "actionLabel", "type": "String?", "required": false, "default": "null or empty leaves the action out" },
+        { "name": "onAction", "type": "VoidCallback?", "required": false, "default": "null disables the action" },
+        { "name": "visible", "type": "bool", "required": false, "default": "true; changing it plays the enter or the exit over motion.snackbar, at once under disableAnimations" }
+      ],
+      "variants": ["info", "error"],
+      "states": ["default", "with-action"],
+      "semantics": "A live region named by message (never empty), announced once when it appears; the glyph and the text are excluded. The action is a focusable button named by actionLabel after the message (44 drawn, 48 hit area, light focus ring, an overlay of the soft primary, a dimmer disabled state); an action wider than a quarter of the bar moves under the message, end-aligned, as Material does, so the message keeps its words whole at 2.0. The tone is a glyph (check or circled exclamation mark), never color alone and never a danger color. No timer: the app decides when to show and dismiss it by flipping visible. After the exit the bar takes no space and leaves the semantics and the focus order, and while it leaves the action cannot take focus",
+      "key": "snackbar.<part> (message, icon, action)",
+      "stories": [
+        "Molecules/AppSnackbar/info-default",
+        "Molecules/AppSnackbar/info-with-action",
+        "Molecules/AppSnackbar/error-default",
+        "Molecules/AppSnackbar/error-with-action"
+      ]
     }
   ]
 }

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:compapp_design/src/tokens/app_colors.dart';
 import 'package:compapp_design/src/tokens/app_decor.dart';
 import 'package:compapp_design/src/tokens/app_motion.dart';
+import 'package:compapp_design/src/tokens/app_opacity.dart';
 import 'package:compapp_design/src/tokens/app_palette.dart';
 import 'package:compapp_design/src/tokens/app_progress.dart';
 import 'package:compapp_design/src/tokens/app_radius.dart';
@@ -47,6 +48,7 @@ void main() {
       'state-layer',
       'progress',
       'decor',
+      'opacity',
     ]);
   });
 
@@ -263,6 +265,19 @@ void main() {
         AppDecor.values[name],
         valueOf(decor, name),
         reason: 'decor.$name',
+      );
+    }
+  });
+
+  test('opacity matches AppOpacity', () {
+    final opacity = section('opacity');
+
+    expect(AppOpacity.values.keys.toSet(), names(opacity));
+    for (final name in names(opacity)) {
+      expect(
+        AppOpacity.values[name],
+        valueOf(opacity, name),
+        reason: 'opacity.$name',
       );
     }
   });

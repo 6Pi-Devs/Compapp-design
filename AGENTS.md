@@ -49,7 +49,7 @@ The root `flutter analyze` and `flutter test` skip `widgetbook/`, so run both pa
 lib/
   compapp_design.dart     barrel: the only import an app needs
   src/
-    tokens/               AppColors, AppSpacing, AppRadius, AppShadows, AppMotion, AppSizes, AppStateLayers, AppProgress, AppDecor, AppTypography (AppPalette is internal)
+    tokens/               AppColors, AppSpacing, AppRadius, AppShadows, AppMotion, AppSizes, AppStateLayers, AppOpacity, AppProgress, AppDecor, AppTypography (AppPalette is internal)
     theme/                CompappTheme.light / dark
     models/               view models and shared enums (MemberView, RoomView, AppIcons)
     atoms/                single-purpose controls (AppButton, AppPebble, AppChip)
@@ -241,11 +241,14 @@ To add or update a golden (a new atom, or an intentional visual change):
 | `elevation.flat` | `AppSizes.hairline` (1px `colorScheme.outlineVariant` border) |
 | `motion.presence`, `motion.in-use` | `AppMotion.presence`, `inUse` and their curves |
 | `motion.spin` | `AppMotion.spin`, `spinCurve` (one turn of a loading spinner) |
+| `motion.snackbar` | `AppMotion.snackbar`, `snackbarCurve` (enter and exit of `AppSnackbar`) |
 | `target.min` | `AppSizes.minTarget` (48 hit area), `AppSizes.minDrawn` (44 drawn) |
 | `size.control-md`, `control-lg` | `AppSizes.controlMd` (44), `controlLg` (52): heights of buttons, chips and fields |
 | `size.glyph-md`, `glyph-lg` | `AppSizes.glyphMd` (16), `glyphLg` (18): icon or spinner beside a label |
 | `size.glyph-action`, `glyph-nav` | `AppSizes.glyphAction` (20), `glyphNav` (22): icon of a top bar action or a sheet close, and of a navigation destination or the back arrow |
 | `size.nav-plate-padding` | `AppSizes.navPlatePadding` (14): horizontal padding of the plate behind a navigation icon |
+| `size.sheet-handle-width`, `sheet-handle-height` | `AppSizes.sheetHandleWidth` (40), `sheetHandleHeight` (4): drag handle of a sheet |
+| `size.empty-motif-width`, `empty-motif-height` | `AppSizes.emptyMotifWidth` (80), `emptyMotifHeight` (60): dashed plan motif of `AppEmptyState` |
 | `size.spinner-md`, `spinner-lg` | `AppSizes.spinnerMd` (12), `spinnerLg` (13.5): the ring of a spinner, drawn in a glyph box |
 | `size.dash`, `dash-gap` | `AppSizes.dash` (4), `dashGap` (3): dash pattern of a 1 px dashed border, scaled by the border width |
 | `size.pebble-xs` to `pebble-xl` | `AppSizes.pebbleXs` to `pebbleXl` (28, 36, 44, 56, 72): sides of `AppPebble` |
@@ -267,7 +270,8 @@ To add or update a golden (a new atom, or an intentional visual change):
 | `size.ribbon` | `AppSizes.ribbon` (28, grows with its text): least height of an `EventRibbon` |
 | `size.border-emphasis`, `focus-ring` | `AppSizes.borderEmphasis` (2, selected, focus and error borders), `focusRing` (4, primary-soft ring around a focused field) |
 | `size.code-cell-width`, `code-cell-height` | `AppSizes.codeCellWidth` (56), `codeCellHeight` (60) |
-| `state-layer.*` | `AppStateLayers`: ink opacity over a fill when pressed (primary 12%, surface 8%, danger 16%) and the spinner track (35%) |
+| `state-layer.*` | `AppStateLayers`: ink opacity over a fill when pressed (primary 12%, surface 8%, danger 16%) and the spinner track (35%). The surface ink of `pressed-secondary` is reused for the hover and focus of a snackbar action over its own soft primary |
+| `opacity.disabled-inverse-label` | `AppOpacity.disabledInverseLabel` (65%): a label on the inverse surface, such as a snackbar action, when its control is disabled. It keeps 4.5:1 in both themes |
 | `decor.room-edge` | `AppDecor.roomEdge` (35%): glow ring of a home `RoomTile` and edge of an occupied one, a share of the presence-home or busy color. Decoration only, it carries no meaning |
 
 ### Component themes

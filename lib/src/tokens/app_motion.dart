@@ -12,11 +12,16 @@ abstract final class AppMotion {
   static const Duration spin = Duration(milliseconds: 1000);
   static const Curve spinCurve = Curves.linear;
 
+  /// Enter and exit of a snackbar.
+  static const Duration snackbar = Duration(milliseconds: 200);
+  static const Curve snackbarCurve = Curves.easeOut;
+
   /// Durations by JSON name, compared against the JSON by the parity test.
   static const Map<String, Duration> values = {
     'presence': presence,
     'in-use': inUse,
     'spin': spin,
+    'snackbar': snackbar,
   };
 
   /// Curves by JSON name, compared against the JSON by the parity test.
@@ -24,5 +29,6 @@ abstract final class AppMotion {
     'presence': presenceCurve,
     'in-use': inUseCurve,
     'spin': spinCurve,
+    'snackbar': snackbarCurve,
   };
 }

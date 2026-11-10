@@ -624,4 +624,65 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       (t) => expect(_widget<AppNavBar>(t).destinations[0].semanticLabel, 'Zed'),
     ),
   ],
+  'SheetHeader': [
+    KnobCase(
+      'title',
+      'Zed',
+      (t) => expect(_widget<SheetHeader>(t).title, 'Zed'),
+    ),
+    KnobCase(
+      'closeLabel',
+      'Zed',
+      (t) => expect(_widget<SheetHeader>(t).closeLabel, 'Zed'),
+    ),
+  ],
+  'AppEmptyState': [
+    KnobCase(
+      'title',
+      'Zed',
+      (t) => expect(_widget<AppEmptyState>(t).title, 'Zed'),
+    ),
+    KnobCase(
+      'body',
+      'Zed',
+      (t) => expect(_widget<AppEmptyState>(t).body, 'Zed'),
+    ),
+    KnobCase(
+      'actionLabel',
+      'Zed',
+      (t) => expect(_widget<AppEmptyState>(t).actionLabel, 'Zed'),
+    ),
+    KnobCase(
+      'actionEnabled',
+      'false',
+      (t) => expect(_widget<AppEmptyState>(t).onAction, isNull),
+    ),
+  ],
+  'AppSnackbar': [
+    KnobCase(
+      'tone',
+      'error',
+      (t) => expect(_widget<AppSnackbar>(t).tone, SnackTone.error),
+    ),
+    KnobCase(
+      'message',
+      'Zed',
+      (t) => expect(_widget<AppSnackbar>(t).message, 'Zed'),
+    ),
+    KnobCase(
+      'actionLabel',
+      'Zed',
+      (t) => expect(_widget<AppSnackbar>(t).actionLabel, 'Zed'),
+    ),
+    KnobCase(
+      'actionEnabled',
+      'false',
+      (t) => expect(_widget<AppSnackbar>(t).onAction, isNull),
+    ),
+    KnobCase(
+      'visible',
+      'false',
+      (t) => expect(_widget<AppSnackbar>(t).visible, isFalse),
+    ),
+  ],
 };

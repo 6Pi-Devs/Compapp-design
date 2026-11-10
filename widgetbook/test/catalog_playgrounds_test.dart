@@ -190,6 +190,8 @@ void main() {
       ('AppNavBar', {'selectedIndex': '4', 'destinations': '2'}),
       ('AppNavBar', {'badgeCount': '-3'}),
       ('AppNavBar', {'label': ''}),
+      ('SheetHeader', {'closeLabel': ''}),
+      ('AppSnackbar', {'message': ''}),
       ('AppNavBar', {'destinationSemanticLabel': ''}),
       ('AppNavBar', {'destinations': '9'}),
     ]) {
