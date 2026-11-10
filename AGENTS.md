@@ -6,7 +6,7 @@ Rules for anyone writing code in this repo, human or AI agent. Read this before 
 
 `compapp_design` is the design system of [Compapp](https://github.com/6Pi-Devs/Compapp-app): design tokens, a Material 3 theme and reusable widgets, organized by atomic design and cataloged in Widgetbook. The look is "Living Floorplan", defined in the [Claude Design canvas](https://claude.ai/artifact/XRN3NJsKyxv3FgVhGgFPpo). The app consumes this package as a git dependency pinned to a release tag. Work is tracked in [Compapp-app#24](https://github.com/6Pi-Devs/Compapp-app/issues/24).
 
-1. **Compose down, never up.** `tokens, models <- atoms <- molecules <- organisms <- templates`. See [Import rules](#import-rules).
+1. **Compose down, never up.** `tokens, models <- foundation <- atoms <- molecules <- organisms <- templates`. See [Import rules](#import-rules).
 2. **Components are pure presentation.** Props are plain data and callbacks. No app or feature types, no repositories, cubits, use cases, `GetIt` or l10n delegates.
 3. **Every visible string is a prop.** The app owns localization and passes strings in. Stories pass English and Spanish samples.
 4. **Colors, sizes and motion come from tokens.** No `Color(0x...)` outside `lib/src/tokens/`, no magic numbers.
@@ -52,6 +52,7 @@ lib/
     tokens/               AppColors, AppSpacing, AppRadius, AppShadows, AppMotion, AppSizes, AppStateLayers, AppOpacity, AppProgress, AppDecor, AppTypography (AppPalette is internal)
     theme/                CompappTheme.light / dark
     models/               view models and shared enums (MemberView, RoomView, AppIcons)
+    foundation/           internal building blocks shared by components, not components (EqualPair)
     atoms/                single-purpose controls (AppButton, AppPebble, AppChip)
     molecules/            atoms composed into a unit (MemberRow, RoomTile)
     organisms/            sections made of molecules (FloorplanMap, PresencePanel)
@@ -70,15 +71,22 @@ fonts/                      bundled Bricolage Grotesque and Instrument Sans, wit
 | `tokens` | Flutter `painting` and `material` types | everything else in `src/` |
 | `models` | Dart SDK, Flutter `painting` and `foundation` types (`@immutable`), other `models` | `tokens` and everything above |
 | `theme` | `tokens` | atoms and above |
-| `atoms` | `tokens`, `models`, and `AppIcon` (the only atom an atom may use, so a button can show an icon) | every other atom, molecules and above |
-| `molecules` | `tokens`, `models`, `atoms` | other molecules, organisms and above |
-| `organisms` | `tokens`, `models`, `atoms`, `molecules` | other organisms, templates |
+| `foundation` | `tokens`, `models`, other `foundation` files | atoms and above, `theme` |
+| `atoms` | `tokens`, `models`, `foundation`, and `AppIcon` (the only atom an atom may use, so a button can show an icon) | every other atom, molecules and above |
+| `molecules` | `tokens`, `models`, `foundation`, `atoms` | other molecules, organisms and above |
+| `organisms` | `tokens`, `models`, `foundation`, `atoms`, `molecules` | other organisms, templates |
 | `templates` | everything below | app or feature code |
 | all levels | Flutter, Dart SDK, `path_parsing`, `package:compapp_design/...` | `flutter_bloc`, `get_it`, `dio`, `go_router`, l10n delegates, anything from Compapp-app |
 
 `BuildContext` is read only for `Theme`, `IconTheme`, `MediaQuery` and `Directionality`. View models (`MemberView`, `RoomView`) and shared enums (`AppIcons`) live in `lib/src/models/`: plain immutable data owned by this package, importable from every level, exempt from the manifest. The app maps its business objects to them. Nothing in `models` imports upward.
 
 Imports under `lib/` are `package:compapp_design/...`. Tests may import `test/helpers/` and `tool/` with a relative path (`tool/` sits outside `lib/`, so it has no package URI).
+
+### Foundation
+
+`lib/src/foundation/` holds the building blocks that more than one component needs and that are not components themselves: a render object (`RenderEqualPair`, with its widget `EqualPair`). It exists so a layout or a drawing is written once instead of copied into each component that needs it. Atoms, molecules, organisms and templates may import it, and it imports only tokens, models, its own files and what every level may import (Flutter, the Dart SDK), never a component.
+
+It is internal: the barrel does not export it, so an app cannot reach it, and it is not in `components.json` (it has no widget to catalog, no story and no golden of its own). `test/manifest_test.dart` skips it on purpose and fails if `components.json` lists a file in it or any `export` under `lib/` points into it. What it draws is covered by the tests of the components that use it and by its own tests in `test/foundation/`. A piece moves here the second time it is needed, not before.
 
 ### Naming
 
@@ -105,7 +113,7 @@ The analyzer enforces the Dart 3.13 shorthand. Write `const new(this.x)` for the
 
 ### Manifest
 
-`components.json` holds one entry per widget. `test/manifest_test.dart` fails when an entry's `path` does not exist, when a Dart file under `lib/src/{atoms,molecules,organisms,templates}/` has no entry, when `id`s or classes repeat, or when a `playground` is missing, is not `<Level>/<Class>/playground`, repeats or is also a story. The schema version is 2: version 2 added the required `playground` field.
+`components.json` holds one entry per widget. `test/manifest_test.dart` fails when an entry's `path` does not exist, when `components.json` lists a file of the internal `foundation/` folder or any `export` under `lib/` points into it (see [Foundation](#foundation)), when a Dart file under `lib/src/{atoms,molecules,organisms,templates}/` has no entry, when `id`s or classes repeat, or when a `playground` is missing, is not `<Level>/<Class>/playground`, repeats or is also a story. The schema version is 2: version 2 added the required `playground` field.
 
 ```json
 {

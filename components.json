@@ -659,8 +659,7 @@
         "Board gaps: the board builds the sides from two AppButtons with a fill each, but the away side is filled with presence-away and AppButton has no variant for it, so the sides are Material TextButtons under one filled thumb that slides.",
         "Board gaps: the track gets a 1 px outline border the board does not draw, so it keeps 3:1 against the page and a card. With it the sides are 54 tall where the board draws 56 (64 minus 4 and 4), and their corner is 11 where the board draws 12.",
         "While the thumb slides every label and glyph is drawn twice, in the muted ink clipped to what is outside the thumb and in the on-color clipped to the thumb, so no color is blended and every pixel reads on every frame. At rest each face is drawn once. The second drawing is excluded from semantics, pointer and focus. The thumb jumps when animations are off. Each face sets its own text style, so a line limit, an italic or an underline around the switch does not change a label while the thumb slides.",
-        "The contract names a Presence type: it is a new two-value enum (home, away) because MemberStatus also has invited.",
-        "The equal-halves-or-stacked layout (_ThumbPair here, _EqualPair in CodeCard) is a private render object duplicated in two molecules. Planned follow-up: an internal lib/src/foundation/ folder importable from atoms and molecules and left out of the manifest."
+        "The contract names a Presence type: it is a new two-value enum (home, away) because MemberStatus also has invited."
       ],
       "stories": [
         "Molecules/PresenceSwitch/switch-home",
@@ -717,7 +716,7 @@
         "The contract lists code, onCopy and onShare. Every visible string is a prop, so label, copyLabel, copiedLabel and shareLabel are added, with copied for the state the app sets.",
         "Board gaps: the board's buttons have no glyphs and these show the copy, check and share ones; the buttons are AppButton secondary, 52 tall with a radius of 16, where the board draws 48 and 12; the card radius is radius.sm (10) where the board draws 12.",
         "The buttons stack at large text, which the board's two-column grid cannot. The dashed edge is decoration in the hairline color, as on RoomTile, because the card is not a control.",
-        "The equal-halves-or-stacked layout (_EqualPair here, _ThumbPair in PresenceSwitch) is a private render object duplicated in two molecules. A dashed outline is also a private copy here, in AppChip, RoomTile and AppEmptyState. Planned follow-up: an internal lib/src/foundation/ folder importable from atoms and molecules and left out of the manifest.",
+        "A dashed outline is also a private copy here, in AppChip, RoomTile and AppEmptyState. Planned follow-up: an internal lib/src/foundation/ folder importable from atoms and molecules and left out of the manifest.",
         "A code that is not grouped (eight digits with no space) is one word: at 2.0x it can be wider than the card and is cut inside the word. The app groups it."
       ],
       "stories": [

@@ -4,6 +4,10 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 
 const _levels = ['atoms', 'molecules', 'organisms', 'templates'];
+
+/// Internal folders under `lib/src/` that hold no component: they are not in
+/// the manifest and the barrel does not export them.
+const _internalFolders = ['foundation'];
 const _entryLevels = ['atom', 'molecule', 'organism', 'template'];
 const _requiredFields = [
   'id',
@@ -61,6 +65,58 @@ void main() {
       isEmpty,
       reason: 'widget files missing from components.json',
     );
+  });
+
+  test('internal folders are not components and are not exported', () {
+    final inManifest = [
+      for (final entry in entries)
+        for (final folder in _internalFolders)
+          if ('${entry['path']}'.startsWith('$folder/'))
+            '${entry['id']}: ${entry['path']}',
+    ];
+    final exported = [
+      for (final file in Directory('lib').listSync(recursive: true))
+        if (file is File && file.path.endsWith('.dart'))
+          for (final target in _exportTargets(
+            file.path.replaceAll(r'\', '/'),
+            file.readAsStringSync(),
+          ))
+            if (_internalFolders.any(
+              (folder) => target.startsWith('lib/src/$folder/'),
+            ))
+              '${file.path}: $target',
+    ];
+    expect(inManifest, isEmpty, reason: 'internal files in components.json');
+    expect(exported, isEmpty, reason: 'internal folders re-exported');
+  });
+
+  group('export targets', () {
+    test('resolve package and relative URIs to a path under lib/', () {
+      const source = '''
+export 'package:compapp_design/src/foundation/equal_pair.dart';
+export '../foundation/dashed_border.dart' show DashedBorder;
+export "src/atoms/app_button.dart";
+export 'package:other/foundation.dart';
+// export 'src/foundation/commented.dart';
+''';
+
+      expect(_exportTargets('lib/src/molecules/a.dart', source), [
+        'lib/src/foundation/equal_pair.dart',
+        'lib/src/foundation/dashed_border.dart',
+        'lib/src/molecules/src/atoms/app_button.dart',
+        'package:other/foundation.dart',
+      ]);
+    });
+
+    test('a folder that only shares the prefix is not an internal one', () {
+      expect(
+        _exportTargets(
+          'lib/a.dart',
+          "export 'src/foundation_extras/x.dart';",
+        ).any((target) => target.startsWith('lib/src/foundation/')),
+        isFalse,
+      );
+    });
   });
 
   test('notes, when present, are an array of non-empty strings', () {
@@ -138,6 +194,26 @@ void main() {
       reason: 'duplicated classes',
     );
   });
+}
+
+/// The files `export` directives in [source] (at [path]) point to: a path
+/// under `lib/` for a `package:compapp_design/` or relative URI, the URI itself
+/// for any other package.
+List<String> _exportTargets(String path, String source) {
+  const prefix = 'package:compapp_design/';
+  return [
+    for (final match in RegExp(
+      r'''^\s*export\s+['"]([^'"]+)['"]''',
+      multiLine: true,
+    ).allMatches(source))
+      switch (match.group(1)!) {
+        final uri when uri.startsWith(prefix) =>
+          'lib/${uri.substring(prefix.length)}',
+        final uri when uri.startsWith('package:') || uri.startsWith('dart:') =>
+          uri,
+        final uri => Uri.parse(path).resolve(uri).path,
+      },
+  ];
 }
 
 String _folder(String level) =>

@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:compapp_design/src/atoms/app_button.dart';
+import 'package:compapp_design/src/foundation/equal_pair.dart';
 import 'package:compapp_design/src/models/app_icons.dart';
 import 'package:compapp_design/src/tokens/app_radius.dart';
 import 'package:compapp_design/src/tokens/app_sizes.dart';
@@ -134,7 +135,7 @@ class CodeCard extends StatelessWidget {
       children: [
         card,
         const SizedBox(height: _gap),
-        _EqualPair(
+        EqualPair(
           spacing: AppSpacing.sm,
           textDirection: Directionality.of(context),
           children: [
@@ -201,181 +202,4 @@ class _DashedBorder extends RoundedRectangleBorder {
       }
     }
   }
-}
-
-/// Lays out two children as equal halves side by side, or one under the other
-/// when the longest word of either does not fit its half. A `LayoutBuilder`
-/// would do the same, but the golden harness measures intrinsic sizes, which it
-/// cannot answer, so this render object does.
-class _EqualPair extends MultiChildRenderObjectWidget {
-  const new({
-    required this.spacing,
-    required this.textDirection,
-    required super.children,
-  });
-
-  final double spacing;
-  final TextDirection textDirection;
-
-  @override
-  RenderObject createRenderObject(BuildContext context) =>
-      _RenderEqualPair(spacing, textDirection);
-
-  @override
-  void updateRenderObject(BuildContext context, _RenderEqualPair renderObject) {
-    renderObject
-      ..spacing = spacing
-      ..textDirection = textDirection;
-  }
-}
-
-class _PairParentData extends ContainerBoxParentData<RenderBox>;
-
-/// How a pair is laid out for some constraints.
-class _PairPlan {
-  const new({
-    required this.size,
-    required this.childConstraints,
-    required this.stacked,
-  });
-
-  final Size size;
-  final BoxConstraints childConstraints;
-  final bool stacked;
-}
-
-class _RenderEqualPair extends RenderBox
-    with
-        ContainerRenderObjectMixin<RenderBox, _PairParentData>,
-        RenderBoxContainerDefaultsMixin<RenderBox, _PairParentData> {
-  new(this._spacing, this._textDirection);
-
-  double _spacing;
-  double get spacing => _spacing;
-  set spacing(double value) {
-    if (value == _spacing) return;
-    _spacing = value;
-    markNeedsLayout();
-  }
-
-  TextDirection _textDirection;
-  TextDirection get textDirection => _textDirection;
-  set textDirection(TextDirection value) {
-    if (value == _textDirection) return;
-    _textDirection = value;
-    markNeedsLayout();
-  }
-
-  RenderBox get _first => firstChild!;
-  RenderBox get _second => childAfter(_first)!;
-
-  @override
-  void setupParentData(RenderBox child) {
-    if (child.parentData is! _PairParentData) {
-      child.parentData = _PairParentData();
-    }
-  }
-
-  _PairPlan _plan(BoxConstraints constraints) {
-    final maxWidth = constraints.maxWidth;
-    final half = (maxWidth - _spacing) / 2;
-    final sideBySide =
-        !maxWidth.isFinite ||
-        (_first.getMinIntrinsicWidth(double.infinity) <= half &&
-            _second.getMinIntrinsicWidth(double.infinity) <= half);
-
-    if (!sideBySide) {
-      final loose = BoxConstraints(
-        minWidth: maxWidth,
-        maxWidth: maxWidth,
-        maxHeight: constraints.maxHeight,
-      );
-      final heights = [
-        _first.getDryLayout(loose).height,
-        _second.getDryLayout(loose).height,
-      ];
-      return _PairPlan(
-        size: constraints.constrain(
-          Size(maxWidth, heights[0] + _spacing + heights[1]),
-        ),
-        childConstraints: loose,
-        stacked: true,
-      );
-    }
-
-    final width = maxWidth.isFinite
-        ? half
-        : math.max(
-            _first.getMaxIntrinsicWidth(double.infinity),
-            _second.getMaxIntrinsicWidth(double.infinity),
-          );
-    final tightWidth = BoxConstraints(
-      minWidth: width,
-      maxWidth: width,
-      maxHeight: constraints.maxHeight,
-    );
-    final height = math.max(
-      _first.getDryLayout(tightWidth).height,
-      _second.getDryLayout(tightWidth).height,
-    );
-    return _PairPlan(
-      size: constraints.constrain(Size(2 * width + _spacing, height)),
-      childConstraints: BoxConstraints.tightFor(width: width, height: height),
-      stacked: false,
-    );
-  }
-
-  @override
-  double computeMinIntrinsicWidth(double height) => math.max(
-    _first.getMinIntrinsicWidth(height),
-    _second.getMinIntrinsicWidth(height),
-  );
-
-  @override
-  double computeMaxIntrinsicWidth(double height) =>
-      2 *
-          math.max(
-            _first.getMaxIntrinsicWidth(height),
-            _second.getMaxIntrinsicWidth(height),
-          ) +
-      _spacing;
-
-  @override
-  double computeMinIntrinsicHeight(double width) =>
-      _plan(BoxConstraints(maxWidth: width)).size.height;
-
-  @override
-  double computeMaxIntrinsicHeight(double width) =>
-      computeMinIntrinsicHeight(width);
-
-  @override
-  Size computeDryLayout(BoxConstraints constraints) => _plan(constraints).size;
-
-  @override
-  void performLayout() {
-    final plan = _plan(constraints);
-    size = plan.size;
-    final children = [_first, _second];
-    for (final child in children) {
-      child.layout(plan.childConstraints, parentUsesSize: true);
-    }
-    for (final (index, child) in children.indexed) {
-      final Offset offset;
-      if (plan.stacked) {
-        offset = Offset(0, index == 0 ? 0 : _first.size.height + _spacing);
-      } else {
-        final slot = _textDirection == TextDirection.ltr ? index : 1 - index;
-        offset = Offset(slot * (child.size.width + _spacing), 0);
-      }
-      (child.parentData! as _PairParentData).offset = offset;
-    }
-  }
-
-  @override
-  void paint(PaintingContext context, Offset offset) =>
-      defaultPaint(context, offset);
-
-  @override
-  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) =>
-      defaultHitTestChildren(result, position: position);
 }
