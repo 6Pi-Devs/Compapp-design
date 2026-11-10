@@ -52,7 +52,7 @@ lib/
     tokens/               AppColors, AppSpacing, AppRadius, AppShadows, AppMotion, AppSizes, AppStateLayers, AppOpacity, AppProgress, AppDecor, AppTypography (AppPalette is internal)
     theme/                CompappTheme.light / dark
     models/               view models and shared enums (MemberView, RoomView, AppIcons)
-    foundation/           internal building blocks shared by components, not components (EqualPair)
+    foundation/           internal building blocks shared by components, not components (EqualPair, DashedBorder, DashedOutlinePainter)
     atoms/                single-purpose controls (AppButton, AppPebble, AppChip)
     molecules/            atoms composed into a unit (MemberRow, RoomTile)
     organisms/            sections made of molecules (FloorplanMap, PresencePanel)
@@ -84,9 +84,9 @@ Imports under `lib/` are `package:compapp_design/...`. Tests may import `test/he
 
 ### Foundation
 
-`lib/src/foundation/` holds the building blocks that more than one component needs and that are not components themselves: a render object (`RenderEqualPair`, with its widget `EqualPair`). It exists so a layout or a drawing is written once instead of copied into each component that needs it. Atoms, molecules, organisms and templates may import it, and it imports only tokens, models, its own files and what every level may import (Flutter, the Dart SDK), never a component.
+`lib/src/foundation/` holds the building blocks that more than one component needs and that are not components themselves: a render object (`RenderEqualPair`, with its widget `EqualPair`), a border (`DashedBorder`), a painter (`DashedOutlinePainter`). It exists so a layout or a drawing is written once instead of copied into each component that needs it. Atoms, molecules, organisms and templates may import it, and it imports only tokens, models, its own files and what every level may import (Flutter, the Dart SDK), never a component.
 
-It is internal: the barrel does not export it, so an app cannot reach it, and it is not in `components.json` (it has no widget to catalog, no story and no golden of its own). `test/manifest_test.dart` skips it on purpose and fails if `components.json` lists a file in it or any `export` under `lib/` points into it. What it draws is covered by the tests of the components that use it and by its own tests in `test/foundation/`. A piece moves here the second time it is needed, not before.
+It is internal: the barrel does not export it, so an app cannot reach it, and it is not in `components.json` (it has no widget to catalog, no story and no golden of its own). `test/manifest_test.dart` skips it on purpose and fails if `components.json` lists a file in it or any `export` under `lib/` points into it. What it draws is covered by the tests of the components that use it and by its own tests in `test/foundation/`. A piece moves here when a second component needs the same code, not before, and the pieces of one family move together: `DashedOutlinePainter` has one user (`AppEmptyState`), but it draws through the same `paintDashedOutline` as `DashedBorder`, which three components use.
 
 ### Naming
 

@@ -1,4 +1,5 @@
 import 'package:compapp_design/compapp_design.dart';
+import 'package:compapp_design/src/foundation/dashed_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -91,14 +92,6 @@ bool _hitsMaterialChip(WidgetTester tester) {
     }
     return false;
   });
-}
-
-int _drawnPaths(ShapeBorder shape, Size size) {
-  final canvas = TestRecordingCanvas();
-  shape.paint(canvas, Offset.zero & size);
-  return canvas.invocations
-      .where((call) => call.invocation.memberName == #drawPath)
-      .length;
 }
 
 void main() {
@@ -353,21 +346,11 @@ void main() {
         );
 
         expect(
-          _shape(tester).runtimeType.toString() == '_DashedBorder',
+          _shape(tester) is DashedBorder,
           kind == AppChipKind.item,
           reason: '$kind',
         );
       }
-    });
-
-    testWidgets('the dashed border is drawn in segments', (tester) async {
-      await tester.pumpWidget(
-        _host(AppChip(label: 'Washer', kind: AppChipKind.item, onTap: () {})),
-      );
-
-      final size = tester.getSize(_surface);
-
-      expect(_drawnPaths(_shape(tester), size), greaterThan(8));
     });
 
     testWidgets('the dashed border keeps the side color and width', (
