@@ -1,3 +1,4 @@
+import 'package:compapp_design_widgetbook/src/catalog/molecules/app_confirm_dialog_use_cases.dart';
 import 'package:compapp_design_widgetbook/src/catalog/molecules/app_empty_state_use_cases.dart';
 import 'package:compapp_design_widgetbook/src/catalog/molecules/app_nav_bar_use_cases.dart';
 import 'package:compapp_design_widgetbook/src/catalog/molecules/app_snackbar_use_cases.dart';
@@ -22,4 +23,5 @@ List<WidgetbookComponent> buildMolecules() => [
   buildSheetHeader(),
   buildAppEmptyState(),
   buildAppSnackbar(),
+  buildAppConfirmDialog(),
 ];

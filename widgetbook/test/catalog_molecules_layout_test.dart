@@ -25,6 +25,7 @@ const _leastWidthOf = <String, double>{
   'SheetHeader': 300,
   'AppEmptyState': 200,
   'AppSnackbar': 300,
+  'AppConfirmDialog': 250,
 };
 
 /// Lays every molecule use case out the way the goldens do, with the real
