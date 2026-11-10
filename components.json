@@ -479,6 +479,64 @@
         "Molecules/EventRibbon/other-continues-both",
         "Molecules/EventRibbon/other-compact"
       ]
+    },
+    {
+      "id": "app-top-bar",
+      "level": "molecule",
+      "class": "AppTopBar",
+      "playground": "Molecules/AppTopBar/playground",
+      "path": "molecules/app_top_bar.dart",
+      "props": [
+        { "name": "title", "type": "String", "required": true },
+        { "name": "subtitle", "type": "String?", "required": false, "default": "home only; null or empty leaves the line out" },
+        { "name": "activityLabel", "type": "String", "required": true, "default": "home only; spoken name of the bell with the unread count in words" },
+        { "name": "unreadCount", "type": "int", "required": true, "default": "home only; zero draws no badge" },
+        { "name": "onActivity", "type": "VoidCallback", "required": true, "default": "home only" },
+        { "name": "me", "type": "MemberView", "required": true, "default": "home only; the signed-in member the account pebble is drawn from (initials, joinOrder; the account is yours, so no \"you\" ring); required, the board has no home bar without the account button" },
+        { "name": "accountLabel", "type": "String", "required": true, "default": "home only; spoken name of the account button, the action it does (\"Your account\"); MemberView.semanticLabel describes the person and is not read" },
+        { "name": "onAccount", "type": "VoidCallback", "required": true, "default": "home only" },
+        { "name": "backLabel", "type": "String", "required": true, "default": "pushed only; spoken name of the back button" },
+        { "name": "onBack", "type": "VoidCallback", "required": true, "default": "pushed only" },
+        { "name": "actionLabel", "type": "String?", "required": false, "default": "pushed only; null or empty leaves the action out" },
+        { "name": "onAction", "type": "VoidCallback?", "required": false, "default": "pushed only; null disables the action" }
+      ],
+      "variants": ["home", "pushed"],
+      "states": ["default", "long-text"],
+      "semantics": "The bar is its own semantics group, so under a Card or a list item the title stays a heading node of its own and the buttons stay buttons. The parts are read in order: the title, the subtitle, the bell, the account (the title, the back button, the action on the pushed bar). The subtitle is plain text. The bell, the account pebble, the back arrow and the action are focusable buttons named by their label props, which are never empty (the badge on the bell is merged into its button and read once, as part of activityLabel); targets are 44 drawn with a 48 hit area. The bar pads itself by the top inset of the screen (no SafeArea needed). It mirrors in right-to-left text, back arrow included, and grows with large text instead of clipping: above a text scale of 1.3 the bell and the account of the home bar drop under the title, and the badge sits beside the bell glyph, never over it",
+      "key": "topBar.<part> (title, subtitle, activity, account, back, action)",
+      "stories": [
+        "Molecules/AppTopBar/home-default",
+        "Molecules/AppTopBar/home-long-text",
+        "Molecules/AppTopBar/pushed-default",
+        "Molecules/AppTopBar/pushed-long-text"
+      ]
+    },
+    {
+      "id": "app-nav-bar",
+      "level": "molecule",
+      "class": "AppNavBar",
+      "playground": "Molecules/AppNavBar/playground",
+      "path": "molecules/app_nav_bar.dart",
+      "props": [
+        { "name": "destinations", "type": "List<NavDestinationView>", "required": true, "default": "one to four: id, icon, label, badgeCount (0 draws none) and semanticLabel of each destination" },
+        { "name": "selectedIndex", "type": "int", "required": true },
+        { "name": "onSelected", "type": "ValueChanged<int>", "required": true, "default": "called with the tapped index, also when it is the selected one" },
+        { "name": "semanticLabel", "type": "String", "required": true, "default": "name of the navigation landmark" }
+      ],
+      "variants": ["home", "things", "tasks", "calendar"],
+      "states": ["default", "badge"],
+      "semantics": "A navigation landmark named by semanticLabel. Each destination is one focusable button in a mutually exclusive group, with a selected state, named by its semanticLabel (which must contain the visible label) or else its label; a badge count is merged into that name and read once. Destinations are 52 tall and at least 48 wide. The selected one has a primary-soft plate with a 2 px primary border and ink text, so selection is not color alone. At most 4 destinations with short single-word labels, on a screen at least 360 wide (the smallest target; at 320 a word like Calendario breaks at 1.3). The one documented text scale cap of the system: labels and badge counts stop growing at 1.3, like Material NavigationBar (_kMaxLabelTextScaleFactor); the semantics keep the full label. The surface runs under the bottom inset. The order mirrors in right-to-left text",
+      "key": "nav.<destinationId>",
+      "stories": [
+        "Molecules/AppNavBar/home-default",
+        "Molecules/AppNavBar/home-badge",
+        "Molecules/AppNavBar/things-default",
+        "Molecules/AppNavBar/things-badge",
+        "Molecules/AppNavBar/tasks-default",
+        "Molecules/AppNavBar/tasks-badge",
+        "Molecules/AppNavBar/calendar-default",
+        "Molecules/AppNavBar/calendar-badge"
+      ]
     }
   ]
 }

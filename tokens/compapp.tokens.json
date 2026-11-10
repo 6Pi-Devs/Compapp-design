@@ -46,6 +46,7 @@
     "pebble-xl": { "$type": "typography", "$value": { "fontFamily": "Bricolage Grotesque", "fontWeight": 600, "fontSize": "28px", "lineHeight": "28px" } },
     "badge-count": { "$type": "typography", "$value": { "fontFamily": "Instrument Sans", "fontWeight": 600, "fontSize": "11px", "lineHeight": "18px" } },
     "badge-label": { "$type": "typography", "$value": { "fontFamily": "Instrument Sans", "fontWeight": 600, "fontSize": "12px", "lineHeight": "16px" } },
+    "nav-label": { "$type": "typography", "$value": { "fontFamily": "Instrument Sans", "fontWeight": 600, "fontSize": "12px", "lineHeight": "16px" }, "$description": "label under a navigation icon; same values as badge-label, kept apart because the two change for different reasons" },
     "ring-label": { "$type": "typography", "$value": { "fontFamily": "Instrument Sans", "fontWeight": 600, "fontSize": "15px", "lineHeight": "15px" } },
     "caption": { "$type": "typography", "$value": { "fontFamily": "Instrument Sans", "fontWeight": 400, "fontSize": "12px", "lineHeight": "16px" } }
   },
@@ -88,6 +89,9 @@
     "control-lg": { "$type": "dimension", "$value": "52px", "$description": "height of a large button and of a text field" },
     "glyph-md": { "$type": "dimension", "$value": "16px", "$description": "icon or spinner beside a medium label" },
     "glyph-lg": { "$type": "dimension", "$value": "18px", "$description": "icon or spinner beside a large label" },
+    "glyph-action": { "$type": "dimension", "$value": "20px", "$description": "icon of a top bar action, such as the bell or a sheet close" },
+    "glyph-nav": { "$type": "dimension", "$value": "22px", "$description": "icon of a navigation destination and of the back arrow" },
+    "nav-plate-padding": { "$type": "dimension", "$value": "14px", "$description": "horizontal padding of the plate behind a navigation icon" },
     "border-emphasis": { "$type": "dimension", "$value": "2px", "$description": "selected, focused and error borders, spinner stroke" },
     "focus-ring": { "$type": "dimension", "$value": "4px", "$description": "primary-soft ring around a focused field" },
     "spinner-md": { "$type": "dimension", "$value": "12px", "$description": "ring of a spinner beside a medium label, drawn in a glyph-md box" },

@@ -185,6 +185,18 @@ abstract final class AppTypography {
     fontFeatures: _tabular,
   );
 
+  /// Label under a navigation icon. It has the values of [badgeLabel] and is
+  /// kept apart because the two change for different reasons.
+  static const TextStyle navLabel = TextStyle(
+    fontFamily: bodyFamily,
+    package: package,
+    fontWeight: FontWeight.w600,
+    fontSize: 12,
+    height: 16 / 12,
+    letterSpacing: 0,
+    fontFeatures: _tabular,
+  );
+
   /// Text of a label badge.
   static const TextStyle badgeLabel = TextStyle(
     fontFamily: bodyFamily,
@@ -226,6 +238,7 @@ abstract final class AppTypography {
     'pebble-xl': pebbleXl,
     'badge-count': badgeCount,
     'badge-label': badgeLabel,
+    'nav-label': navLabel,
     'ring-label': ringLabel,
     'caption': caption,
   };

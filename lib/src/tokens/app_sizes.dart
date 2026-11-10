@@ -21,6 +21,18 @@ abstract final class AppSizes {
   /// Icon or spinner beside a large label (`size.glyph-lg`).
   static const double glyphLg = 18;
 
+  /// Icon of a top bar action, such as the bell or a sheet's close
+  /// (`size.glyph-action`).
+  static const double glyphAction = 20;
+
+  /// Icon of a navigation destination and of the back arrow
+  /// (`size.glyph-nav`).
+  static const double glyphNav = 22;
+
+  /// Horizontal padding of the plate behind a navigation icon
+  /// (`size.nav-plate-padding`).
+  static const double navPlatePadding = 14;
+
   /// Selected, focused and error borders, spinner stroke
   /// (`size.border-emphasis`).
   static const double borderEmphasis = 2;
@@ -127,6 +139,9 @@ abstract final class AppSizes {
     'size.control-lg': controlLg,
     'size.glyph-md': glyphMd,
     'size.glyph-lg': glyphLg,
+    'size.glyph-action': glyphAction,
+    'size.glyph-nav': glyphNav,
+    'size.nav-plate-padding': navPlatePadding,
     'size.border-emphasis': borderEmphasis,
     'size.focus-ring': focusRing,
     'size.spinner-md': spinnerMd,

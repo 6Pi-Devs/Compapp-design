@@ -182,6 +182,16 @@ void main() {
       ('TaskRow', {'logAgainSemanticLabel': '', 'ageDays': '-5'}),
       ('RoomTile', {'semanticLabel': '', 'occupants': '9', 'beacons': '9'}),
       ('ItemBeacon', {'semanticLabel': '', 'inUse': 'true'}),
+      ('AppTopBar', {'unreadCount': '-3'}),
+      ('AppTopBar', {'accountLabel': ''}),
+      ('AppTopBar', {'activityLabel': ''}),
+      ('AppTopBar', {'backLabel': '', 'form': 'pushed'}),
+      ('AppNavBar', {'selectedIndex': '9'}),
+      ('AppNavBar', {'selectedIndex': '4', 'destinations': '2'}),
+      ('AppNavBar', {'badgeCount': '-3'}),
+      ('AppNavBar', {'label': ''}),
+      ('AppNavBar', {'destinationSemanticLabel': ''}),
+      ('AppNavBar', {'destinations': '9'}),
     ]) {
       testWidgets('$component $knobs', (tester) async {
         await _open(tester, _pathOf(component), knobs: knobs);

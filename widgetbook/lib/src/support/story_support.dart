@@ -7,6 +7,19 @@ Widget useCaseFrame({required Widget child}) {
   return Padding(padding: const EdgeInsets.all(AppSpacing.md), child: child);
 }
 
+/// Width of the bars (top bar, nav bar, snackbar) in a fixed use case: the
+/// widest column a golden scenario gives (360) minus the frame padding. A bar
+/// takes the width it is given, so a use case gives it one, instead of
+/// collapsing to nothing in a harness that sizes scenarios to their content.
+const double barStoryWidth = 328;
+
+/// [useCaseFrame] around a bar that is [barStoryWidth] wide.
+Widget barFrame({required Widget child}) {
+  return useCaseFrame(
+    child: SizedBox(width: barStoryWidth, child: child),
+  );
+}
+
 /// Freezes motion for a use case, as the system's "reduce motion" setting
 /// does. Spinners and other loops stand still, so goldens are deterministic
 /// and `pumpAndSettle` can finish.

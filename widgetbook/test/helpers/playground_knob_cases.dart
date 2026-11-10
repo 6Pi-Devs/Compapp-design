@@ -532,4 +532,96 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       (t) => expect(_widget<AppFreshnessBar>(t).semanticLabel, 'Zed'),
     ),
   ],
+  'AppTopBar': [
+    KnobCase(
+      'form',
+      'pushed',
+      (t) => expect(_widget<AppTopBar>(t).variant, AppTopBarVariant.pushed),
+    ),
+    KnobCase('title', 'Zed', (t) => expect(_widget<AppTopBar>(t).title, 'Zed')),
+    KnobCase(
+      'subtitle',
+      'Zed',
+      (t) => expect(_widget<AppTopBar>(t).subtitle, 'Zed'),
+    ),
+    KnobCase(
+      'activityLabel',
+      'Zed',
+      (t) => expect(_widget<AppTopBar>(t).activityLabel, 'Zed'),
+    ),
+    KnobCase(
+      'unreadCount',
+      '42',
+      (t) => expect(_widget<AppTopBar>(t).unreadCount, 42),
+    ),
+    KnobCase(
+      'meInitials',
+      'Z',
+      (t) => expect(_widget<AppTopBar>(t).me?.initials, 'Z'),
+    ),
+    KnobCase(
+      'meJoinOrder',
+      '3',
+      (t) => expect(_widget<AppTopBar>(t).me?.joinOrder, 3),
+    ),
+    KnobCase(
+      'accountLabel',
+      'Zed',
+      (t) => expect(_widget<AppTopBar>(t).accountLabel, 'Zed'),
+    ),
+    KnobCase(
+      'backLabel',
+      'Zed',
+      (t) => expect(_widget<AppTopBar>(t).backLabel, 'Zed'),
+      also: {'form': 'pushed'},
+    ),
+    KnobCase(
+      'actionLabel',
+      'Zed',
+      (t) => expect(_widget<AppTopBar>(t).actionLabel, 'Zed'),
+      also: {'form': 'pushed'},
+    ),
+    KnobCase('actionEnabled', 'false', (t) {
+      final bar = _widget<AppTopBar>(t);
+      expect(bar.variant, AppTopBarVariant.pushed);
+      expect(bar.onAction, isNull);
+    }, also: {'form': 'pushed'}),
+  ],
+  'AppNavBar': [
+    KnobCase(
+      'destinations',
+      '3',
+      (t) => expect(_widget<AppNavBar>(t).destinations, hasLength(3)),
+    ),
+    KnobCase(
+      'selectedIndex',
+      '2',
+      (t) => expect(_widget<AppNavBar>(t).selectedIndex, 2),
+    ),
+    KnobCase(
+      'semanticLabel',
+      'Zed',
+      (t) => expect(_widget<AppNavBar>(t).semanticLabel, 'Zed'),
+    ),
+    KnobCase(
+      'icon',
+      'oven',
+      (t) => expect(_widget<AppNavBar>(t).destinations[0].icon, AppIcons.oven),
+    ),
+    KnobCase(
+      'label',
+      'Zed',
+      (t) => expect(_widget<AppNavBar>(t).destinations[0].label, 'Zed'),
+    ),
+    KnobCase(
+      'badgeCount',
+      '42',
+      (t) => expect(_widget<AppNavBar>(t).destinations[0].badgeCount, 42),
+    ),
+    KnobCase(
+      'destinationSemanticLabel',
+      'Zed',
+      (t) => expect(_widget<AppNavBar>(t).destinations[0].semanticLabel, 'Zed'),
+    ),
+  ],
 };
