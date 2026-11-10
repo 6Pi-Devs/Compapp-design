@@ -1,7 +1,6 @@
-import 'dart:math' as math;
-
 import 'package:compapp_design/src/atoms/app_icon.dart';
 import 'package:compapp_design/src/atoms/app_pebble.dart';
+import 'package:compapp_design/src/foundation/dashed_border.dart';
 import 'package:compapp_design/src/models/app_icons.dart';
 import 'package:compapp_design/src/models/member_status.dart';
 import 'package:compapp_design/src/models/member_view.dart';
@@ -116,7 +115,7 @@ class RoomTile extends StatelessWidget {
     final side = BorderSide(color: border, width: AppSizes.borderRoom);
     const radius = BorderRadius.all(Radius.circular(AppRadius.md));
     final ShapeBorder shape = state == RoomTileState.free
-        ? _DashedBorder(borderRadius: radius, side: side)
+        ? DashedBorder(borderRadius: radius, side: side)
         : RoundedRectangleBorder(borderRadius: radius, side: side);
 
     final header = ExcludeSemantics(
@@ -223,49 +222,5 @@ class RoomTile extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-/// A rounded rectangle whose side is dashed. Material has no dashed border.
-class _DashedBorder extends RoundedRectangleBorder {
-  const new({super.borderRadius, super.side});
-
-  @override
-  _DashedBorder copyWith({
-    BorderSide? side,
-    BorderRadiusGeometry? borderRadius,
-  }) => _DashedBorder(
-    side: side ?? this.side,
-    borderRadius: borderRadius ?? this.borderRadius,
-  );
-
-  @override
-  ShapeBorder scale(double t) =>
-      _DashedBorder(side: side.scale(t), borderRadius: borderRadius * t);
-
-  @override
-  void paint(Canvas canvas, Rect rect, {TextDirection? textDirection}) {
-    if (side.style == BorderStyle.none) return;
-    final outline = Path()
-      ..addRRect(
-        borderRadius
-            .resolve(textDirection)
-            .toRRect(rect)
-            .deflate(side.width / 2),
-      );
-    final paint = Paint()
-      ..color = side.color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = side.width;
-    final dash = side.width * AppSizes.dash;
-    final period = dash + side.width * AppSizes.dashGap;
-    for (final metric in outline.computeMetrics()) {
-      for (var start = 0.0; start < metric.length; start += period) {
-        canvas.drawPath(
-          metric.extractPath(start, math.min(start + dash, metric.length)),
-          paint,
-        );
-      }
-    }
   }
 }

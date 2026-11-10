@@ -1,4 +1,5 @@
 import 'package:compapp_design/compapp_design.dart';
+import 'package:compapp_design/src/foundation/dashed_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -357,8 +358,7 @@ void main() {
       for (final state in RoomTileState.values) {
         await tester.pumpWidget(host(_cell(_tile(state: state))));
 
-        final dashed =
-            _decoration(tester).shape.runtimeType.toString() == '_DashedBorder';
+        final dashed = _decoration(tester).shape is DashedBorder;
         expect(dashed, state == RoomTileState.free, reason: state.name);
       }
     });

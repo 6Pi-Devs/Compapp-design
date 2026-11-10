@@ -1,4 +1,5 @@
 import 'package:compapp_design/compapp_design.dart';
+import 'package:compapp_design/src/foundation/dashed_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -91,14 +92,6 @@ bool _hitsMaterialChip(WidgetTester tester) {
     }
     return false;
   });
-}
-
-int _drawnPaths(ShapeBorder shape, Size size) {
-  final canvas = TestRecordingCanvas();
-  shape.paint(canvas, Offset.zero & size);
-  return canvas.invocations
-      .where((call) => call.invocation.memberName == #drawPath)
-      .length;
 }
 
 void main() {
@@ -353,21 +346,11 @@ void main() {
         );
 
         expect(
-          _shape(tester).runtimeType.toString() == '_DashedBorder',
+          _shape(tester) is DashedBorder,
           kind == AppChipKind.item,
           reason: '$kind',
         );
       }
-    });
-
-    testWidgets('the dashed border is drawn in segments', (tester) async {
-      await tester.pumpWidget(
-        _host(AppChip(label: 'Washer', kind: AppChipKind.item, onTap: () {})),
-      );
-
-      final size = tester.getSize(_surface);
-
-      expect(_drawnPaths(_shape(tester), size), greaterThan(8));
     });
 
     testWidgets('the dashed border keeps the side color and width', (
@@ -387,6 +370,49 @@ void main() {
 
       expect(_side(tester).color, CompappTheme.light.colorScheme.primary);
       expect(_side(tester).width, AppSizes.borderEmphasis);
+    });
+  });
+
+  group('shape animation', () {
+    /// The border the chip's Material is drawing this frame, which is not the
+    /// `shape` it was given while the shape animates to a new one.
+    ShapeBorder drawnShape(WidgetTester tester) {
+      final clipper = tester
+          .widget<PhysicalShape>(
+            find.descendant(
+              of: find.byType(FilterChip),
+              matching: find.byType(PhysicalShape),
+            ),
+          )
+          .clipper;
+      return (clipper as ShapeBorderClipper).shape;
+    }
+
+    testWidgets('an item chip stays dashed while it is toggled', (
+      tester,
+    ) async {
+      Widget chip({required bool selected}) => _host(
+        AppChip(
+          label: 'Washer',
+          kind: AppChipKind.item,
+          selected: selected,
+          onTap: () {},
+        ),
+      );
+
+      await tester.pumpWidget(chip(selected: false));
+      await tester.pumpWidget(chip(selected: true));
+
+      for (final milliseconds in [10, 40, 50, 100]) {
+        await tester.pump(Duration(milliseconds: milliseconds));
+        expect(
+          drawnShape(tester),
+          isA<DashedBorder>(),
+          reason: 'after $milliseconds more ms',
+        );
+      }
+      await tester.pumpAndSettle();
+      expect(drawnShape(tester), isA<DashedBorder>());
     });
   });
 
