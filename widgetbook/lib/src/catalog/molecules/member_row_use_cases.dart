@@ -11,7 +11,9 @@ import 'package:widgetbook/widgetbook.dart';
 const _rowWidth = 320.0;
 
 /// One use case per state of the Molecules board: at home, away, invited and
-/// you (the member of this device, with the inset ring on the pebble).
+/// you (the member of this device, with the inset ring on the pebble), and a
+/// long one, whose long name, subtitle and trailing text reach the stacked
+/// layout at the large text scale of the golden scenarios.
 WidgetbookComponent buildMemberRow() {
   return WidgetbookComponent(
     name: 'MemberRow',
@@ -28,7 +30,7 @@ WidgetbookComponent buildMemberRow() {
   );
 }
 
-enum _MemberState { home, away, invited, you }
+enum _MemberState { home, away, invited, you, long }
 
 Widget _row(BuildContext context, _MemberState state) {
   return switch (state) {
@@ -93,6 +95,29 @@ Widget _row(BuildContext context, _MemberState state) {
       ),
       subtitle: context.sample(en: 'In Bedroom 1', es: 'En el dormitorio 1'),
       trailing: context.sample(en: 'since 3 h', es: 'desde hace 3 h'),
+    ),
+    _MemberState.long => MemberRow(
+      member: MemberView(
+        id: 'guillermo',
+        name: context.sample(
+          en: 'Alexander Montgomery',
+          es: 'Guillermo Castellanos',
+        ),
+        initials: context.sample(en: 'AM', es: 'GC'),
+        joinOrder: 4,
+        semanticLabel: context.sample(
+          en: 'Alexander Montgomery, at home',
+          es: 'Guillermo Castellanos, en casa',
+        ),
+      ),
+      subtitle: context.sample(
+        en: 'Shared calendar',
+        es: 'Calendario compartido',
+      ),
+      trailing: context.sample(
+        en: 'until Friday night',
+        es: 'hasta el viernes por la noche',
+      ),
     ),
   };
 }
