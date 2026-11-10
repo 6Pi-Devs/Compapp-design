@@ -145,6 +145,9 @@ abstract final class AppSizes {
   /// Least height of an event ribbon (`size.ribbon`). It grows with its text.
   static const double ribbon = 28;
 
+  /// Side of the glyph tile of an activity row (`size.activity-tile`).
+  static const double activityTile = 40;
+
   /// Every token by its JSON name, checked by the parity test.
   static const Map<String, double> values = {
     'target.min': minTarget,
@@ -191,5 +194,6 @@ abstract final class AppSizes {
     'size.beacon': beacon,
     'size.border-room': borderRoom,
     'size.ribbon': ribbon,
+    'size.activity-tile': activityTile,
   };
 }

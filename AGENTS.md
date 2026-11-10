@@ -128,7 +128,7 @@ The analyzer enforces the Dart 3.13 shorthand. Write `const new(this.x)` for the
 }
 ```
 
-`path` is relative to `lib/src/`. `level` is `atom`, `molecule`, `organism` or `template`, and the path starts with its folder.
+`path` is relative to `lib/src/`. `level` is `atom`, `molecule`, `organism` or `template`, and the path starts with its folder. `notes` is optional, an array of strings: each records a known gap with the board or a decision a reader would otherwise have to rediscover.
 
 ### Widgetbook and golden tests
 
@@ -268,6 +268,7 @@ To add or update a golden (a new atom, or an intentional visual change):
 | `size.beacon` | `AppSizes.beacon` (34): glyph tile or breathing ring of `ItemBeacon` |
 | `size.border-room` | `AppSizes.borderRoom` (1.5): border of a `RoomTile`, solid or dashed |
 | `size.ribbon` | `AppSizes.ribbon` (28, grows with its text): least height of an `EventRibbon` |
+| `size.activity-tile` | `AppSizes.activityTile` (40): glyph tile of `ActivityRow` |
 | `size.border-emphasis`, `focus-ring` | `AppSizes.borderEmphasis` (2, selected, focus and error borders), `focusRing` (4, primary-soft ring around a focused field) |
 | `size.code-cell-width`, `code-cell-height` | `AppSizes.codeCellWidth` (56), `codeCellHeight` (60) |
 | `state-layer.*` | `AppStateLayers`: ink opacity over a fill when pressed (primary 12%, surface 8%, danger 16%) and the spinner track (35%). The surface ink of `pressed-secondary` is reused for the hover and focus of a snackbar action over its own soft primary |

@@ -63,6 +63,20 @@ void main() {
     );
   });
 
+  test('notes, when present, are an array of non-empty strings', () {
+    final invalid = [
+      for (final entry in entries)
+        if (entry.containsKey('notes') &&
+            !(entry['notes'] is List &&
+                (entry['notes'] as List).isNotEmpty &&
+                (entry['notes'] as List).every(
+                  (note) => note is String && note.trim().isNotEmpty,
+                )))
+          '${entry['id']}: ${entry['notes']}',
+    ];
+    expect(invalid, isEmpty, reason: 'notes must be a list of strings');
+  });
+
   test('every entry has the required fields', () {
     final incomplete = [
       for (final entry in entries)

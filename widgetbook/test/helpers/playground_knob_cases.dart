@@ -520,6 +520,53 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       (t) => expect(_widget<EventRibbon>(t).compact, isTrue),
     ),
   ],
+  'ActivityRow': [
+    KnobCase(
+      'icon',
+      'oven',
+      (t) => expect(_widget<ActivityRow>(t).entry.icon, AppIcons.oven),
+    ),
+    KnobCase(
+      'tone',
+      'neutral',
+      (t) => expect(_widget<ActivityRow>(t).entry.tone, ActivityTone.neutral),
+    ),
+    KnobCase(
+      'before',
+      'Zed',
+      (t) => expect(_widget<ActivityRow>(t).entry.text.first.text, 'Zed'),
+    ),
+    KnobCase(
+      'strong',
+      'Zed',
+      (t) => expect(
+        _widget<ActivityRow>(t).entry.text
+            .where((run) => run.strong)
+            .map((run) => run.text),
+        ['Zed'],
+      ),
+    ),
+    KnobCase(
+      'after',
+      'Zed',
+      (t) => expect(_widget<ActivityRow>(t).entry.text.last.text, 'Zed'),
+    ),
+    KnobCase(
+      'meta',
+      'Zed',
+      (t) => expect(_widget<ActivityRow>(t).entry.meta, 'Zed'),
+    ),
+    KnobCase(
+      'unread',
+      'false',
+      (t) => expect(_widget<ActivityRow>(t).unread, isFalse),
+    ),
+    KnobCase(
+      'semanticLabel',
+      'Zed',
+      (t) => expect(_widget<ActivityRow>(t).semanticLabel, endsWith('Zed')),
+    ),
+  ],
   'AppFreshnessBar': [
     KnobCase(
       'ageDays',
