@@ -8,6 +8,8 @@ import '../helpers/bar_host.dart';
 import '../helpers/bundled_fonts.dart';
 import '../helpers/contrast.dart';
 import '../helpers/painted_color.dart';
+import '../helpers/painted_pixels.dart';
+import '../helpers/word_breaks.dart';
 
 const _destinations = [
   NavDestinationView(id: 'home', icon: AppIcons.floorplan, label: 'Home'),
@@ -510,12 +512,13 @@ void main() {
 
       final bar = inBarHost(tester, find.byType(AppNavBar));
       expect(bar.height, plain + 34);
-      final pixels = await paintedRegion(
+      final pixels = await paintedPixels(
         tester,
-        Rect.fromLTWH(bar.center.dx, bar.bottom - 4, 1, 3),
+        barBoundaryKey,
+        region: Rect.fromLTWH(bar.center.dx, bar.bottom - 4, 1, 3),
       );
       expect(
-        countColor(
+        countPixels(
           pixels,
           CompappTheme.light.colorScheme.surfaceContainerLowest,
         ),

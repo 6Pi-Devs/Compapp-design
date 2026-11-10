@@ -7,6 +7,8 @@ import '../helpers/bar_host.dart';
 import '../helpers/bundled_fonts.dart';
 import '../helpers/contrast.dart';
 import '../helpers/painted_color.dart';
+import '../helpers/painted_pixels.dart';
+import '../helpers/word_breaks.dart';
 
 void _noop() {}
 
@@ -628,14 +630,18 @@ void main() {
           matching: find.byType(AppIcon),
         );
 
-        final pixels = await paintedRegion(tester, inBarHost(tester, icon));
+        final pixels = await paintedPixels(
+          tester,
+          barBoundaryKey,
+          region: inBarHost(tester, icon),
+        );
 
         expect(
-          countColor(pixels, theme.colorScheme.onSurface),
+          countPixels(pixels, theme.colorScheme.onSurface),
           greaterThan(3),
           reason: name,
         );
-        expect(countColor(pixels, theme.colorScheme.primary), 0, reason: name);
+        expect(countPixels(pixels, theme.colorScheme.primary), 0, reason: name);
       });
 
       testWidgets(
@@ -658,19 +664,28 @@ void main() {
                 .first,
           );
 
-          final glyph = await paintedRegion(tester, inBarHost(tester, icon));
-          final border = await paintedRegion(
+          final glyph = await paintedPixels(
             tester,
-            Rect.fromLTWH(drawn.left, drawn.center.dy, 1, 1),
+            barBoundaryKey,
+            region: inBarHost(tester, icon),
+          );
+          final border = await paintedPixels(
+            tester,
+            barBoundaryKey,
+            region: Rect.fromLTWH(drawn.left, drawn.center.dy, 1, 1),
           );
 
           expect(
-            countColor(glyph, scheme.onSurface),
+            countPixels(glyph, scheme.onSurface),
             greaterThan(3),
             reason: name,
           );
-          expect(countColor(glyph, scheme.primary), 0, reason: name);
-          expect(countColor(border, scheme.outline), 1, reason: '$name border');
+          expect(countPixels(glyph, scheme.primary), 0, reason: name);
+          expect(
+            countPixels(border, scheme.outline),
+            1,
+            reason: '$name border',
+          );
         },
       );
     }
@@ -862,14 +877,19 @@ void main() {
 
         // The ring of an `isYou` pebble sits inset from the edge: the pixel
         // there is the pebble color, not the dark ring.
-        final band = await paintedRegion(
+        final band = await paintedPixels(
           tester,
-          Rect.fromLTWH(pebble.left + 2, pebble.center.dy, 2, 1),
+          barBoundaryKey,
+          region: Rect.fromLTWH(pebble.left + 2, pebble.center.dy, 2, 1),
         );
 
         expect(tester.widget<AppPebble>(find.byType(AppPebble)).isYou, isFalse);
-        expect(countColor(band, colors.onPebble), 0, reason: name);
-        expect(countColor(band, colors.pebbleAt(0)), band.length, reason: name);
+        expect(countPixels(band, colors.onPebble), 0, reason: name);
+        expect(
+          countPixels(band, colors.pebbleAt(0)),
+          band.length,
+          reason: name,
+        );
       });
     }
   });
