@@ -659,6 +659,32 @@
         "Molecules/PresenceSwitch/switch-home",
         "Molecules/PresenceSwitch/switch-away"
       ]
+    },
+    {
+      "id": "knock-button",
+      "level": "molecule",
+      "class": "KnockButton",
+      "playground": "Molecules/KnockButton/playground",
+      "path": "molecules/knock_button.dart",
+      "props": [
+        { "name": "label", "type": "String", "required": true, "default": "visible label of the ready button (\"Who's home?\"), which names it" },
+        { "name": "onKnock", "type": "VoidCallback", "required": true, "default": "called by a tap while the button is ready" },
+        { "name": "cooldown", "type": "KnockCooldown?", "required": false, "default": "null: ready. Set: inert, with the share of the wait left (remaining, 0 to 1, never NaN), a label (\"Asked\"), the time left (\"11 min\") and the spoken sentence (semanticLabel)" }
+      ],
+      "variants": ["button"],
+      "states": ["ready", "cooldown"],
+      "semantics": "One node in both states, never replaced: a button, focusable, with a focus action and a focused flag. Ready: enabled, named by label, a tap calls onKnock. Cooldown: the same node marked disabled, without the tap action, named by cooldown.semanticLabel (\"Asked who's home. You can ask again in 11 minutes\"). The visible texts, the ring and Material's own node add nothing. The Material button is the same widget in both states and stays focusable and inert in the wait, so keyboard focus stays on it when the wait starts and the next Tab goes to the next control. The wait is told by words and a ring, never color alone. Calm: no danger color, no blame",
+      "key": "presence.knock",
+      "notes": [
+        "The contract lists availableAt: DateTime? and now: DateTime. The design system keeps no clock and no dates, so the app counts the wait and passes KnockCooldown (remaining share, label, time left, spoken sentence) instead.",
+        "Board gaps: the glyph is 18 (size.glyph-lg) where the board draws 20, and the 2 px between the ring and the two lines of text, and between them, is not drawn (there is no 2 px token).",
+        "Board gaps: the ring is AppProgressRing at 24 with its 4 px stroke where the board draws a 2.5 px one, and its track has the same color as the sunken fill, so only the arc shows.",
+        "The semantics node is the same one before and after the wait starts (a test compares its id and checks it is still focused), so a screen reader keeps its cursor. How a given screen reader announces the change of name and enabled state is not verified on a device."
+      ],
+      "stories": [
+        "Molecules/KnockButton/button-ready",
+        "Molecules/KnockButton/button-cooldown"
+      ]
     }
   ]
 }

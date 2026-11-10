@@ -589,6 +589,42 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       (t) => expect(_widget<PresenceSwitch>(t).semanticLabel, 'Zed'),
     ),
   ],
+  'KnockButton': [
+    KnobCase(
+      'label',
+      'Zed',
+      (t) => expect(_widget<KnockButton>(t).label, 'Zed'),
+    ),
+    KnobCase(
+      'cooldown',
+      'true',
+      (t) => expect(_widget<KnockButton>(t).cooldown, isNotNull),
+    ),
+    KnobCase(
+      'remaining',
+      '0.4',
+      (t) => expect(_widget<KnockButton>(t).cooldown?.remaining, 0.4),
+      also: {'cooldown': 'true'},
+    ),
+    KnobCase(
+      'cooldownLabel',
+      'Zed',
+      (t) => expect(_widget<KnockButton>(t).cooldown?.label, 'Zed'),
+      also: {'cooldown': 'true'},
+    ),
+    KnobCase(
+      'remainingLabel',
+      'Zed',
+      (t) => expect(_widget<KnockButton>(t).cooldown?.remainingLabel, 'Zed'),
+      also: {'cooldown': 'true'},
+    ),
+    KnobCase(
+      'cooldownSemanticLabel',
+      'Zed',
+      (t) => expect(_widget<KnockButton>(t).cooldown?.semanticLabel, 'Zed'),
+      also: {'cooldown': 'true'},
+    ),
+  ],
   'AppFreshnessBar': [
     KnobCase(
       'ageDays',
