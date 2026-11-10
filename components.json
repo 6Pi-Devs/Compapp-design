@@ -359,14 +359,21 @@
         { "name": "trailing", "type": "String?", "required": false, "default": "text at the end of the row; a status dot sits before it (none while invited)" }
       ],
       "variants": ["row"],
-      "states": ["home", "away", "invited", "you"],
+      "states": ["home", "away", "invited", "you", "long"],
       "semantics": "One merged node, not interactive: member.semanticLabel (it names the member and says you, admin and away), then the subtitle, then the trailing text. The visible name, the pebble and the dot add nothing of their own, so nothing is said twice",
       "key": "member.<accountId>",
+      "notes": [
+        "Layout: the pebble and the texts take up to two thirds of the row and the trailing text one third, beside each other. When the longest word of the name or the subtitle does not fit beside the pebble in its share, or the longest word of the trailing text does not fit in its third, the trailing text and its dot move under the texts and the texts take the width the pebble leaves (as the home AppTopBar does with its buttons), so no word breaks at large text. At a text scale of 1.0 in a phone column the row is laid out as before.",
+        "A small private render object lays the row out, with intrinsic and dry layout, not a LayoutBuilder, so the golden harness can measure it.",
+        "One case is left: a word wider than the whole row. It wraps by its letters, so all of it stays visible at 200% (WCAG 1.4.4); the name is never cut with an ellipsis.",
+        "The row keeps the baseline of the name, so it lines up with a neighbor in a baseline-aligned Row. The status dot sits on the middle of the first line of the trailing text. The row-long state has a long name, subtitle and trailing text, so the large text scenarios of its golden show the stacked layout."
+      ],
       "stories": [
         "Molecules/MemberRow/row-home",
         "Molecules/MemberRow/row-away",
         "Molecules/MemberRow/row-invited",
-        "Molecules/MemberRow/row-you"
+        "Molecules/MemberRow/row-you",
+        "Molecules/MemberRow/row-long"
       ]
     },
     {
