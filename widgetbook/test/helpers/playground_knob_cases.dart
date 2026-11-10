@@ -685,4 +685,31 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       (t) => expect(_widget<AppSnackbar>(t).visible, isFalse),
     ),
   ],
+  'AppConfirmDialog': [
+    KnobCase(
+      'destructive',
+      'true',
+      (t) => expect(_widget<AppConfirmDialog>(t).destructive, isTrue),
+    ),
+    KnobCase(
+      'title',
+      'Zed',
+      (t) => expect(_widget<AppConfirmDialog>(t).title, 'Zed'),
+    ),
+    KnobCase(
+      'message',
+      'Zed',
+      (t) => expect(_widget<AppConfirmDialog>(t).message, 'Zed'),
+    ),
+    KnobCase(
+      'confirmLabel',
+      'Zed',
+      (t) => expect(_widget<AppConfirmDialog>(t).confirmLabel, 'Zed'),
+    ),
+    KnobCase(
+      'cancelLabel',
+      'Zed',
+      (t) => expect(_widget<AppConfirmDialog>(t).cancelLabel, 'Zed'),
+    ),
+  ],
 };

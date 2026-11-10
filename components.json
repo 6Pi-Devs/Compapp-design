@@ -602,6 +602,32 @@
         "Molecules/AppSnackbar/error-default",
         "Molecules/AppSnackbar/error-with-action"
       ]
+    },
+    {
+      "id": "app-confirm-dialog",
+      "level": "molecule",
+      "class": "AppConfirmDialog",
+      "playground": "Molecules/AppConfirmDialog/playground",
+      "path": "molecules/app_confirm_dialog.dart",
+      "props": [
+        { "name": "title", "type": "String", "required": true },
+        { "name": "message", "type": "String", "required": true },
+        { "name": "confirmLabel", "type": "String", "required": true },
+        { "name": "cancelLabel", "type": "String", "required": true },
+        { "name": "onConfirm", "type": "VoidCallback", "required": true },
+        { "name": "onCancel", "type": "VoidCallback", "required": true },
+        { "name": "destructive", "type": "bool", "required": false, "default": "false; true makes the confirm button the danger AppButton" }
+      ],
+      "variants": ["default", "destructive"],
+      "states": ["default", "long-text"],
+      "semantics": "A route scope named by title; the title is a heading and the message follows it. The cancel button comes first in focus order and the confirm button after it, both named by their visible labels and both the md AppButton (44 drawn, 48 hit area). The confirm button is primary, or danger when destructive, so red only shows where something is lost. The buttons wrap onto two lines when text or large text leaves no room, and the dialog grows with its text. The static show(context, ...) helper opens it with showDialog and completes with true on confirm and false on cancel, barrier tap or back, popping with the Navigator so the package needs no router",
+      "key": "confirmDialog.<part> (title, message, cancel, confirm)",
+      "stories": [
+        "Molecules/AppConfirmDialog/default-default",
+        "Molecules/AppConfirmDialog/default-long-text",
+        "Molecules/AppConfirmDialog/destructive-default",
+        "Molecules/AppConfirmDialog/destructive-long-text"
+      ]
     }
   ]
 }

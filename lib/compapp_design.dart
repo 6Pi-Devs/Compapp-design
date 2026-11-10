@@ -23,6 +23,7 @@ export 'src/models/nav_destination_view.dart';
 export 'src/models/room_tile_state.dart';
 export 'src/models/room_view.dart';
 export 'src/models/task_view.dart';
+export 'src/molecules/app_confirm_dialog.dart';
 export 'src/molecules/app_empty_state.dart';
 export 'src/molecules/app_nav_bar.dart';
 export 'src/molecules/app_snackbar.dart';

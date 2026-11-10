@@ -145,6 +145,10 @@ abstract final class AppSizes {
   /// Least height of an event ribbon (`size.ribbon`). It grows with its text.
   static const double ribbon = 28;
 
+  /// Widest a dialog grows on a tablet or in landscape
+  /// (`size.dialog-max-width`).
+  static const double dialogMaxWidth = 560;
+
   /// Every token by its JSON name, checked by the parity test.
   static const Map<String, double> values = {
     'target.min': minTarget,
@@ -191,5 +195,6 @@ abstract final class AppSizes {
     'size.beacon': beacon,
     'size.border-room': borderRoom,
     'size.ribbon': ribbon,
+    'size.dialog-max-width': dialogMaxWidth,
   };
 }
