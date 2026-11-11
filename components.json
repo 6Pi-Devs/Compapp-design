@@ -555,12 +555,18 @@
       "props": [
         { "name": "title", "type": "String", "required": true },
         { "name": "onClose", "type": "VoidCallback", "required": true },
-        { "name": "closeLabel", "type": "String", "required": true, "default": "spoken name of the close button" }
+        { "name": "closeLabel", "type": "String", "required": true, "default": "spoken name of the close button" },
+        { "name": "titleFocusNode", "type": "FocusNode?", "required": false, "default": "null: the title is plain text. With a node it takes focus (no Tab stop) and shows the house focus ring while a keyboard user has it" },
+        { "name": "namesRoute", "type": "bool", "required": false, "default": "false: with true the title heading node names the route that holds the header" }
       ],
       "variants": ["default"],
       "states": ["default", "long-title"],
-      "semantics": "The header is its own semantics group: under a Card or a list item the title stays a heading node of its own, read before the close button, and the button stays a button. The close button is a focusable button named by closeLabel, which is never empty, 44 drawn with a 48 hit area. The drag handle is decorative and excluded from semantics. A long title wraps and the header grows while the close button stays at the top end; the layout mirrors in right-to-left text. The title is centered on the 48 hit area of the close button (15 below the handle, board 12)",
-      "key": "sheet.<part> (title, close, handle)",
+      "semantics": "The header is its own semantics group: under a Card or a list item the title stays a heading node of its own, read before the close button, and the button stays a button. The close button is a focusable button named by closeLabel, which is never empty, 44 drawn with a 48 hit area. The drag handle is decorative and excluded from semantics. A long title wraps and the header grows while the close button stays at the top end; the layout mirrors in right-to-left text. The title is centered on the 48 hit area of the close button (15 below the handle, board 12). With a titleFocusNode the title node is focusable and reports focused, still the heading, and the ring (2 px of ink outside the text, shown only for keyboard highlight) is drawn above it",
+      "key": "sheet.<part> (title, close, handle, titleRing while the ring shows)",
+      "notes": [
+        "titleFocusNode exists for sheets that open with focus on the title (ItemSheet). The board draws no focus state for a title, so the ring is the house one of RoomTile and the buttons. The playground forces the focused look with a node that reports focus, but the ring itself also needs keyboard highlight, so it stays off while the catalog is driven by a pointer.",
+        "namesRoute puts the route-naming flag on the title's heading node, so a sheet shown in a route (showModalBottomSheet) names that route by its title instead of repeating the title in a node of its own. It is off by default, because the flag only means something under a route scope."
+      ],
       "stories": [
         "Molecules/SheetHeader/default-default",
         "Molecules/SheetHeader/default-long-title"

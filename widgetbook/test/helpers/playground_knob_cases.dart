@@ -773,6 +773,16 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       'Zed',
       (t) => expect(_widget<SheetHeader>(t).closeLabel, 'Zed'),
     ),
+    KnobCase(
+      'focused look',
+      'true',
+      (t) => expect(_widget<SheetHeader>(t).titleFocusNode, isNotNull),
+    ),
+    KnobCase(
+      'namesRoute',
+      'true',
+      (t) => expect(_widget<SheetHeader>(t).namesRoute, isTrue),
+    ),
   ],
   'AppEmptyState': [
     KnobCase(

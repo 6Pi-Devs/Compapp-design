@@ -24,6 +24,13 @@ import 'package:flutter/semantics.dart';
 /// while the close button stays at the top end. It mirrors in right-to-left
 /// text.
 ///
+/// A sheet that opens with the title as its starting point passes a
+/// [titleFocusNode]: the title then takes focus like any widget, without a stop
+/// of its own in the Tab order, and while the node holds the focus of someone
+/// using a keyboard the title has the house focus ring, 2 px of ink drawn
+/// outside its text. The node is the caller's: it creates, requests and
+/// disposes it. Without one the title is plain text, as before.
+///
 /// One snap to the board: the title is centered on the 48 hit area of the
 /// close button, so its first line sits 15 below the handle where the board
 /// has 12.
@@ -32,6 +39,8 @@ class SheetHeader extends StatelessWidget {
     required this.title,
     required this.onClose,
     required this.closeLabel,
+    this.titleFocusNode,
+    this.namesRoute = false,
     super.key,
   }) : assert(closeLabel != '', 'The close button needs a spoken label');
 
@@ -41,9 +50,23 @@ class SheetHeader extends StatelessWidget {
   /// Spoken name of the close button, for example "Close".
   final String closeLabel;
 
+  /// Focus node of the title, for a sheet that starts with focus on it.
+  final FocusNode? titleFocusNode;
+
+  /// Whether the title names the route that holds the header, for a sheet
+  /// shown in its own route: assistive technology then announces the title
+  /// when the sheet opens. The route itself must be a route scope.
+  final bool namesRoute;
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final focusNode = titleFocusNode;
+    final title = Text(
+      this.title,
+      key: const Key('sheet.title'),
+      style: AppTypography.title.copyWith(color: scheme.onSurface),
+    );
 
     return Semantics(
       container: true,
@@ -90,14 +113,11 @@ class SheetHeader extends StatelessWidget {
                       child: Semantics(
                         container: true,
                         header: true,
+                        namesRoute: namesRoute,
                         sortKey: const OrdinalSortKey(0),
-                        child: Text(
-                          title,
-                          key: const Key('sheet.title'),
-                          style: AppTypography.title.copyWith(
-                            color: scheme.onSurface,
-                          ),
-                        ),
+                        child: focusNode == null
+                            ? title
+                            : _FocusRing(node: focusNode, child: title),
                       ),
                     ),
                   ),
@@ -134,6 +154,90 @@ class SheetHeader extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Makes the title focusable (no Tab stop) and draws the keyboard focus ring
+/// around it, outside its text and above it.
+class _FocusRing extends StatefulWidget {
+  const new({required this.node, required this.child});
+
+  final FocusNode node;
+  final Widget child;
+
+  @override
+  State<_FocusRing> createState() => _FocusRingState();
+}
+
+class _FocusRingState extends State<_FocusRing> {
+  bool _show = false;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.node.addListener(_update);
+    FocusManager.instance.addHighlightModeListener(_onHighlightMode);
+    _show = _shown;
+  }
+
+  @override
+  void didUpdateWidget(_FocusRing oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.node != widget.node) {
+      oldWidget.node.removeListener(_update);
+      widget.node.addListener(_update);
+      _show = _shown;
+    }
+  }
+
+  @override
+  void dispose() {
+    FocusManager.instance.removeHighlightModeListener(_onHighlightMode);
+    widget.node.removeListener(_update);
+    super.dispose();
+  }
+
+  bool get _shown =>
+      widget.node.hasFocus &&
+      FocusManager.instance.highlightMode == FocusHighlightMode.traditional;
+
+  void _onHighlightMode(FocusHighlightMode mode) => _update();
+
+  void _update() {
+    if (_shown != _show) setState(() => _show = _shown);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Focus(
+      focusNode: widget.node,
+      skipTraversal: true,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          widget.child,
+          if (_show)
+            Positioned(
+              left: -AppSizes.borderEmphasis,
+              top: -AppSizes.borderEmphasis,
+              right: -AppSizes.borderEmphasis,
+              bottom: -AppSizes.borderEmphasis,
+              child: IgnorePointer(
+                child: DecoratedBox(
+                  key: const Key('sheet.titleRing'),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      width: AppSizes.borderEmphasis,
+                    ),
+                    borderRadius: BorderRadius.circular(AppRadius.xs),
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
