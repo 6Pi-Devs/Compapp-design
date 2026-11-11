@@ -1,4 +1,4 @@
-/// Compapp design system: tokens, atoms and molecules.
+/// Compapp design system: tokens, atoms, molecules and organisms.
 library;
 
 export 'src/atoms/app_badge.dart';
@@ -13,6 +13,8 @@ export 'src/atoms/app_status_dot.dart';
 export 'src/atoms/app_switch.dart';
 export 'src/atoms/app_text_field.dart';
 export 'src/compapp_design.dart';
+export 'src/models/activity_entry.dart';
+export 'src/models/activity_list_view.dart';
 export 'src/models/activity_text.dart';
 export 'src/models/activity_tone.dart';
 export 'src/models/activity_view.dart';
@@ -25,6 +27,10 @@ export 'src/models/member_status.dart';
 export 'src/models/member_view.dart';
 export 'src/models/nav_destination_view.dart';
 export 'src/models/presence.dart';
+export 'src/models/presence_broadcast.dart';
+export 'src/models/presence_entry.dart';
+export 'src/models/presence_group.dart';
+export 'src/models/presence_view.dart';
 export 'src/models/room_tile_state.dart';
 export 'src/models/room_view.dart';
 export 'src/models/task_view.dart';
@@ -42,6 +48,8 @@ export 'src/molecules/presence_switch.dart';
 export 'src/molecules/room_tile.dart';
 export 'src/molecules/sheet_header.dart';
 export 'src/molecules/task_row.dart';
+export 'src/organisms/activity_list.dart';
+export 'src/organisms/presence_panel.dart';
 export 'src/theme/compapp_theme.dart';
 export 'src/tokens/app_colors.dart';
 export 'src/tokens/app_colors_context.dart';

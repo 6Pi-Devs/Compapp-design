@@ -9,28 +9,31 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'helpers/use_case_harness.dart';
 
-/// The least width a molecule use case must be drawn with in a golden
-/// scenario. A row that takes "the space that is left" gets none when the
-/// harness sizes a scenario to its content, and the golden would show an empty
-/// scenario.
+/// The least width a molecule or organism use case must be drawn with in a
+/// golden scenario. A row that takes "the space that is left" gets none when
+/// the harness sizes a scenario to its content, and the golden would show an
+/// empty scenario.
 const _leastWidth = 100.0;
 const _leastHeight = 40.0;
 
-/// The least width of the molecules that fill their column, by class name.
-/// It is an explicit minimum for each of them: the narrow ones (a beacon
-/// that is free, a compact ribbon) are narrow on purpose and have none.
+/// The least width of the molecules and organisms that fill their column, by
+/// class name. It is an explicit minimum for each of them: the narrow ones (a
+/// beacon that is free, a compact ribbon) are narrow on purpose and have none.
 const _leastWidthOf = <String, double>{
   'AppTopBar': 300,
   'AppNavBar': 300,
   'SheetHeader': 300,
   'AppEmptyState': 200,
   'AppSnackbar': 300,
+  'ActivityList': 300,
+  'PresencePanel': 300,
 };
 
-/// Lays every molecule use case out the way the goldens do, with the real
-/// fonts, and checks that each of the four scenarios (light and dark, text
-/// scale 1.0 and 2.0) draws the molecule at a visible size and overflows
-/// nowhere.
+/// Lays every molecule and organism use case out the way the goldens do, with
+/// the real fonts, and checks that each of the four scenarios (light and dark,
+/// text scale 1.0 and 2.0) draws the component at a visible size and overflows
+/// nowhere. An organism can be tall: the scenario is as tall as it is, so the
+/// golden shows all of it.
 void main() {
   setUpAll(() async {
     Future<void> load(String family, List<String> files) async {
@@ -51,7 +54,9 @@ void main() {
 
   final useCases = collectFixedUseCases(buildCatalog());
   for (final MapEntry(key: path, value: useCase) in useCases.entries) {
-    if (!path.startsWith('Molecules/')) continue;
+    if (!path.startsWith('Molecules/') && !path.startsWith('Organisms/')) {
+      continue;
+    }
 
     testWidgets('$path is drawn in every golden scenario', (tester) async {
       await tester.pumpWidget(
@@ -80,13 +85,13 @@ void main() {
       final className = path.split('/')[1];
       final least = _leastWidthOf[className];
       if (least != null) {
-        final molecules = find.byWidgetPredicate(
+        final components = find.byWidgetPredicate(
           (widget) => widget.runtimeType.toString() == className,
         );
-        expect(molecules, findsNWidgets(4), reason: className);
+        expect(components, findsNWidgets(4), reason: className);
         for (var i = 0; i < 4; i++) {
           expect(
-            tester.getSize(molecules.at(i)).width,
+            tester.getSize(components.at(i)).width,
             greaterThanOrEqualTo(least),
             reason: '$className in scenario $i',
           );

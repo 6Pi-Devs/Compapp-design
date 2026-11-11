@@ -196,6 +196,57 @@ void main() {
       ('AppNavBar', {'destinations': '9'}),
       ('ActivityRow', {'semanticLabel': ''}),
       (
+        'ActivityList',
+        {
+          'unreadEntries': '-3',
+          'earlierEntries': '99',
+          'moreUnread': '-4',
+          'unreadPrefix': '',
+          'unreadTitle': '',
+          'unreadSemanticLabel': '',
+          'earlierTitle': '',
+          'markAllReadLabel': '',
+          'emptyTitle': '',
+          'emptyBody': '',
+        },
+      ),
+      (
+        'PresencePanel',
+        {
+          'homeMembers': '-3',
+          'awayMembers': '99',
+          'invitedMembers': '99',
+          'homeTitle': '',
+          'awayTitle': '',
+          'invitedTitle': '',
+          'knockLabel': '',
+          'cooldown': 'true',
+          'remaining': 'NaN',
+          'cooldownLabel': '',
+          'remainingLabel': '',
+          'cooldownSemanticLabel': '',
+        },
+      ),
+      (
+        'PresencePanel',
+        {
+          'homeMembers': '0',
+          'awayMembers': '0',
+          'emptyHomeLabel': '',
+          'awayEmptyLabel': 'Nobody away',
+          'invitedEmptyLabel': 'Nobody invited',
+        },
+      ),
+      (
+        'ActivityList',
+        {
+          'unreadEntries': '0',
+          'earlierEntries': '0',
+          'emptyTitle': '',
+          'emptyBody': '',
+        },
+      ),
+      (
         'CodeCard',
         {
           'code': '',
