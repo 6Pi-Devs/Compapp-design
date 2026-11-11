@@ -1034,4 +1034,80 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       ),
     ),
   ],
+  'TaskComposer': [
+    KnobCase(
+      'query',
+      'Zed',
+      (t) => expect(_widget<TaskComposer>(t).view.query, 'Zed'),
+    ),
+    KnobCase(
+      'suggestions',
+      '3',
+      (t) => expect(_widget<TaskComposer>(t).view.suggestions, hasLength(3)),
+    ),
+    KnobCase(
+      'rooms',
+      '1',
+      (t) => expect(_widget<TaskComposer>(t).view.rooms, hasLength(1)),
+    ),
+    KnobCase(
+      'items',
+      '1',
+      (t) => expect(_widget<TaskComposer>(t).view.items, hasLength(1)),
+    ),
+    KnobCase(
+      'linkedKind',
+      'item',
+      (t) => expect(
+        _widget<TaskComposer>(t).view.linked?.kind,
+        TaskTargetKind.item,
+      ),
+    ),
+    KnobCase(
+      'linkedIndex',
+      '1',
+      (t) => expect(_widget<TaskComposer>(t).view.linked?.id, 'bathroom'),
+      also: {'linkedKind': 'room'},
+    ),
+    KnobCase(
+      'label',
+      'Zed',
+      (t) => expect(_widget<TaskComposer>(t).view.label, 'Zed'),
+    ),
+    KnobCase(
+      'hint',
+      'Zed',
+      (t) => expect(_widget<TaskComposer>(t).view.hint, 'Zed'),
+    ),
+    KnobCase(
+      'helperText',
+      'Zed',
+      (t) => expect(_widget<TaskComposer>(t).view.helperText, 'Zed'),
+    ),
+    KnobCase(
+      'suggestionsLabel',
+      'Zed',
+      (t) => expect(_widget<TaskComposer>(t).view.suggestionsLabel, 'Zed'),
+    ),
+    KnobCase(
+      'targetsLabel',
+      'Zed',
+      (t) => expect(_widget<TaskComposer>(t).view.targetsLabel, 'Zed'),
+    ),
+    KnobCase(
+      'submitLabel',
+      'Zed',
+      (t) => expect(_widget<TaskComposer>(t).view.submitLabel, 'Zed'),
+    ),
+    KnobCase(
+      'submitting',
+      'true',
+      (t) => expect(_widget<TaskComposer>(t).view.submitting, isTrue),
+    ),
+    KnobCase(
+      'loadingLabel',
+      'Zed',
+      (t) => expect(_widget<TaskComposer>(t).view.loadingLabel, 'Zed'),
+    ),
+  ],
 };

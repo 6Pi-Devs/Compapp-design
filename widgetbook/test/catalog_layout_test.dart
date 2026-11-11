@@ -28,6 +28,7 @@ const _leastWidthOf = <String, double>{
   'ActivityList': 300,
   'PresencePanel': 300,
   'CalendarStrip': 300,
+  'TaskComposer': 300,
 };
 
 /// Lays every molecule and organism use case out the way the goldens do, with

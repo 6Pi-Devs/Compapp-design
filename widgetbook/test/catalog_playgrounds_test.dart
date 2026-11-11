@@ -253,6 +253,27 @@ void main() {
         {'startOffset': '999', 'todayIndex': '-9', 'events': '-2'},
       ),
       (
+        'TaskComposer',
+        {
+          'suggestions': '9',
+          'rooms': '-3',
+          'items': '99',
+          'linkedKind': 'room',
+          'linkedIndex': '2',
+          'query': '',
+          'label': '',
+          'suggestionsLabel': '',
+          'targetsLabel': '',
+          'submitLabel': '',
+          'submitting': 'true',
+          'helperText': '',
+        },
+      ),
+      (
+        'TaskComposer',
+        {'rooms': '0', 'items': '0', 'linkedKind': 'item', 'suggestions': '0'},
+      ),
+      (
         'ActivityList',
         {
           'unreadEntries': '0',

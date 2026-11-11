@@ -811,6 +811,41 @@
         "Organisms/CalendarStrip/strip-with-events",
         "Organisms/CalendarStrip/strip-empty-week"
       ]
+    },
+    {
+      "id": "task-composer",
+      "level": "organism",
+      "class": "TaskComposer",
+      "playground": "Organisms/TaskComposer/playground",
+      "path": "organisms/task_composer.dart",
+      "props": [
+        { "name": "view", "type": "TaskComposerView", "required": true, "default": "the query typed so far, the suggestions found for it (each a TaskSuggestion: id, title and an optional subtitle), the rooms (RoomView) and items (ItemView) a task can be tied to, which of them is linked (a TaskTarget: its kind and id) or null, the label and the optional hint and helper text of the field, the spoken names of the list and of the chips, the label of the button, whether it is submitting and the spoken value of the button while it waits" },
+        { "name": "onQuery", "type": "ValueChanged<String>", "required": true, "default": "called with the text of the field every time it changes" },
+        { "name": "onPick", "type": "ValueChanged<String>", "required": true, "default": "called with the id of the chosen suggestion" },
+        { "name": "onLink", "type": "ValueChanged<TaskTarget?>", "required": true, "default": "called with the room or item of the pressed chip, or with null when the chip that is on is pressed again" },
+        { "name": "onSubmit", "type": "ValueChanged<TaskSubmission>", "required": true, "default": "called by the button, or the keyboard's done key, with a TaskSubmission (the name in the field without the spaces around it, and the link); only while the field has more than spaces and the view is not submitting" }
+      ],
+      "variants": ["composer"],
+      "states": ["empty", "typing", "match", "new-task", "submitting"],
+      "semantics": "A form container. The field is AppTextField, named by the visible label. The suggestions, when there are any, are a list node named by suggestionsLabel with one list item per suggestion, each a single button node whose name is its title and subtitle together, so the spoken name is the visible text (label in name). The chips are a container named by targetsLabel; each is an AppChip button named by its label, selected when linked, with the check and the border as the visible cue, and an item is dashed where a room is solid. The button is an AppButton named by its label, disabled until the name has more than spaces; while submitting it stays the same focusable button, ignores every activation and adds loadingLabel as its value in a live region, the field is read-only and the suggestions and chips are disabled. Calm: no danger color, never who is behind",
+      "key": "tasks.composer (also tasks.composer.field, tasks.composer.suggestions, tasks.composer.suggestion.<taskId> on the button of a suggestion, tasks.composer.targets, tasks.composer.room.<roomId> and tasks.composer.item.<itemId> on a chip, and tasks.composer.submit)",
+      "notes": [
+        "The contract lists TaskComposerView(query, suggestions, rooms, items, linked). The design system has no types for a suggestion or a link, so TaskSuggestion carries an id, a title and a subtitle, rooms and items are the RoomView and ItemView the floorplan already uses (the icon of an item is not drawn), and the link is a TaskTarget with a kind and an id, because a room and an item may share an id. Every visible text is a prop: the label, the hint, the helper text, the label of the button, and the spoken names of the list and the chips, which the board does not draw. The ids of each list are the keys of its rows and chips, and asserts check that each list has unique ids in debug builds.",
+        "The contract lists onSubmit(name, note, target) but the board draws no field for a note, so there is none: onSubmit gives a TaskSubmission with the name and the target, a value object so that a note can be added later without changing the signature. A note is a follow-up for the board's owner to confirm. onLink is told by the contract as onLink(target) and does not say how a link is removed: pressing the chip that is on calls onLink(null).",
+        "Board gap, the field: the board draws one box with the 2 px primary border that holds the text input and, under it, the one suggestion on the sunken color. AppTextField is a field with its own label above, its own border and focus ring, so the field and the suggestions are two things here: the field, then a sunken card with a hairline between suggestions, each at least 52 tall as on the board (a suggestion is a button with its title in 15/600 and its subtitle in 12 muted). The board shows one suggestion, and the composer shows as many as the app sends, in its order.",
+        "Board gaps, the states: the board draws only the match (the typed name, a suggestion that says it is the same task as before, the chosen room and the button). The other four are drawn from the contract's names: empty is an empty field with a hint and the button disabled, typing is a name still being typed with the suggestions found so far, new task is a name with no suggestion and a helper line under the field that the app passes to say it is new (the board draws no text for it), and submitting is the match with the button waiting, the field read-only and the rest disabled. Which of them a view is, is decided by what the app passes in.",
+        "The rule of the board, that matching ignores case and extra spaces like the backend catalog, is the app's, because the composer takes the suggestions already found. The composer also applies it to what it draws: a suggestion whose title is the same as an earlier one by that rule is left out, so the same task is never offered twice.",
+        "The field shows the text the person typed. The texts sent through onQuery are remembered until the app answers, and a query that comes back as one of them, even late and after more was typed, is an echo and leaves the field, its caret and its composing region alone. The field is replaced only by a query the app changed by itself (a picked suggestion, an emptied form after logging), caret at the end. The button and the done key log the text of the field, not the query of the view, so a key the app has not heard yet is not lost; the button is enabled from the field too. A debug assert checks that the linked target is one of the rooms or items.",
+        "The words put the chips under the field and the button last, as the board does, with 16 of padding and 12 between the parts. The chips are 44 tall AppChips that wrap onto more lines, so at large text a long name wraps inside its chip and the chips wrap under each other.",
+        "The list is announced as a list by its role and its name, and not as a live region: announcing every change of the suggestions would speak on every key. How a screen reader announces the list, the form role and the change of the button from ready to waiting is not verified on a device."
+      ],
+      "stories": [
+        "Organisms/TaskComposer/composer-empty",
+        "Organisms/TaskComposer/composer-typing",
+        "Organisms/TaskComposer/composer-match",
+        "Organisms/TaskComposer/composer-new-task",
+        "Organisms/TaskComposer/composer-submitting"
+      ]
     }
   ]
 }
