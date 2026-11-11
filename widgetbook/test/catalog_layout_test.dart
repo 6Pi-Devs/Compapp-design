@@ -27,6 +27,8 @@ const _leastWidthOf = <String, double>{
   'AppSnackbar': 300,
   'ActivityList': 300,
   'PresencePanel': 300,
+  'CalendarStrip': 300,
+  'TaskComposer': 300,
 };
 
 /// Lays every molecule and organism use case out the way the goldens do, with
