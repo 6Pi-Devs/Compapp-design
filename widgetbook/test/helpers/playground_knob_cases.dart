@@ -1192,4 +1192,72 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       (t) => expect(_widget<FloorplanMap>(t).view.loadingLabel, 'Zed'),
     ),
   ],
+  'ItemSheet': [
+    KnobCase(
+      'mode',
+      'start',
+      (t) => expect(_widget<ItemSheet>(t).view.mode, ItemSheetMode.start),
+    ),
+    KnobCase(
+      'title',
+      'Zed',
+      (t) => expect(_widget<ItemSheet>(t).view.title, 'Zed'),
+    ),
+    KnobCase(
+      'message',
+      'Zed',
+      (t) => expect(_widget<ItemSheet>(t).view.message, 'Zed'),
+    ),
+    KnobCase(
+      'confirmLabel',
+      'Zed',
+      (t) => expect(_widget<ItemSheet>(t).view.confirmLabel, 'Zed'),
+    ),
+    KnobCase(
+      'closeLabel',
+      'Zed',
+      (t) => expect(_widget<ItemSheet>(t).view.closeLabel, 'Zed'),
+    ),
+    KnobCase(
+      'memberIsYou',
+      'true',
+      (t) => expect(_widget<ItemSheet>(t).view.usage!.member.isYou, isTrue),
+      also: {'mode': 'finish'},
+    ),
+
+    KnobCase(
+      'memberName',
+      'Zed',
+      (t) => expect(_widget<ItemSheet>(t).view.usage!.member.name, 'Zed'),
+    ),
+    KnobCase(
+      'memberJoinOrder',
+      '5',
+      (t) => expect(_widget<ItemSheet>(t).view.usage!.member.joinOrder, 5),
+    ),
+    KnobCase(
+      'memberStatus',
+      'away',
+      (t) => expect(
+        _widget<ItemSheet>(t).view.usage!.member.status,
+        MemberStatus.away,
+      ),
+    ),
+    KnobCase(
+      'memberIsAdmin',
+      'true',
+      (t) => expect(_widget<ItemSheet>(t).view.usage!.member.isAdmin, isTrue),
+    ),
+    KnobCase(
+      'memberSemanticLabel',
+      'Zed',
+      (t) =>
+          expect(_widget<ItemSheet>(t).view.usage!.member.semanticLabel, 'Zed'),
+    ),
+    KnobCase(
+      'usageSubtitle',
+      'Zed',
+      (t) => expect(_widget<ItemSheet>(t).view.usage!.subtitle, 'Zed'),
+    ),
+  ],
 };

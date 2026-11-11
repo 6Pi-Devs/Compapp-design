@@ -887,6 +887,39 @@
         "Organisms/FloorplanMap/map-empty",
         "Organisms/FloorplanMap/map-loading"
       ]
+    },
+    {
+      "id": "item-sheet",
+      "level": "organism",
+      "class": "ItemSheet",
+      "playground": "Organisms/ItemSheet/playground",
+      "path": "organisms/item_sheet.dart",
+      "props": [
+        { "name": "view", "type": "ItemSheetView", "required": true, "default": "the item (ItemView, which keys the sheet), the mode (start, finish, nudge, remind or cooldown), who is using it (ItemUsage: a MemberView and the worded subtitle, null exactly for a start), the title, the optional message (required for a cooldown), the label of the confirm button and the spoken label of the close button" },
+        { "name": "onConfirm", "type": "VoidCallback", "required": true, "default": "called by the confirm button, which is disabled in cooldown" },
+        { "name": "onClose", "type": "VoidCallback", "required": true, "default": "called by the close button and by the Escape key" }
+      ],
+      "variants": ["sheet"],
+      "states": ["start", "finish", "nudge", "remind", "cooldown"],
+      "semantics": "A container holding the SheetHeader (the title is a heading that names the route that shows the sheet, so the route announces the question once, and takes the initial focus, then the close button), the usage as one merged MemberRow node (the member's spoken label, then the subtitle), the message as a text and the confirm button, a single button node named by its visible label (disabled in cooldown, so it is announced as unavailable and the message before it says why). Focus starts on the title once the sheet is laid out, only if the title is still attached; a rebuild never asks for it again, and a view that disables the button while it has focus moves focus to the title instead of dropping it to the route. Escape closes. Nothing is told by color alone: the wait is in the message and the disabled button",
+      "key": "itemSheet.<itemId> (also sheet.title, sheet.close and sheet.handle from the header, member.<memberId> on the usage row, itemSheet.message and itemSheet.confirm)",
+      "notes": [
+        "The board's contract is ItemSheetView(item, usage, mode, nudgeAvailableAt). The design system has no clock, so there is no instant: the app words the wait into the message and sends the mode cooldown, as FloorplanMap and PresencePanel do. The view carries the visible words (title, message, confirm and close labels) because the app owns localization. nudgeAvailableAt is therefore not a prop, and a cooldown without a message is rejected in debug builds.",
+        "Board gap, the modes: the board draws only one sheet, a nudge (\"Ask Carlos to free the washer?\", Carlos started it 34 min ago, \"You can ask the same person once every 15 minutes.\", Send request) and lists \"start | finish | nudge | remind\" in its caption, with cooldown added by the contract. It says nothing of what start, finish and remind look like. They are built as the same sheet with other words: start has no usage (the item is free), finish, nudge and remind each have the person using the item, and cooldown is a nudge or a remind whose button waits. The business rules say the user of an item can be asked to free it or reminded with a cooldown, and that anyone can finish a use, which is what finish, nudge and remind follow. The mode decides which parts must be there and whether the button waits; the wording is the app's. The sheet does not tell a nudge from a remind visually.",
+        "Board gap, the usage row: the board's row has the item name (Washer) as the title and Carlos' pebble, with the usage text as the subtitle. MemberRow names the member, so the row shows the member's name with the subtitle the app words (\"Started 34 min ago\"), and the item is named by the title. ItemView.name and icon are not drawn; the item only keys the sheet. The row sits on the sunken card color with 12 of side padding and is 64 tall (board 60).",
+        "Board gap, the surface: the board draws the sheet with 24 top corners, a 12 radius at the bottom and the sheet shadow, over a page. The sheet here has 24 top corners only (it is anchored to the bottom of the screen by its route) and adds the bottom safe-area inset (MediaQuery.padding, so an ancestor SafeArea is not doubled) under the button. The message is the body style (15/22) where the board draws 13/20, because no 13/20 regular text token exists. Spacing is 12 between the parts as on the board.",
+        "SheetHeader gained an optional titleFocusNode for this (in the commit before this one): the title is the starting point of focus, so it is focusable without a Tab stop and has the house focus ring for keyboard users. The next Tab reaches the close button, then the confirm button.",
+        "Hosting: show it with showModalBottomSheet(isScrollControlled: true, backgroundColor: Colors.transparent, ...). The sheet draws its own surface, the route supplies the barrier, the focus scope and the route semantics (one scopesRoute node), and the title heading names that route (SheetHeader.namesRoute), so the title is not said twice. On Android the route also carries Flutter's own 'Dialog' label on its node; which name a given screen reader prefers is not verified on a device. A new item id mounts the content again (focus falls back through the scope's history, to the title once it was there).",
+        "Scrolling: the header stays pinned and the body (the person, the message, the button) scrolls inside the sheet when the height is bounded, which is the case in showModalBottomSheet. When the header alone would take more than half of the bounded height (the default route caps a sheet at 9/16 of the screen, so at 2.0 text on 320 by 568 the title fills it), the header stops being pinned and scrolls together with the body, so the button is still reached; at exactly half it is still pinned. The outer scroll is a Scrollable around the private render object, which is a viewport (RenderAbstractViewport) so ensureVisible and screen-reader focus scroll it. A small private render object gives the body what the header leaves of a bounded height and is a plain column when the height is unbounded (a column with a flex child asserts there), so intrinsic sizes and dry layout still work for the golden harness. onClose is called by the close button and by Escape while focus is inside the sheet; the barrier, a drag down and the route's DismissIntent bypass it, so the app must treat the route's pop result as a close too.",
+        "Nudge message: the backend's nudge endpoint takes an optional message of up to 280 characters, and the sheet has no field for it because the board draws none. A text field (AppTextField) in the body and an onConfirm that carries the text is a follow-up. Remind follows the contract's REMINDER meaning (the washer finished hours ago); nudge, remind and cooldown cannot target the user's own use (the backend answers HOME_CANNOT_NUDGE_SELF), and ItemSheet asserts it in debug builds (ItemSheetView stays const, which cannot read the member)."
+      ],
+      "stories": [
+        "Organisms/ItemSheet/sheet-start",
+        "Organisms/ItemSheet/sheet-finish",
+        "Organisms/ItemSheet/sheet-nudge",
+        "Organisms/ItemSheet/sheet-remind",
+        "Organisms/ItemSheet/sheet-cooldown"
+      ]
     }
   ]
 }
