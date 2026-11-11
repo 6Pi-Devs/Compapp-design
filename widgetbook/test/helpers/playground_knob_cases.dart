@@ -464,6 +464,11 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       '2',
       (t) => expect(_widget<RoomTile>(t).beacons, hasLength(2)),
     ),
+    KnobCase(
+      'tappable',
+      'true',
+      (t) => expect(_widget<RoomTile>(t).onTap, isNotNull),
+    ),
   ],
   'TaskRow': [
     KnobCase(

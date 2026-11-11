@@ -180,7 +180,15 @@ void main() {
       ('MemberRow', {'semanticLabel': ''}),
       ('EventRibbon', {'semanticLabel': '', 'kind': 'other'}),
       ('TaskRow', {'logAgainSemanticLabel': '', 'ageDays': '-5'}),
-      ('RoomTile', {'semanticLabel': '', 'occupants': '9', 'beacons': '9'}),
+      (
+        'RoomTile',
+        {
+          'semanticLabel': '',
+          'occupants': '9',
+          'beacons': '9',
+          'tappable': 'true',
+        },
+      ),
       ('ItemBeacon', {'semanticLabel': '', 'inUse': 'true'}),
       ('AppTopBar', {'unreadCount': '-3'}),
       ('AppTopBar', {'accountLabel': ''}),
