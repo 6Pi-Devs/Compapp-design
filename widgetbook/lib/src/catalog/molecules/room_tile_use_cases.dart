@@ -172,7 +172,8 @@ const List<({String id, AppIcons icon})> _beaconSamples = [
 
 /// Every prop of [RoomTile] as a knob. The lists are knobs by count: how many
 /// of three members stand in the room and how many of three items are pinned
-/// to it. The tile fills a cell of the plan, as in the board.
+/// to it. The callback is a switch: tappable gives the tile an onTap, off
+/// leaves it plain. The tile fills a cell of the plan, as in the board.
 WidgetbookUseCase _playground() {
   return WidgetbookUseCase(
     name: playgroundUseCaseName,
@@ -212,6 +213,10 @@ WidgetbookUseCase _playground() {
             divisions: _beaconSamples.length,
           )
           .clamp(0, _beaconSamples.length);
+      final tappable = context.knobs.boolean(
+        label: 'tappable',
+        description: 'Gives the tile an onTap: a button with a focus ring',
+      );
 
       return useCaseFrame(
         child: SizedBox(
@@ -224,6 +229,7 @@ WidgetbookUseCase _playground() {
               caption: caption,
               semanticLabel: typedLabel.isEmpty ? sampleLabel : typedLabel,
               occupants: _roster.take(occupants).toList(),
+              onTap: tappable ? () {} : null,
               beacons: [
                 for (final sample in _beaconSamples.take(beacons))
                   ItemBeacon(

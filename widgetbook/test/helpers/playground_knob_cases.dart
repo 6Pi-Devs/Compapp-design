@@ -464,6 +464,11 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       '2',
       (t) => expect(_widget<RoomTile>(t).beacons, hasLength(2)),
     ),
+    KnobCase(
+      'tappable',
+      'true',
+      (t) => expect(_widget<RoomTile>(t).onTap, isNotNull),
+    ),
   ],
   'TaskRow': [
     KnobCase(
@@ -1108,6 +1113,73 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       'loadingLabel',
       'Zed',
       (t) => expect(_widget<TaskComposer>(t).view.loadingLabel, 'Zed'),
+    ),
+  ],
+  'FloorplanMap': [
+    KnobCase(
+      'rooms',
+      '3',
+      (t) => expect(_widget<FloorplanMap>(t).view.rooms, hasLength(3)),
+    ),
+    KnobCase(
+      'archivedRooms',
+      '2',
+      (t) => expect(
+        _widget<FloorplanMap>(t).view.rooms.where((r) => r.archived),
+        hasLength(2),
+      ),
+    ),
+    KnobCase(
+      'absences',
+      '2',
+      (t) => expect(_widget<FloorplanMap>(t).view.absences, hasLength(2)),
+    ),
+    KnobCase(
+      'washerInUse',
+      'false',
+      (t) => expect(
+        _widget<FloorplanMap>(t).view.rooms
+            .firstWhere((r) => r.room.id == 'kitchen')
+            .items
+            .single
+            .inUse,
+        isFalse,
+      ),
+    ),
+    KnobCase(
+      'loading',
+      'true',
+      (t) => expect(_widget<FloorplanMap>(t).view.loading, isTrue),
+    ),
+    KnobCase(
+      'firstRoomName',
+      'Zed',
+      (t) => expect(_widget<FloorplanMap>(t).view.rooms.first.room.name, 'Zed'),
+    ),
+    KnobCase(
+      'firstRoomCaption',
+      'Zed',
+      (t) => expect(_widget<FloorplanMap>(t).view.rooms.first.caption, 'Zed'),
+    ),
+    KnobCase(
+      'awayLabel',
+      'Zed',
+      (t) => expect(_widget<FloorplanMap>(t).view.awayLabel, 'Zed'),
+    ),
+    KnobCase(
+      'emptyTitle',
+      'Zed',
+      (t) => expect(_widget<FloorplanMap>(t).view.emptyTitle, 'Zed'),
+    ),
+    KnobCase(
+      'emptyBody',
+      'Zed',
+      (t) => expect(_widget<FloorplanMap>(t).view.emptyBody, 'Zed'),
+    ),
+    KnobCase(
+      'loadingLabel',
+      'Zed',
+      (t) => expect(_widget<FloorplanMap>(t).view.loadingLabel, 'Zed'),
     ),
   ],
 };

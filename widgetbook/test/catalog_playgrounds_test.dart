@@ -180,7 +180,15 @@ void main() {
       ('MemberRow', {'semanticLabel': ''}),
       ('EventRibbon', {'semanticLabel': '', 'kind': 'other'}),
       ('TaskRow', {'logAgainSemanticLabel': '', 'ageDays': '-5'}),
-      ('RoomTile', {'semanticLabel': '', 'occupants': '9', 'beacons': '9'}),
+      (
+        'RoomTile',
+        {
+          'semanticLabel': '',
+          'occupants': '9',
+          'beacons': '9',
+          'tappable': 'true',
+        },
+      ),
       ('ItemBeacon', {'semanticLabel': '', 'inUse': 'true'}),
       ('AppTopBar', {'unreadCount': '-3'}),
       ('AppTopBar', {'accountLabel': ''}),
@@ -273,6 +281,23 @@ void main() {
         'TaskComposer',
         {'rooms': '0', 'items': '0', 'linkedKind': 'item', 'suggestions': '0'},
       ),
+      (
+        'FloorplanMap',
+        {
+          'rooms': '99',
+          'archivedRooms': '99',
+          'absences': '99',
+          'washerInUse': 'false',
+          'firstRoomName': '',
+          'firstRoomCaption': '',
+          'awayLabel': '',
+          'emptyTitle': '',
+          'emptyBody': '',
+          'loadingLabel': '',
+        },
+      ),
+      ('FloorplanMap', {'rooms': '-3', 'absences': '0', 'loading': 'true'}),
+      ('FloorplanMap', {'rooms': '0', 'absences': '0'}),
       (
         'ActivityList',
         {
