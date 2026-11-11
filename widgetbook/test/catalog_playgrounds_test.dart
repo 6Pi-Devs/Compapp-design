@@ -238,6 +238,21 @@ void main() {
         },
       ),
       (
+        'CalendarStrip',
+        {
+          'startOffset': '-5',
+          'todayIndex': '99',
+          'events': '9',
+          'todayLabel': '',
+          'firstEventTitle': '',
+          'firstEventLabel': '',
+        },
+      ),
+      (
+        'CalendarStrip',
+        {'startOffset': '999', 'todayIndex': '-9', 'events': '-2'},
+      ),
+      (
         'ActivityList',
         {
           'unreadEntries': '0',

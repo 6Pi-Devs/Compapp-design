@@ -780,6 +780,37 @@
         "Organisms/PresencePanel/panel-cooldown",
         "Organisms/PresencePanel/panel-everyone-away"
       ]
+    },
+    {
+      "id": "calendar-strip",
+      "level": "organism",
+      "class": "CalendarStrip",
+      "playground": "Organisms/CalendarStrip/playground",
+      "path": "organisms/calendar_strip.dart",
+      "props": [
+        { "name": "view", "type": "CalendarStripView", "required": true, "default": "the seven days (each a CalendarStripDay: its YYYY-MM-DD date, the visible weekday and number, and its spoken label), the events that touch them (each a CalendarStripEvent: a CalendarEventView, its first and last day as YYYY-MM-DD strings, which may lie outside the week, and its spoken label) and which date is today, or null" },
+        { "name": "onDayTap", "type": "ValueChanged<String>", "required": true, "default": "called with the YYYY-MM-DD date of the tapped day" },
+        { "name": "onEventTap", "type": "ValueChanged<String>", "required": true, "default": "called with the id of the tapped event" }
+      ],
+      "variants": ["strip"],
+      "states": ["with-events", "empty-week"],
+      "semantics": "A container holding one button per day and, when there are events, a list node with one list item per event. A day is a single button node named by the app's spoken label of the day followed by the spoken label of every event that covers it, so a day reads its events; the visible weekday and number add nothing of their own. An event is a single button node named by its spoken label, which contains the visible title (label in name); its glyph tile and title add nothing. The ribbons of the band under the days are decorative and say nothing. Today is the filled cell and the app's spoken label, never color alone; the kind of an event is its glyph and its title, never color alone. Calm: no danger color, never who is behind",
+      "key": "calendar.strip (also calendar.day.<yyyy-mm-dd> on the button of a day, calendar.events on the list, calendar.event.<eventId> on the button of an event, calendar.ribbon.<eventId>.<yyyy-mm-dd> on the piece of a ribbon, and event.<eventId> on the EventRibbon inside a piece and a button)",
+      "notes": [
+        "The contract lists CalendarStripView(days: List<LocalDate>, events, today). The design system has no LocalDate: dates are YYYY-MM-DD strings in the home's zone (the board's rule) that the strip only compares as strings, which order like the dates they spell. Every visible text is a prop, so a day carries its weekday, its number and its spoken label, and an event its first day, its last day and its spoken label. The ids of the events are the keys of their rows and the dates of the days the keys of the cells, and asserts check that both are unique, the dates in order and the week seven days long in debug builds. An event that touches none of the days is left out.",
+        "Board gap, the title: the board writes the title of an event on a ribbon that spans its days. EventRibbon cuts its title with an ellipsis, and a ribbon over 44 wide columns cannot hold a title at 200% text, which WCAG 1.4.4 does not allow us to lose. So the band under the days draws one compact ribbon (the glyph on the fill of the kind) on each day an event covers, the pieces joining where the event goes on and keeping a flat edge where it goes on past the week, and the whole title is in a list under the band, wrapped and never cut. The band is decoration (it says nothing to assistive technology); the list rows are the buttons of the events, so onEventTap is reachable at 48 tall, which a 28 tall ribbon is not.",
+        "Board gap, the cells: the board draws a 12 padding, a 4 gap between columns and a 44 tall day row, which makes a column about 40 wide in a phone. A day is a button and needs at least 44 drawn and 48 of hit area, so the card pads only 4 at the sides, the columns have no gap, a day is 48 tall, and a column is 44.3 wide at 320 and 45.4 at 328. The button of a day is 48 wide, so it spills over its column by up to 2 px on each side and overlaps its neighbors, and its semantics node is 48 wide. The touch area is the column, 44.3 px at 320 wide and at least 48 from 346 wide: a tap in the part of the button that spills over the next column goes to the next day, and the tap-target guideline passes on the node rect only. Material's date picker has the same 7 columns in 328.",
+        "Board gap, large text: seven columns cannot hold a weekday at 200% text (Wed is 49 wide at 11 px and 2.0, and the board's day cell is 44). When the longest word of a day cell does not fit its share of the width, the days move to two rows of four and three, and the ribbons go with their days. The board does not draw this. At 1.0 to 1.5 in a 320 column the strip is one row.",
+        "Board gap, lanes: events are placed in the first row of the band they do not overlap, in the order the app gives them. The board draws the one day events on the second row; here the overnight stay of Saturday goes on the first row beside the absence, because it does not overlap it. Two events side by side keep 4 between them (a 2 inset on each rounded end).",
+        "Today is the filled primary cell with on-primary text, as on the board, which draws no other cue: the fill is a shape and a luminance step and the spoken label carries it, so the app must say 'today' in the label of that day. It is not color alone, but it is the only visible cue.",
+        "A day reads the spoken labels of the events that cover it (the contract's 'each day reads its events'), and the event row says the same label again to be activated, so an event is said once on each day it covers and once in the list. A label must contain its visible texts (the weekday and the number for a day, the title for an event); asserts check it in debug builds.",
+        "The empty week has no text of its own: neither the board nor the contract draws one. It is the seven days alone.",
+        "The weekday is the short form the app chooses and is never cut by an ellipsis. A weekday wider than the whole row still wraps by its letters, as any text does. How a screen reader announces the list, the days and a change of today is not verified on a device."
+      ],
+      "stories": [
+        "Organisms/CalendarStrip/strip-with-events",
+        "Organisms/CalendarStrip/strip-empty-week"
+      ]
     }
   ]
 }

@@ -981,4 +981,57 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       also: {'cooldown': 'true'},
     ),
   ],
+  'CalendarStrip': [
+    KnobCase(
+      'startOffset',
+      '10',
+      (t) =>
+          expect(_widget<CalendarStrip>(t).view.days.first.date, '2026-11-11'),
+    ),
+    KnobCase(
+      'todayIndex',
+      '3',
+      (t) => expect(
+        _widget<CalendarStrip>(t).view.today,
+        _widget<CalendarStrip>(t).view.days[3].date,
+      ),
+    ),
+    KnobCase(
+      'events',
+      '1',
+      (t) => expect(_widget<CalendarStrip>(t).view.events, hasLength(1)),
+    ),
+    KnobCase(
+      'longWeekdays',
+      'true',
+      (t) => expect(
+        _widget<CalendarStrip>(t).view.days.first.weekday.length,
+        greaterThan(3),
+      ),
+    ),
+    KnobCase(
+      'todayLabel',
+      'Zed',
+      (t) => expect(
+        _widget<CalendarStrip>(t).view.days.first.semanticLabel,
+        endsWith('Zed'),
+      ),
+    ),
+    KnobCase(
+      'firstEventTitle',
+      'Zed',
+      (t) => expect(
+        _widget<CalendarStrip>(t).view.events.first.event.title,
+        'Zed',
+      ),
+    ),
+    KnobCase(
+      'firstEventLabel',
+      'Zed',
+      (t) => expect(
+        _widget<CalendarStrip>(t).view.events.first.semanticLabel,
+        contains('Zed'),
+      ),
+    ),
+  ],
 };
