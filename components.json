@@ -922,6 +922,87 @@
         "Organisms/ItemSheet/sheet-remind",
         "Organisms/ItemSheet/sheet-cooldown"
       ]
+    },
+    {
+      "id": "room-editor",
+      "level": "organism",
+      "class": "RoomEditor",
+      "playground": "Organisms/RoomEditor/playground",
+      "path": "organisms/room_editor.dart",
+      "props": [
+        {
+          "name": "view",
+          "type": "RoomEditorView",
+          "required": true,
+          "default": "the headings and the words of the add and assign buttons, the bedrooms and common areas (RoomEditorRoom: a RoomView that keys the row, the subtitle, the occupants as MemberViews, the members that can be moved in as RoomAssignOptions with their spoken labels, and the spoken labels of the edit, archive and assign buttons), the archived rooms (RoomEditorArchivedRoom: a RoomView, a subtitle and the spoken label of the restore button), and an optional limit message"
+        },
+        {
+          "name": "onAdd",
+          "type": "VoidCallback",
+          "required": true,
+          "default": "called by the add button, which is disabled while the view has a limit message"
+        },
+        {
+          "name": "onEdit",
+          "type": "ValueChanged<String>",
+          "required": true,
+          "default": "called with the room id by its edit button"
+        },
+        {
+          "name": "onArchive",
+          "type": "ValueChanged<String>",
+          "required": true,
+          "default": "called with the room id by its archive button, which is always enabled"
+        },
+        {
+          "name": "onRestore",
+          "type": "ValueChanged<String>",
+          "required": true,
+          "default": "called with the room id by the restore button of an archived room, which the limit of rooms does not block"
+        },
+        {
+          "name": "onAssign",
+          "type": "void Function(String roomId, String accountId)",
+          "required": true,
+          "default": "called with the room id and the member id by an option of the assign list"
+        },
+        {
+          "name": "initialAssignOpen",
+          "type": "Set<String>",
+          "required": false,
+          "default": "empty: the ids of the bedrooms whose assign list is open when the editor is first built; only the rooms of that first view, so a room added or restored later stays closed"
+        }
+      ],
+      "variants": [
+        "editor"
+      ],
+      "states": [
+        "default",
+        "archived-rooms",
+        "assign-open",
+        "limit-reached"
+      ],
+      "semantics": "A container holding one container per list (bedrooms, common areas, archived), each a heading node then a list node. A room is a list item holding one merged node with its name and subtitle, then its buttons, each its own node named by the app so it says which room it acts on (Edit Bedroom 1, Archive Kitchen), then, for a bedroom with members to move in, the assign button (named by the app, with the expanded state on its own node) and, while it is open, a list node of items, each one button named by the app (Move Carlos to Bedroom 1). The pebbles are decorative: the subtitle says who sleeps there. An archived room is a list item with one merged node (name and subtitle) and a restore button named by the app (Restore Office). The add button sits in the bedrooms container, named by its visible label. Nothing is told by color alone: the limit is words, the disabled add button is announced, and every action has a label",
+      "key": "rooms.editor (also rooms.section.<bedrooms|commonAreas|archived>, rooms.<roomId> on the row, rooms.edit.<roomId>, rooms.archive.<roomId>, rooms.restore.<roomId>, rooms.assign.<roomId>, rooms.options.<roomId>, rooms.option.<roomId>.<accountId>, rooms.pebble.<roomId>.<accountId>, rooms.add and rooms.limit)",
+      "notes": [
+        "The board's contract is RoomEditorView(bedrooms, commonAreas, members) and the events onAdd, onEdit, onArchive and onAssign(roomId, accountId). The board draws no way to assign a member, so the assign button is new: it opens, under the row, one button for each member that can be moved into that bedroom, and a tap calls onAssign. The members are not a list of the view: each bedroom carries its own assignOptions, because every button needs a spoken label that names the member and the room, and only the app can word it. A bedroom that is full has no options and no assign button, so the editor does not know about capacity: the app decides. Escape inside the list closes it and puts focus on the assign button. initialAssignOpen is a seed for an app that restores what was open and for the assign-open story; tapping owns the list afterwards.",
+        "Board gap, restore: the board's contract has no restore, but the business rules let the admin restore a room and the backend has POST .../rooms/{id}/restore. Archived rooms still count toward the limit of 30, so without it an admin at the limit could never free a name or add a room. onRestore and a restore icon button on every archived row (44 drawn, 48 hit area, named by the app, for example 'Restore Office') are therefore added. Restoring does not change how many rooms there are, so the limit message never disables it. The restored room leaves the archived list for the active one: focus moves to the restore button of the next archived room, else the previous one, else the edit button of the restored room.",
+        "Board gap, which button is where: the board draws only Edit on the bedroom and only Archive on the kitchen. Every room here has both, as the business rules let the admin edit and archive any room. Archive is always enabled. The backend refuses to archive a bedroom someone sleeps in (HOME_BEDROOM_IN_USE), and a disabled icon would differ from an enabled one only by color (WCAG 1.4.1) and never say why, so the app answers a refused archive with the localized reason, for example in an AppSnackbar.",
+        "Board gap, the states: the board draws one editor and the contract lists 'default' and 'with archived rooms' without drawing the archived one. An archived room is a plain row (name and a subtitle the app words, in the muted ink) with a restore button, under its own heading. assign-open (the list open from the start) and limit-reached are not on the board.",
+        "Board gap, the limit: a home has at most 30 rooms, archived ones included (HOME_ROOM_LIMIT_REACHED). The design system does not know the limit and the app must not copy it, so the app passes the reason in limitMessage when the home is full: the add button is then disabled and the message is shown under the bedrooms heading.",
+        "Board gap, the add button: it is a ghost AppButton with a plus icon at 44 drawn (the board's text button is 44 tall with 13/600 text and no icon). It sits beside the bedrooms heading and wraps under it at large text. It adds a room of any kind: the board has one Add room button, in the bedrooms section.",
+        "Board gap, sizes: the pebble is 28 (the board draws 32, which no pebble size has), the row is as tall as its content with 8 of vertical padding (the board has a fixed 56), and the icon buttons are 44 drawn with a 48 hit area (the board draws 44 with no target padding). A shared bedroom draws every occupant as a pebble, wrapping inside three pebbles of width so the texts keep their room. Rows are separated by a 1 px hairline in the line color, as in PresencePanel, and the card has 12 of side padding.",
+        "AppButton gained an optional focusNode and expanded for this (in the commit before this one): the editor hands focus to the add button and the assign button, and the assign button says on its own node whether its list is shown.",
+        "Layout: the buttons of a row and the add button are Wrap children, not expanded ones, so they sit beside the texts (or the heading) only when those fit whole beside them, and otherwise go under them: a long word is never cut.",
+        "Focus (keyboard users only, once the new view is laid out, and only to a node that is still attached): when a view removes the room that holds focus, focus moves to the edit button of the next room, else of the previous one, else to the add button (when that is disabled, nothing is asked and focus falls to the route: the editor has no other stop to offer). When the add button holds focus and a limit message arrives, focus moves to the edit button of the first room (the restore button of the first archived room when every room is archived). When the assign list that holds focus loses every option, focus moves to the edit button, and when it loses only the option that holds it, to the assign button. A rebuild with the same view asks for nothing. Rows are keyed by room id, so an open assign list survives another room being added or removed above it. The two guards of the post-frame hand-over (the widget is still mounted, the node is still attached) cover each other: a mutant that drops either one survives, because a disposed node has no parent.",
+        "The editor is a plain column, not a scrollable: put it in the scrollable of the screen. It checks in debug builds that no room id repeats across the three lists, that archived rooms come with a heading, that a common area has no occupants or options, that no member is offered the room they already sleep in or twice, that a room with options has an assignLabel that holds the visible assignLabel of the view, and that the spoken label of an option holds the name of the member (label in name). The editor does not check the role: the app shows it to the admin only, as the board says."
+      ],
+      "stories": [
+        "Organisms/RoomEditor/editor-default",
+        "Organisms/RoomEditor/editor-archived-rooms",
+        "Organisms/RoomEditor/editor-assign-open",
+        "Organisms/RoomEditor/editor-limit-reached"
+      ]
     }
   ]
 }

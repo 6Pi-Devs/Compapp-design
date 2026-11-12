@@ -31,6 +31,7 @@ const _leastWidthOf = <String, double>{
   'TaskComposer': 300,
   'FloorplanMap': 300,
   'ItemSheet': 300,
+  'RoomEditor': 300,
 };
 
 /// Lays every molecule and organism use case out the way the goldens do, with
