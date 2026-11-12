@@ -299,6 +299,25 @@ void main() {
       ('FloorplanMap', {'rooms': '-3', 'absences': '0', 'loading': 'true'}),
       ('FloorplanMap', {'rooms': '0', 'absences': '0'}),
       (
+        'AppFormPage',
+        {
+          'title': '',
+          'backLabel': '',
+          'submitLabel': '',
+          'submittingLabel': '',
+          'submitting': 'true',
+        },
+      ),
+      ('AppFormPage', {'fields': '99'}),
+      ('AppFormPage', {'fields': '-3'}),
+      ('AppFormPage', {'fields': '0'}),
+      ('AppFormPage', {'fields': '0', 'nameError': 'Zed'}),
+      ('AppFormPage', {'fields': '1', 'nameError': ''}),
+      ('AppSheet', {'title': '', 'closeLabel': '', 'primaryLabel': ''}),
+      ('AppSheet', {'bodyParagraphs': '99', 'actions': '99'}),
+      ('AppSheet', {'bodyParagraphs': '-3', 'actions': '-3'}),
+      ('AppSheet', {'secondaryLabel': '', 'actions': '2'}),
+      (
         'ItemSheet',
         {
           'memberJoinOrder': '99',

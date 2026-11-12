@@ -510,7 +510,8 @@
         { "name": "backLabel", "type": "String", "required": true, "default": "pushed only; spoken name of the back button" },
         { "name": "onBack", "type": "VoidCallback", "required": true, "default": "pushed only" },
         { "name": "actionLabel", "type": "String?", "required": false, "default": "pushed only; null or empty leaves the action out" },
-        { "name": "onAction", "type": "VoidCallback?", "required": false, "default": "pushed only; null disables the action" }
+        { "name": "onAction", "type": "VoidCallback?", "required": false, "default": "pushed only; null disables the action" },
+        { "name": "namesRoute", "type": "bool", "required": false, "default": "false: set it for the bar of a screen, so the title names the route and assistive technology announces it when the screen opens (as the title of Material's AppBar does on Android); leave it off for a bar inside a card or a sheet" }
       ],
       "variants": ["home", "pushed"],
       "states": ["default", "long-text"],
@@ -913,7 +914,7 @@
         "Board gap, the usage row: the board's row has the item name (Washer) as the title and Carlos' pebble, with the usage text as the subtitle. MemberRow names the member, so the row shows the member's name with the subtitle the app words (\"Started 34 min ago\"), and the item is named by the title. ItemView.name and icon are not drawn; the item only keys the sheet. The row sits on the sunken card color with 12 of side padding and is 64 tall (board 60).",
         "Board gap, the surface: the board draws the sheet with 24 top corners, a 12 radius at the bottom and the sheet shadow, over a page. The sheet here has 24 top corners only (it is anchored to the bottom of the screen by its route) and adds the bottom safe-area inset (MediaQuery.padding, so an ancestor SafeArea is not doubled) under the button. The message is the body style (15/22) where the board draws 13/20, because no 13/20 regular text token exists. Spacing is 12 between the parts as on the board.",
         "SheetHeader gained an optional titleFocusNode for this (in the commit before this one): the title is the starting point of focus, so it is focusable without a Tab stop and has the house focus ring for keyboard users. The next Tab reaches the close button, then the confirm button.",
-        "Hosting: show it with showModalBottomSheet(isScrollControlled: true, backgroundColor: Colors.transparent, ...). The sheet draws its own surface, the route supplies the barrier, the focus scope and the route semantics (one scopesRoute node), and the title heading names that route (SheetHeader.namesRoute), so the title is not said twice. On Android the route also carries Flutter's own 'Dialog' label on its node; which name a given screen reader prefers is not verified on a device. A new item id mounts the content again (focus falls back through the scope's history, to the title once it was there).",
+        "Hosting: show it with showModalBottomSheet(isScrollControlled: true, useSafeArea: true, backgroundColor: Colors.transparent, ...). useSafeArea matters: by default the route removes the top inset, and at 2.0 text on 320 by 568 with a 24 status bar the close button sits under the status bar; with it the header clears the inset (a real-route test checks both). The sheet draws its own surface, the route supplies the barrier, the focus scope and the route semantics (one scopesRoute node), and the title heading names that route (SheetHeader.namesRoute), so the title is not said twice. On Android the route also carries Flutter's own 'Dialog' label on its node; which name a given screen reader prefers is not verified on a device. A new item id mounts the content again (focus falls back through the scope's history, to the title once it was there).",
         "Scrolling: the header stays pinned and the body (the person, the message, the button) scrolls inside the sheet when the height is bounded, which is the case in showModalBottomSheet. When the header alone would take more than half of the bounded height (the default route caps a sheet at 9/16 of the screen, so at 2.0 text on 320 by 568 the title fills it), the header stops being pinned and scrolls together with the body, so the button is still reached; at exactly half it is still pinned. The outer scroll is a Scrollable around the private render object, which is a viewport (RenderAbstractViewport) so ensureVisible and screen-reader focus scroll it. A small private render object gives the body what the header leaves of a bounded height and is a plain column when the height is unbounded (a column with a flex child asserts there), so intrinsic sizes and dry layout still work for the golden harness. onClose is called by the close button and by Escape while focus is inside the sheet; the barrier, a drag down and the route's DismissIntent bypass it, so the app must treat the route's pop result as a close too.",
         "Nudge message: the backend's nudge endpoint takes an optional message of up to 280 characters, and the sheet has no field for it because the board draws none. A text field (AppTextField) in the body and an onConfirm that carries the text is a follow-up. Remind follows the contract's REMINDER meaning (the washer finished hours ago); nudge, remind and cooldown cannot target the user's own use (the backend answers HOME_CANNOT_NUDGE_SELF), and ItemSheet asserts it in debug builds (ItemSheetView stays const, which cannot read the member)."
       ],
@@ -1061,6 +1062,76 @@
         "Organisms/RoomDrawBoard/admin-applied",
         "Organisms/RoomDrawBoard/member-pending",
         "Organisms/RoomDrawBoard/member-applied"
+      ]
+    },
+    {
+      "id": "app-sheet",
+      "level": "template",
+      "class": "AppSheet",
+      "playground": "Templates/AppSheet/playground",
+      "path": "templates/app_sheet.dart",
+      "props": [
+        { "name": "title", "type": "String", "required": true, "default": "the heading of the sheet; it names the route, so it is never empty" },
+        { "name": "closeLabel", "type": "String", "required": true, "default": "spoken name of the close button, never empty" },
+        { "name": "onClose", "type": "VoidCallback", "required": true, "default": "called by the close button and by the Escape key" },
+        { "name": "body", "type": "Widget", "required": true, "default": "the slot under the header; it scrolls with the actions" },
+        { "name": "actions", "type": "List<AppButton>", "required": false, "default": "[]: the buttons under the body, one under the other, as wide as the sheet, in the order given" }
+      ],
+      "variants": ["sheet"],
+      "states": ["plain", "one-action", "two-actions"],
+      "semantics": "A container holding the SheetHeader (the title is a heading that names the route that shows the sheet, so the route announces it once, and takes the initial focus, then the close button), then the body and the actions, which are the app's widgets and say what they are. Focus starts on the title once the sheet is laid out, only if the title is still attached; a rebuild never asks for it again. Tab goes title, close, body, actions in order. Escape closes. The sheet adds no node of its own to the body or the actions",
+      "key": "sheet.title, sheet.close and sheet.handle from the header, appSheet.body around the body slot and appSheet.actions around the actions (only when there are any); the root key is the app's",
+      "notes": [
+        "Board gap: the board draws no template, no page scaffold and no generic sheet, only the ItemSheet organism and the SheetHeader molecule. AppSheet is the layout of ItemSheet with the content left to the app, kept as close to it as possible: the same surface (24 top corners, the sheet fill and shadow), the same pinned header, 12 between the parts, the bottom inset of the screen under the last child.",
+        "Hosting: show it with showModalBottomSheet(isScrollControlled: true, useSafeArea: true, backgroundColor: Colors.transparent, ...). useSafeArea matters: by default the route removes the top inset, and once the keyboard is up at large text (320 by 568, 24 status bar, 250 keyboard, 2.0) the close button and the title sit under the status bar; with it the header clears the inset (a real-route test checks both). The route supplies the barrier, the focus scope and the one route semantics node; the title names that route. The barrier, a drag down and the route's DismissIntent bypass onClose, so the app treats the pop result as a close too.",
+        "Scrolling: as ItemSheet. The header stays pinned and the body with the actions scrolls when the height is bounded; a header taller than half of the bounded height scrolls with the body, so the last action is still reached (at exactly half it is pinned). The layout is the foundation HeaderBody, moved out of ItemSheet when this template became its second user. ItemSheet keeps its own Scrollable and its own content, and imports the same HeaderBody, so there is no duplicated code.",
+        "Keyboard: the height the keyboard takes (MediaQuery.viewInsets) is left under the sheet surface, so a field in the body is not covered and the actions are reached by scrolling the body. The surface is not drawn behind the keyboard. A route that already lifts the sheet above the keyboard must remove the view insets from the MediaQuery it gives the sheet, or the room is left twice. ItemSheet has no fields and does not do this.",
+        "Focus in the slots is the app's. The sheet takes focus to the title once, when it opens. A button of the actions that disables itself while it holds focus has to move focus first, because the sheet cannot know which action a view will disable (ItemSheet can, so it does it for its one button). Tab order is the order of the slots; a body with its own scrolling list scrolls inside the sheet.",
+        "Not a prop: a drag handle that closes, a barrier tap, a snap size or a drag-to-dismiss. Those belong to the route. The actions slot has no limit on how many buttons, but a sheet of more than two is a menu; the order given is the order read, the one that confirms first.",
+        "The sample bodies are the PresencePanel organism (who is home, the cooldown and the button are the organism's own) and two sentences from the business rules (archived rooms count toward the limit; anyone can leave, and an admin's role passes on). The sheet is not told which."
+      ],
+      "stories": [
+        "Templates/AppSheet/sheet-plain",
+        "Templates/AppSheet/sheet-one-action",
+        "Templates/AppSheet/sheet-two-actions"
+      ]
+    },
+    {
+      "id": "app-form-page",
+      "level": "template",
+      "class": "AppFormPage",
+      "playground": "Templates/AppFormPage/playground",
+      "path": "templates/app_form_page.dart",
+      "props": [
+        { "name": "title", "type": "String", "required": true, "default": "the heading of the pushed bar; it names the route, so it is never empty" },
+        { "name": "backLabel", "type": "String", "required": true, "default": "spoken name of the back button, never empty" },
+        { "name": "onBack", "type": "VoidCallback", "required": true, "default": "called by the back button" },
+        { "name": "fields", "type": "List<Widget>", "required": true, "default": "the form: one widget per field, stacked in the order given, 16 apart and as wide as the page allows" },
+        { "name": "submitLabel", "type": "String", "required": true, "default": "the visible label of the submit button, never empty" },
+        { "name": "onSubmit", "type": "VoidCallback?", "required": true, "default": "called by the submit button; null disables it" },
+        { "name": "submitting", "type": "bool", "required": false, "default": "false; true shows the spinner of the button and ignores taps" },
+        { "name": "submittingLabel", "type": "String?", "required": false, "default": "null; what assistive technology reads as the value of the button while submitting, never empty when given" }
+      ],
+      "variants": ["form"],
+      "states": ["filled", "error", "submitting"],
+      "semantics": "A Scaffold holding the pushed AppTopBar (the title is a heading that names the route, the back button is a button named by backLabel), a form group (SemanticsRole.form) with the fields, which are the app's widgets and say what they are, and the submit button, a single button named by its visible label (disabled when onSubmit is null; while submitting it keeps its node and focus, announces submittingLabel as its value and ignores taps). Tab goes through the back button, the fields in the order given, then the submit button, also for fields that have scrolled out of sight: an OrderedTraversalPolicy sets the order, so it does not depend on where the fields are on the screen. The page never takes focus by itself",
+      "key": "formPage.fields (the column of fields) and formPage.submit (the button), topBar.back and topBar.title from the bar; the root key is the app's",
+      "notes": [
+        "Board gap: the board draws no page, no form and no template. The page is the pushed AppTopBar of the board over a column of fields with a bottom button, laid out as a pushed route would be: 16 of side padding, 16 between the fields, the button at the bottom with 12 above and 16 below it (plus the bottom inset of the screen) and a hairline over it.",
+        "The slots: the fields are a List<Widget> and the button is built by the page from submitLabel, onSubmit, submitting and submittingLabel, so the primary action is always an AppButton, large, full width, 48 or more tall. The board has no secondary action at the bottom. A form with two actions is not this page. The bar has no action text (the pushed bar can take one); the page does not expose it because a form has one way to send.",
+        "Keyboard: the page is a Scaffold with the default resizeToAvoidBottomInset, so the keyboard takes room from the body. The button is the Scaffold's bottomNavigationBar with the keyboard's height added under it (the Scaffold leaves that bar at the bottom of the screen, under the keyboard), so the body ends above it and it rides directly above the keyboard. The bottom inset (home indicator) is the padding MediaQuery reports, which a phone zeroes while the keyboard is up, so there is no extra gap above the keyboard. The fields scroll; a field that takes focus is scrolled into view above the button by Flutter's own ensureVisible.",
+        "Large text on a short screen: the bar is pinned over the scrolling fields. When the bar alone would take more than half of the room above the button (200% text on 320 by 568 with the keyboard up), the bar scrolls away with the fields (the foundation HeaderBody, as AppSheet does), so the fields keep the room and the button stays reachable. Nothing is clamped.",
+        "Focus: the traversal order is set (back, fields, submit) because the default reading order sorts by position on screen, and a field scrolled below the button would be visited after it. The fields are a FocusTraversalGroup of their own, so a FocusTraversalOrder a field sets (or a nested group with its own policy) orders only the fields and never moves one in front of the back button or behind the submit button. The page asks for no focus: a form that wants one puts autofocus on its field. When onSubmit becomes null while the button has focus, the page moves focus off the disabled button: to the back button (the first stop) for keyboard users, and to nothing for touch users, so focus never falls back to the last field and opens the keyboard. Submitting keeps the button enabled for focus, so it does not lose it.",
+        "Route name: the page sets AppTopBar.namesRoute (added in the commit before this one), so a screen reader announces the title when the page opens. The page does not push, pop or confirm discarding changes: the app owns the route and the back button's meaning.",
+        "Sample content follows the business rules: the admin renames the home (the name titles every push), the time zone cannot be changed yet (a read-only field that says so). The sample fields are AppTextField atoms; the board has no organism that is a form field.",
+        "SnackBars: the button is the bottom bar of the Scaffold, so a SnackBar shown through the ScaffoldMessenger sits above it and never covers it (also with the keyboard up). An AppSnackbar the app places itself must leave a bottom margin that clears the button, which is as tall as a large button plus 28 and the bottom inset. A page is a route of its own, pushed above the home shell: it owns its Scaffold, so a tab body inside a shell must not use one.",
+        "Semantics, the button and the form group: the form group (SemanticsRole.form, its own node, fields not merged) holds the fields only. The button stays outside it on purpose: it is pinned in the bottom bar, outside the scrolling area and in a different subtree, so no single node can hold both without making the pinned bar part of the scrolled content. It is read right after the last field and is a button named by its label.",
+        "Known gap, accepted: at 2.0 text on 320 by 568 with the keyboard up, the focus ring of the back button is clipped by 2 px at the top of the screen, because the bar has scrolled to the top of the viewport. The button stays fully usable."
+      ],
+      "stories": [
+        "Templates/AppFormPage/form-filled",
+        "Templates/AppFormPage/form-error",
+        "Templates/AppFormPage/form-submitting"
       ]
     }
   ]

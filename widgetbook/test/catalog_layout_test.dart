@@ -33,13 +33,15 @@ const _leastWidthOf = <String, double>{
   'ItemSheet': 300,
   'RoomEditor': 300,
   'RoomDrawBoard': 300,
+  'AppSheet': 300,
+  'AppFormPage': 300,
 };
 
-/// Lays every molecule and organism use case out the way the goldens do, with
-/// the real fonts, and checks that each of the four scenarios (light and dark,
-/// text scale 1.0 and 2.0) draws the component at a visible size and overflows
-/// nowhere. An organism can be tall: the scenario is as tall as it is, so the
-/// golden shows all of it.
+/// Lays every molecule, organism and template use case out the way the
+/// goldens do, with the real fonts, and checks that each of the four scenarios
+/// (light and dark, text scale 1.0 and 2.0) draws the component at a visible
+/// size and overflows nowhere. An organism can be tall: the scenario is as
+/// tall as it is, so the golden shows all of it.
 void main() {
   setUpAll(() async {
     Future<void> load(String family, List<String> files) async {
@@ -60,7 +62,9 @@ void main() {
 
   final useCases = collectFixedUseCases(buildCatalog());
   for (final MapEntry(key: path, value: useCase) in useCases.entries) {
-    if (!path.startsWith('Molecules/') && !path.startsWith('Organisms/')) {
+    if (!path.startsWith('Molecules/') &&
+        !path.startsWith('Organisms/') &&
+        !path.startsWith('Templates/')) {
       continue;
     }
 

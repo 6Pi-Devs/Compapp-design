@@ -736,6 +736,11 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       expect(bar.variant, AppTopBarVariant.pushed);
       expect(bar.onAction, isNull);
     }, also: {'form': 'pushed'}),
+    KnobCase(
+      'namesRoute',
+      'true',
+      (t) => expect(_widget<AppTopBar>(t).namesRoute, isTrue),
+    ),
   ],
   'AppNavBar': [
     KnobCase(
@@ -1270,6 +1275,81 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       'usageSubtitle',
       'Zed',
       (t) => expect(_widget<ItemSheet>(t).view.usage!.subtitle, 'Zed'),
+    ),
+  ],
+  'AppSheet': [
+    KnobCase('title', 'Zed', (t) => expect(_widget<AppSheet>(t).title, 'Zed')),
+    KnobCase(
+      'closeLabel',
+      'Zed',
+      (t) => expect(_widget<AppSheet>(t).closeLabel, 'Zed'),
+    ),
+    KnobCase('bodyText', 'Zed', (t) {
+      final body = _widget<AppSheet>(t).body as Column;
+      expect((body.children.first as Text).data, 'Zed');
+    }),
+    KnobCase('bodyParagraphs', '3', (t) {
+      expect((_widget<AppSheet>(t).body as Column).children, hasLength(3));
+    }),
+    KnobCase(
+      'actions',
+      '2',
+      (t) => expect(_widget<AppSheet>(t).actions, hasLength(2)),
+    ),
+    KnobCase(
+      'primaryLabel',
+      'Zed',
+      (t) => expect(_widget<AppSheet>(t).actions.first.label, 'Zed'),
+    ),
+    KnobCase('secondaryLabel', 'Zed', (t) {
+      final actions = _widget<AppSheet>(t).actions;
+      expect(actions, hasLength(2));
+      expect(actions[1].label, 'Zed');
+    }, also: {'actions': '2'}),
+  ],
+  'AppFormPage': [
+    KnobCase(
+      'title',
+      'Zed',
+      (t) => expect(_widget<AppFormPage>(t).title, 'Zed'),
+    ),
+    KnobCase(
+      'backLabel',
+      'Zed',
+      (t) => expect(_widget<AppFormPage>(t).backLabel, 'Zed'),
+    ),
+    KnobCase(
+      'fields',
+      '5',
+      (t) => expect(_widget<AppFormPage>(t).fields, hasLength(5)),
+    ),
+    KnobCase(
+      'nameError',
+      'Zed',
+      (t) => expect(
+        (_widget<AppFormPage>(t).fields.first as AppTextField).errorText,
+        'Zed',
+      ),
+    ),
+    KnobCase(
+      'submitLabel',
+      'Zed',
+      (t) => expect(_widget<AppFormPage>(t).submitLabel, 'Zed'),
+    ),
+    KnobCase(
+      'submitEnabled',
+      'false',
+      (t) => expect(_widget<AppFormPage>(t).onSubmit, isNull),
+    ),
+    KnobCase(
+      'submitting',
+      'true',
+      (t) => expect(_widget<AppFormPage>(t).submitting, isTrue),
+    ),
+    KnobCase(
+      'submittingLabel',
+      'Zed',
+      (t) => expect(_widget<AppFormPage>(t).submittingLabel, 'Zed'),
     ),
   ],
   'RoomDrawBoard': [

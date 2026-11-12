@@ -1147,10 +1147,14 @@ void main() {
       TextDirection direction = TextDirection.ltr,
       VoidCallback? onConfirm,
       bool scrollControlled = true,
+      bool useSafeArea = true,
+      double topPadding = 0,
     }) async {
       tester.view
         ..physicalSize = size
-        ..devicePixelRatio = 1;
+        ..devicePixelRatio = 1
+        ..padding = FakeViewPadding(top: topPadding)
+        ..viewPadding = FakeViewPadding(top: topPadding);
       addTearDown(tester.view.reset);
       await tester.pumpWidget(
         MaterialApp(
@@ -1170,6 +1174,7 @@ void main() {
                 onPressed: () => showModalBottomSheet<void>(
                   context: context,
                   isScrollControlled: scrollControlled,
+                  useSafeArea: useSafeArea,
                   backgroundColor: Colors.transparent,
                   builder: (_) => ItemSheet(
                     view: view,
@@ -1294,6 +1299,40 @@ void main() {
       expect(confirmed, 1);
     });
 
+    for (final direction in TextDirection.values) {
+      testWidgets('with a status bar at 2.0 on a short screen the header '
+          'clears the top inset ($direction)', (tester) async {
+        const status = 24.0;
+        await openModal(
+          tester,
+          spanish(),
+          size: const Size(320, 568),
+          textScale: 2,
+          direction: direction,
+          topPadding: status,
+        );
+
+        expect(tester.takeException(), isNull);
+        expect(tester.getRect(_root).top, greaterThanOrEqualTo(status));
+        expect(tester.getRect(_close).top, greaterThanOrEqualTo(status));
+        expect(tester.getTopLeft(_title).dy, greaterThanOrEqualTo(status));
+      });
+    }
+
+    testWidgets('without useSafeArea the route removes the top inset, which '
+        'is why the recipe asks for it', (tester) async {
+      await openModal(
+        tester,
+        spanish(),
+        size: const Size(320, 568),
+        textScale: 2,
+        topPadding: 24,
+        useSafeArea: false,
+      );
+
+      expect(tester.getRect(_close).top, lessThan(24));
+    });
+
     testWidgets('the route is named once, by the title', (tester) async {
       final handle = tester.ensureSemantics();
       await openModal(tester, _view(), size: const Size(360, 640));
@@ -1330,7 +1369,7 @@ void main() {
 
   group('layout under every constraint', () {
     final body = find.byWidgetPredicate(
-      (widget) => widget.runtimeType.toString() == '_HeaderBody',
+      (widget) => widget.runtimeType.toString() == 'HeaderBody',
     );
 
     Widget host({required double? maxHeight}) => barHost(
@@ -1493,7 +1532,7 @@ void main() {
 
       final box = tester.renderObject<RenderBox>(
         find.byWidgetPredicate(
-          (widget) => widget.runtimeType.toString() == '_HeaderBody',
+          (widget) => widget.runtimeType.toString() == 'HeaderBody',
         ),
       );
       expect(box.size.height, header * 2 - 1);
@@ -1508,7 +1547,7 @@ void main() {
 
   group('the viewport of a header that scrolls with the body', () {
     final headerBody = find.byWidgetPredicate(
-      (widget) => widget.runtimeType.toString() == '_HeaderBody',
+      (widget) => widget.runtimeType.toString() == 'HeaderBody',
     );
     final member = find.byKey(const Key('member.carlos'));
 
