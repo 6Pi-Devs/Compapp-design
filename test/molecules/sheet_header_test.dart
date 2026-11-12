@@ -1,17 +1,27 @@
+import 'dart:ui' show Tristate;
+
 import 'package:compapp_design/compapp_design.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers/bar_host.dart';
 import '../helpers/bundled_fonts.dart';
 import '../helpers/contrast.dart';
 import '../helpers/painted_color.dart';
+import '../helpers/painted_pixels.dart';
 
 SheetHeader _header({
   String title = 'Ask Carlos to free the washer?',
   VoidCallback? onClose,
-}) => SheetHeader(title: title, onClose: onClose ?? () {}, closeLabel: 'Close');
+  FocusNode? titleFocusNode,
+}) => SheetHeader(
+  title: title,
+  onClose: onClose ?? () {},
+  closeLabel: 'Close',
+  titleFocusNode: titleFocusNode,
+);
 
 final Finder _close = find.byKey(const Key('sheet.close'));
 final Finder _handle = find.byKey(const Key('sheet.handle'));
@@ -347,4 +357,236 @@ void main() {
       expect(tester.getSize(_title).height, closeTo(base * 2, 1));
     });
   });
+
+  group('title focus', () {
+    late FocusNode node;
+    setUp(() => node = FocusNode());
+    tearDown(() => node.dispose());
+
+    final ring = find.byKey(const Key('sheet.titleRing'));
+
+    Future<int> inkAround(
+      WidgetTester tester,
+      ThemeData theme, {
+      required bool outside,
+    }) async {
+      final origin = tester.getTopLeft(find.byKey(barBoundaryKey));
+      final title = tester.getRect(_title).shift(-origin);
+      final region = outside
+          ? Rect.fromLTWH(
+              title.left + 4,
+              title.top - AppSizes.borderEmphasis,
+              title.width - 8,
+              AppSizes.borderEmphasis,
+            )
+          : Rect.fromLTWH(title.left + 4, title.top, title.width - 8, 2);
+      final pixels = await paintedPixels(
+        tester,
+        barBoundaryKey,
+        region: region,
+      );
+      return countPixels(pixels, theme.colorScheme.onSurface);
+    }
+
+    testWidgets('a node on the title takes focus, with no Tab stop', (
+      tester,
+    ) async {
+      await tester.pumpWidget(barHost(_header(titleFocusNode: node)));
+      expect(node.hasPrimaryFocus, isFalse);
+
+      node.requestFocus();
+      await tester.pump();
+      expect(node.hasPrimaryFocus, isTrue);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+      expect(node.hasPrimaryFocus, isFalse);
+      expect(
+        FocusManager.instance.primaryFocus!.context!
+            .findAncestorWidgetOfExactType<TextButton>(),
+        isNotNull,
+        reason: 'Tab goes from the title to the close button',
+      );
+    });
+
+    testWidgets('Tab never stops on the title on its way in', (tester) async {
+      await tester.pumpWidget(barHost(_header(titleFocusNode: node)));
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+
+      expect(node.hasPrimaryFocus, isFalse);
+      expect(
+        FocusManager.instance.primaryFocus!.context!
+            .findAncestorWidgetOfExactType<TextButton>(),
+        isNotNull,
+      );
+    });
+
+    for (final (name, theme) in themes) {
+      testWidgets('the ring is 2 px of ink outside the text, for the keyboard '
+          'only ($name)', (tester) async {
+        await tester.pumpWidget(
+          barHost(
+            _header(titleFocusNode: node),
+            theme: theme,
+            padding: const EdgeInsets.all(8),
+          ),
+        );
+        expect(ring, findsNothing);
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        node.requestFocus();
+        await tester.pump();
+
+        expect(ring, findsOneWidget);
+        expect(await inkAround(tester, theme, outside: true), greaterThan(0));
+        expect(
+          await inkAround(tester, theme, outside: false),
+          lessThan(8),
+          reason: 'the ring leaves the text alone',
+        );
+
+        await tester.tapAt(tester.getCenter(_title) + const Offset(0, 100));
+        await tester.pump();
+        expect(ring, findsNothing, reason: 'a touch ends the highlight');
+      });
+    }
+
+    testWidgets('the title is a focused heading for assistive technology', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(barHost(_header(titleFocusNode: node)));
+      node.requestFocus();
+      await tester.pump();
+
+      final data = tester.getSemantics(_title).getSemanticsData();
+      expect(data.flagsCollection.isHeader, isTrue);
+      expect(data.flagsCollection.isFocused, Tristate.isTrue);
+      expect(data.label, 'Ask Carlos to free the washer?');
+      handle.dispose();
+    });
+
+    testWidgets('swapping the node moves the listener and drops the old '
+        'ring', (tester) async {
+      final other = FocusNode();
+      addTearDown(other.dispose);
+      await tester.pumpWidget(barHost(_header(titleFocusNode: node)));
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      node.requestFocus();
+      await tester.pump();
+      expect(ring, findsOneWidget);
+
+      await tester.pumpWidget(barHost(_header(titleFocusNode: other)));
+      await tester.pump();
+      expect(ring, findsNothing);
+      // The count of listeners is only visible through a protected getter.
+      // ignore: invalid_use_of_protected_member
+      expect(node.hasListeners, isFalse, reason: 'the old node is let go');
+
+      other.requestFocus();
+      await tester.pump();
+      expect(ring, findsOneWidget);
+    });
+
+    testWidgets('the ring is 2 px outside the text on every side', (
+      tester,
+    ) async {
+      await tester.pumpWidget(barHost(_header(titleFocusNode: node)));
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      node.requestFocus();
+      await tester.pump();
+
+      final text = tester.getRect(_title);
+      final box = tester.getRect(ring);
+      expect(box.left, text.left - AppSizes.borderEmphasis);
+      expect(box.top, text.top - AppSizes.borderEmphasis);
+      expect(box.right, text.right + AppSizes.borderEmphasis);
+      expect(box.bottom, text.bottom + AppSizes.borderEmphasis);
+    });
+
+    testWidgets('a node that already has focus when the ring mounts shows it '
+        'at once', (tester) async {
+      final focused = _AlwaysFocused();
+      addTearDown(focused.dispose);
+      await tester.pumpWidget(barHost(_header()));
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+
+      await tester.pumpWidget(barHost(_header(titleFocusNode: focused)));
+
+      expect(ring, findsOneWidget);
+    });
+
+    testWidgets('a header that is gone stops listening to the node and to '
+        'the highlight mode', (tester) async {
+      await tester.pumpWidget(barHost(_header(titleFocusNode: node)));
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      node.requestFocus();
+      await tester.pump();
+      await tester.pumpWidget(barHost(const SizedBox()));
+
+      node.requestFocus();
+      await tester.tapAt(const Offset(10, 300));
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+
+      expect(tester.takeException(), isNull);
+      // The count of listeners is only visible through a protected getter.
+      // ignore: invalid_use_of_protected_member
+      expect(node.hasListeners, isFalse, reason: 'the node is let go');
+    });
+
+    testWidgets('namesRoute is on the title heading node only when asked', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(barHost(_header()));
+      expect(
+        tester
+            .getSemantics(_title)
+            .getSemanticsData()
+            .flagsCollection
+            .namesRoute,
+        isFalse,
+      );
+
+      await tester.pumpWidget(
+        barHost(
+          SheetHeader(
+            title: 'Free it?',
+            onClose: () {},
+            closeLabel: 'Close',
+            namesRoute: true,
+          ),
+        ),
+      );
+
+      final data = tester.getSemantics(_title).getSemanticsData();
+      expect(data.flagsCollection.namesRoute, isTrue);
+      expect(data.flagsCollection.isHeader, isTrue);
+      expect(data.label, 'Free it?');
+      handle.dispose();
+    });
+
+    testWidgets('without a node the title is plain text', (tester) async {
+      await tester.pumpWidget(barHost(_header()));
+
+      expect(
+        find.descendant(
+          of: find.byType(SheetHeader),
+          matching: find.byWidgetPredicate(
+            (widget) => widget is Focus && widget.skipTraversal,
+          ),
+        ),
+        findsNothing,
+      );
+    });
+  });
+}
+
+/// A node that always reports focus, as a story's focused look does.
+class _AlwaysFocused extends FocusNode {
+  @override
+  bool get hasFocus => true;
 }

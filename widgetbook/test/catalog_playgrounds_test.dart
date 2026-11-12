@@ -299,6 +299,22 @@ void main() {
       ('FloorplanMap', {'rooms': '-3', 'absences': '0', 'loading': 'true'}),
       ('FloorplanMap', {'rooms': '0', 'absences': '0'}),
       (
+        'ItemSheet',
+        {
+          'memberJoinOrder': '99',
+          'title': '',
+          'confirmLabel': '',
+          'closeLabel': '',
+          'memberName': '',
+          'memberSemanticLabel': '',
+          'usageSubtitle': '',
+        },
+      ),
+      ('ItemSheet', {'mode': 'cooldown', 'message': ''}),
+      ('ItemSheet', {'memberIsYou': 'true'}),
+      ('ItemSheet', {'memberIsYou': 'true', 'mode': 'cooldown'}),
+      ('ItemSheet', {'memberIsYou': 'true', 'mode': 'start'}),
+      (
         'ActivityList',
         {
           'unreadEntries': '0',
