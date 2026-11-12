@@ -480,6 +480,7 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       'true',
       (t) => expect(_widget<RoomTile>(t).onTap, isNotNull),
     ),
+    KnobCase('draw', 'true', (t) => expect(_widget<RoomTile>(t).draw, isTrue)),
   ],
   'TaskRow': [
     KnobCase(
@@ -1269,6 +1270,74 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       'usageSubtitle',
       'Zed',
       (t) => expect(_widget<ItemSheet>(t).view.usage!.subtitle, 'Zed'),
+    ),
+  ],
+  'RoomDrawBoard': [
+    KnobCase(
+      'status',
+      'applied',
+      (t) =>
+          expect(_widget<RoomDrawBoard>(t).view.status, RoomDrawStatus.applied),
+    ),
+    KnobCase(
+      'statusLabel',
+      'Zed',
+      (t) => expect(_widget<RoomDrawBoard>(t).view.statusLabel, 'Zed'),
+    ),
+    KnobCase(
+      'drawId',
+      'Zed',
+      (t) => expect(_widget<RoomDrawBoard>(t).view.drawId, 'Zed'),
+    ),
+    KnobCase(
+      'bedrooms',
+      '3',
+      (t) => expect(_widget<RoomDrawBoard>(t).view.bedrooms.length, 3),
+    ),
+    KnobCase(
+      'groupInFourth',
+      '2',
+      (t) => expect(
+        _widget<RoomDrawBoard>(t).view.bedrooms.last.members.length,
+        2,
+      ),
+    ),
+    KnobCase(
+      'firstCaption',
+      'Zed',
+      (t) =>
+          expect(_widget<RoomDrawBoard>(t).view.bedrooms.first.caption, 'Zed'),
+    ),
+    KnobCase(
+      'isAdmin',
+      'false',
+      (t) => expect(_widget<RoomDrawBoard>(t).view.isAdmin, isFalse),
+    ),
+    KnobCase(
+      'drawAgainLabel',
+      'Zed',
+      (t) => expect(_widget<RoomDrawBoard>(t).view.drawAgainLabel, 'Zed'),
+    ),
+    KnobCase(
+      'applyLabel',
+      'Zed',
+      (t) => expect(_widget<RoomDrawBoard>(t).view.applyLabel, 'Zed'),
+    ),
+    KnobCase(
+      'readOnlyNote',
+      'Zed',
+      (t) => expect(_widget<RoomDrawBoard>(t).view.readOnlyNote, 'Zed'),
+      also: {'isAdmin': 'false'},
+    ),
+    KnobCase(
+      'canDrawAgain',
+      'false',
+      (t) => expect(_widget<RoomDrawBoard>(t).onDrawAgain, isNull),
+    ),
+    KnobCase(
+      'canApply',
+      'false',
+      (t) => expect(_widget<RoomDrawBoard>(t).onApply, isNull),
     ),
   ],
   'RoomEditor': [

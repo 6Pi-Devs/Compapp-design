@@ -170,10 +170,20 @@ const List<({String id, AppIcons icon})> _beaconSamples = [
   };
 }
 
+/// The spoken label the playground gives the tile: the typed one, the sample
+/// when it is empty, and in the draw form the name in front when it lacks it.
+String _label(String typed, String sample, String name, {required bool draw}) {
+  final label = typed.isEmpty ? sample : typed;
+  return draw && !label.contains(name) ? '$name, $label' : label;
+}
+
 /// Every prop of [RoomTile] as a knob. The lists are knobs by count: how many
 /// of three members stand in the room and how many of three items are pinned
 /// to it. The callback is a switch: tappable gives the tile an onTap, off
-/// leaves it plain. The tile fills a cell of the plan, as in the board.
+/// leaves it plain. The draw switch gives it the draw form of the room draw
+/// result, which has no beacons (the beacons knob has no effect then, and a
+/// label that lacks the name gets it in front, as the tile asks). The tile
+/// fills a cell of the plan, as in the board.
 WidgetbookUseCase _playground() {
   return WidgetbookUseCase(
     name: playgroundUseCaseName,
@@ -217,6 +227,12 @@ WidgetbookUseCase _playground() {
         label: 'tappable',
         description: 'Gives the tile an onTap: a button with a focus ring',
       );
+      final draw = context.knobs.boolean(
+        label: 'draw',
+        description:
+            'The draw form: the caption beside the pebbles, no beacons (the '
+            'beacons knob has no effect)',
+      );
 
       return useCaseFrame(
         child: SizedBox(
@@ -227,11 +243,12 @@ WidgetbookUseCase _playground() {
               room: RoomView(id: 'playground', name: name),
               state: state,
               caption: caption,
-              semanticLabel: typedLabel.isEmpty ? sampleLabel : typedLabel,
+              semanticLabel: _label(typedLabel, sampleLabel, name, draw: draw),
               occupants: _roster.take(occupants).toList(),
               onTap: tappable ? () {} : null,
+              draw: draw,
               beacons: [
-                for (final sample in _beaconSamples.take(beacons))
+                for (final sample in _beaconSamples.take(draw ? 0 : beacons))
                   ItemBeacon(
                     item: ItemView(
                       id: sample.id,
