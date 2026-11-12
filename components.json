@@ -16,7 +16,9 @@
         { "name": "loading", "type": "bool", "required": false, "default": "false" },
         { "name": "semanticLabel", "type": "String?", "required": false },
         { "name": "loadingSemanticLabel", "type": "String?", "required": false },
-        { "name": "statesController", "type": "WidgetStatesController?", "required": false }
+        { "name": "statesController", "type": "WidgetStatesController?", "required": false },
+        { "name": "focusNode", "type": "FocusNode?", "required": false, "default": "the caller's node, for a parent that hands focus to the button or reads whether it has it" },
+        { "name": "expanded", "type": "bool?", "required": false, "default": "null says nothing; true or false makes it a disclosure that says whether what it opens is shown" }
       ],
       "variants": ["primary-lg", "primary-md", "secondary-lg", "secondary-md", "ghost-md", "danger-lg", "danger-md"],
       "states": ["default", "pressed", "focus", "disabled", "loading"],

@@ -120,8 +120,9 @@ enum _ForcedState {
   final Set<WidgetState> states;
 }
 
-/// Every prop of [AppButton] as a knob. The forced state holds a Material
-/// state in a states controller, since a knob cannot press or focus a button.
+/// Every prop of [AppButton] as a knob, except the focus node, which is
+/// plumbing. The forced state holds a Material state in a states controller,
+/// since a knob cannot press or focus a button.
 WidgetbookUseCase _playground() {
   return WidgetbookUseCase(
     name: playgroundUseCaseName,
@@ -148,6 +149,14 @@ WidgetbookUseCase _playground() {
         'loadingSemanticLabel',
         context.sample(en: 'Loading', es: 'Cargando'),
       );
+      final disclosure = context.knobs.boolean(
+        label: 'disclosure',
+        description: 'Makes the button say whether what it opens is shown',
+      );
+      final expanded = context.knobs.boolean(
+        label: 'expanded',
+        description: 'Whether what the button opens is shown: needs disclosure',
+      );
       final forced = context.enumKnob('forced state', _ForcedState.values);
 
       return useCaseFrame(
@@ -167,6 +176,7 @@ WidgetbookUseCase _playground() {
                 semanticLabel: semanticLabel,
                 loadingSemanticLabel: loadingSemanticLabel,
                 statesController: controller,
+                expanded: disclosure ? expanded : null,
               ),
             ],
           ),

@@ -63,6 +63,17 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       (t) => expect(_widget<AppButton>(t).loadingSemanticLabel, 'Busy'),
     ),
     KnobCase(
+      'disclosure',
+      'true',
+      (t) => expect(_widget<AppButton>(t).expanded, isFalse),
+    ),
+    KnobCase(
+      'expanded',
+      'true',
+      (t) => expect(_widget<AppButton>(t).expanded, isTrue),
+      also: {'disclosure': 'true'},
+    ),
+    KnobCase(
       'forced state',
       'pressed',
       (t) => expect(

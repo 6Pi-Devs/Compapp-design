@@ -1,3 +1,5 @@
+import 'dart:ui' show Tristate;
+
 import 'package:compapp_design/compapp_design.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
@@ -1060,5 +1062,86 @@ void main() {
 
     expect(tester.takeException(), isNull);
     expect(tester.getSize(find.byType(AppButton)).width, 200);
+  });
+
+  group('focusNode', () {
+    for (final variant in AppButtonVariant.values) {
+      testWidgets('is the node of the ${variant.name} button', (tester) async {
+        final node = FocusNode();
+        addTearDown(node.dispose);
+        await tester.pumpWidget(
+          _host(
+            AppButton(
+              label: 'Add room',
+              variant: variant,
+              onPressed: () {},
+              focusNode: node,
+            ),
+          ),
+        );
+
+        expect(node.hasFocus, isFalse);
+        node.requestFocus();
+        await tester.pump();
+        expect(node.hasFocus, isTrue);
+        expect(
+          find.descendant(
+            of: find.byType(AppButton),
+            matching: find.byWidgetPredicate(
+              (widget) => widget is Focus && widget.focusNode == node,
+            ),
+          ),
+          findsOneWidget,
+        );
+      });
+    }
+  });
+
+  group('expanded', () {
+    for (final variant in AppButtonVariant.values) {
+      for (final (expanded, label) in [(true, 'open'), (false, 'closed')]) {
+        testWidgets('is $label on the node of the ${variant.name} button', (
+          tester,
+        ) async {
+          final handle = tester.ensureSemantics();
+          await tester.pumpWidget(
+            _host(
+              AppButton(
+                label: 'Assign',
+                variant: variant,
+                semanticLabel: 'Assign someone to Bedroom 1',
+                expanded: expanded,
+                onPressed: () {},
+              ),
+            ),
+          );
+
+          final node = tester.getSemantics(
+            find.bySemanticsLabel('Assign someone to Bedroom 1'),
+          );
+          final data = node.getSemanticsData();
+          expect(node.label, 'Assign someone to Bedroom 1');
+          expect(
+            data.flagsCollection.isExpanded,
+            expanded ? Tristate.isTrue : Tristate.isFalse,
+          );
+          expect(data.hasAction(SemanticsAction.tap), isTrue);
+          handle.dispose();
+        });
+      }
+    }
+
+    testWidgets('says nothing by default', (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _host(AppButton(label: 'Assign', onPressed: () {})),
+      );
+
+      final data = tester
+          .getSemantics(find.bySemanticsLabel('Assign'))
+          .getSemanticsData();
+      expect(data.flagsCollection.isExpanded, Tristate.none);
+      handle.dispose();
+    });
   });
 }
