@@ -12,6 +12,7 @@ import '../helpers/contrast.dart';
 import '../helpers/host.dart';
 import '../helpers/painted_color.dart';
 import '../helpers/painted_pixels.dart';
+import '../helpers/word_breaks.dart';
 
 const _tileWidth = 168.0;
 const _cellHeight = 104.0;
@@ -44,6 +45,8 @@ RoomTile _tile({
   String label = 'Bathroom, occupied by Carlos, 12 minutes',
   List<MemberView> occupants = const [],
   List<Widget> beacons = const [],
+  bool draw = false,
+  VoidCallback? onTap,
 }) => RoomTile(
   room: RoomView(id: id, name: name),
   state: state,
@@ -51,6 +54,8 @@ RoomTile _tile({
   semanticLabel: label,
   occupants: occupants,
   beacons: beacons,
+  draw: draw,
+  onTap: onTap,
 );
 
 Widget _cell(
@@ -65,11 +70,9 @@ Widget _cell(
 Finder _key(String id) => find.byKey(Key('floorplan.room.$id'));
 Finder _pebble(String id) => find.byKey(Key('roomTile.pebble.$id'));
 
-ShapeDecoration _decoration(WidgetTester tester) {
+ShapeDecoration _decoration(WidgetTester tester, {String id = 'bathroom'}) {
   final box = tester.widget<DecoratedBox>(
-    find
-        .descendant(of: _key('bathroom'), matching: find.byType(DecoratedBox))
-        .first,
+    find.descendant(of: _key(id), matching: find.byType(DecoratedBox)).first,
   );
   return box.decoration as ShapeDecoration;
 }
@@ -768,6 +771,358 @@ void main() {
         }
       }
     });
+  });
+
+  group('draw form', () {
+    setUpAll(loadBundledFonts);
+
+    RoomTile drawTile({
+      RoomTileState state = RoomTileState.home,
+      String id = 'bedroom1',
+      String name = 'Bedroom 1',
+      String caption = 'from Bedroom 3',
+      String? label,
+      List<MemberView> occupants = const [_carlos],
+      VoidCallback? onTap,
+    }) => _tile(
+      state: state,
+      id: id,
+      name: name,
+      caption: caption,
+      label:
+          label ??
+          '$name: ${occupants.map((m) => m.name).join(' and ')}, $caption',
+      occupants: occupants,
+      onTap: onTap,
+      draw: true,
+    );
+
+    Finder bedroom() => _key('bedroom1');
+
+    testWidgets('the name is alone on top and the caption sits at the bottom, '
+        'beside the pebble', (tester) async {
+      await tester.pumpWidget(host(_cell(drawTile())));
+
+      final tile = tester.getRect(bedroom());
+      final name = tester.getRect(find.text('Bedroom 1'));
+      final caption = tester.getRect(find.text('from Bedroom 3'));
+      final pebble = tester.getRect(_pebble('carlos'));
+      expect(pebble.left, tile.left + AppSpacing.sm, reason: 'at the start');
+      expect(pebble.bottom, tile.bottom - AppSpacing.sm);
+      expect(
+        caption.left,
+        closeTo(pebble.right + AppSpacing.xs, 0.01),
+        reason: 'beside the pebble',
+      );
+      expect(caption.center.dy, closeTo(pebble.center.dy, 0.5));
+      expect(caption.top, greaterThan(name.bottom + 8), reason: 'not under it');
+    });
+
+    testWidgets('a group of people keeps its order, pebbles first', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        host(
+          _cell(
+            drawTile(
+              id: 'bedroom2',
+              name: 'Bedroom 2 · 2 beds',
+              occupants: const [_ana, _carlos],
+              caption: 'from Bedroom 4',
+            ),
+            width: 240,
+          ),
+        ),
+      );
+
+      final ana = tester.getRect(_pebble('ana'));
+      final carlos = tester.getRect(_pebble('carlos'));
+      final caption = tester.getRect(find.text('from Bedroom 4'));
+      expect(ana.right + AppSpacing.xs, closeTo(carlos.left, 0.01));
+      expect(carlos.right + AppSpacing.xs, closeTo(caption.left, 0.01));
+    });
+
+    testWidgets('a bedroom that stays free shows only the caption at the '
+        'bottom start, on the dashed wall', (tester) async {
+      await tester.pumpWidget(
+        host(
+          _cell(
+            drawTile(
+              state: RoomTileState.free,
+              occupants: const [],
+              caption: 'Stays free',
+              label: 'Bedroom 1, stays free',
+            ),
+          ),
+        ),
+      );
+
+      final tile = tester.getRect(bedroom());
+      final caption = tester.getRect(find.text('Stays free'));
+      expect(find.byType(AppPebble), findsNothing);
+      expect(caption.left, tile.left + AppSpacing.sm);
+      expect(caption.bottom, tile.bottom - AppSpacing.sm);
+      expect(
+        (_decoration(tester, id: 'bedroom1').shape as DashedBorder).side.color,
+        CompappTheme.light.colorScheme.outlineVariant,
+      );
+    });
+
+    testWidgets('every state keeps its wall in the draw form', (tester) async {
+      for (final state in RoomTileState.values) {
+        await tester.pumpWidget(
+          host(
+            _cell(drawTile(state: state)),
+            background: CompappTheme.light.colorScheme.surface,
+          ),
+        );
+        final size = tester.getSize(bedroom());
+
+        expect(
+          await paintedColorAt(
+            tester,
+            hostBoundaryKey,
+            Offset(size.width - 12, 12),
+          ),
+          isSameColorAs(_fillOf(CompappTheme.light, state)),
+          reason: state.name,
+        );
+        expect(
+          find.byWidgetPredicate(
+            (w) => w is AppIcon && w.icon == AppIcons.occupied,
+          ),
+          state == RoomTileState.occupied ? findsOneWidget : findsNothing,
+        );
+      }
+    });
+
+    testWidgets('without draw the caption stays under the name', (
+      tester,
+    ) async {
+      await tester.pumpWidget(host(_cell(_tile(occupants: const [_carlos]))));
+      final caption = tester.getRect(find.text('occupied'));
+      final name = tester.getRect(find.text('Bathroom'));
+
+      expect(caption.top, closeTo(name.bottom, 4));
+      expect(caption.left, name.left);
+    });
+
+    testWidgets('the caption wraps under the pebbles when the line is full', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        host(
+          _cell(
+            drawTile(occupants: const [_ana, _carlos]),
+            width: 128,
+            height: 140,
+          ),
+        ),
+      );
+
+      final carlos = tester.getRect(_pebble('carlos'));
+      final caption = tester.getRect(find.text('from Bedroom 3'));
+      expect(caption.top, greaterThanOrEqualTo(carlos.bottom));
+      expect(caption.left, tester.getRect(bedroom()).left + AppSpacing.sm);
+      expect(tester.takeException(), isNull);
+    });
+
+    for (final scale in [1.0, 1.3, 1.5, 2.0]) {
+      for (final (width, direction) in [
+        (_tileWidth, TextDirection.ltr),
+        (_tileWidth, TextDirection.rtl),
+        (320.0, TextDirection.ltr),
+        (360.0, TextDirection.rtl),
+      ]) {
+        testWidgets('Spanish text at ${scale}x in ${width.toInt()} '
+            '${direction.name} wraps whole words and stays inside', (
+          tester,
+        ) async {
+          const name = 'Dormitorio 4 · 2 camas';
+          const caption = 'desde Dormitorio 3';
+          await tester.pumpWidget(
+            host(
+              Align(
+                alignment: AlignmentDirectional.topStart,
+                child: SizedBox(
+                  width: width,
+                  child: drawTile(
+                    name: name,
+                    caption: caption,
+                    occupants: const [_ana, _carlos],
+                  ),
+                ),
+              ),
+              textScale: scale,
+              direction: direction,
+              width: 400,
+            ),
+          );
+
+          expect(tester.takeException(), isNull);
+          final tile = tester.getRect(bedroom());
+          for (final finder in [
+            find.text(name),
+            find.text(caption),
+            _pebble('ana'),
+            _pebble('carlos'),
+          ]) {
+            final box = tester.getRect(finder);
+            expect(
+              box.left,
+              greaterThanOrEqualTo(tile.left + AppSpacing.sm - 0.01),
+            );
+            expect(
+              box.right,
+              lessThanOrEqualTo(tile.right - AppSpacing.sm + 0.01),
+            );
+            expect(
+              box.bottom,
+              lessThanOrEqualTo(tile.bottom - AppSpacing.sm + 0.01),
+            );
+          }
+          expectNoMidWordBreaks(tester, find.text(name));
+          expectNoMidWordBreaks(tester, find.text(caption));
+          if (direction == TextDirection.rtl) {
+            expect(
+              tester.getRect(_pebble('ana')).right,
+              tile.right - AppSpacing.sm,
+              reason: 'the pebbles start at the right',
+            );
+          }
+        });
+      }
+    }
+
+    testWidgets('can be measured by intrinsic sizing, as the goldens do', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        host(
+          IntrinsicWidth(
+            child: IntrinsicHeight(
+              child: drawTile(occupants: const [_ana, _carlos]),
+            ),
+          ),
+        ),
+      );
+
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('its dry layout agrees with its real one', (tester) async {
+      await tester.pumpWidget(
+        host(
+          Align(
+            alignment: AlignmentDirectional.topStart,
+            child: SizedBox(
+              width: 150,
+              child: drawTile(occupants: const [_ana, _carlos]),
+            ),
+          ),
+        ),
+      );
+      final box = tester.renderObject<RenderBox>(bedroom());
+
+      expect(box.getDryLayout(const BoxConstraints(maxWidth: 150)), box.size);
+    });
+
+    testWidgets('is one node named by the label', (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(host(_cell(drawTile())));
+
+      expect(
+        tester.getSemantics(bedroom()),
+        isSemantics(label: 'Bedroom 1: Carlos, from Bedroom 3'),
+      );
+      expect(semanticsLabels(tester), ['Bedroom 1: Carlos, from Bedroom 3']);
+      handle.dispose();
+    });
+
+    testWidgets('with an onTap it is still a button named by the label', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      var taps = 0;
+      await tester.pumpWidget(host(_cell(drawTile(onTap: () => taps++))));
+
+      expect(
+        tester.getSemantics(bedroom()),
+        isSemantics(
+          label: 'Bedroom 1: Carlos, from Bedroom 3',
+          isButton: true,
+          isFocusable: true,
+          hasTapAction: true,
+          hasFocusAction: true,
+        ),
+      );
+      await tester.tap(bedroom());
+      expect(taps, 1);
+      handle.dispose();
+    });
+
+    testWidgets('a draw tile with beacons is refused', (tester) async {
+      await tester.pumpWidget(
+        host(
+          _cell(
+            RoomTile(
+              room: const RoomView(id: 'a', name: 'A'),
+              state: RoomTileState.free,
+              caption: 'free',
+              semanticLabel: 'A, free',
+              draw: true,
+              beacons: [_beacon('Oven')],
+            ),
+          ),
+        ),
+      );
+
+      expect(
+        tester.takeException(),
+        isA<AssertionError>().having(
+          (e) => e.message,
+          'message',
+          contains('no beacons'),
+        ),
+      );
+    });
+
+    testWidgets('a draw tile whose label lacks its name is refused', (
+      tester,
+    ) async {
+      await tester.pumpWidget(host(_cell(drawTile(label: 'Carlos goes here'))));
+
+      expect(
+        tester.takeException(),
+        isA<AssertionError>().having(
+          (e) => e.message,
+          'message',
+          contains('label in name'),
+        ),
+      );
+    });
+
+    for (final (name, theme) in themes) {
+      test('its caption reaches 4.5:1 on every wall ($name)', () {
+        final scheme = theme.colorScheme;
+        expectContrast(
+          {
+            for (final state in RoomTileState.values)
+              '${state.name} caption': (
+                switch (state) {
+                  RoomTileState.away ||
+                  RoomTileState.free => scheme.onSurfaceVariant,
+                  RoomTileState.home ||
+                  RoomTileState.occupied => scheme.onSurface,
+                },
+                _fillOf(theme, state),
+              ),
+          },
+          minimum: 4.5,
+          reason: name,
+        );
+      });
+    }
   });
 
   group('tapped', () {

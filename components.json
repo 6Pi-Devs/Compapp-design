@@ -410,7 +410,8 @@
         { "name": "semanticLabel", "type": "String", "required": true, "default": "spoken description of the whole tile" },
         { "name": "occupants", "type": "List<MemberView>", "required": false, "default": "empty; drawn as s36 pebbles at the end of the footer line, wrapped under the beacons and start-aligned when they do not fit on one line" },
         { "name": "beacons", "type": "List<Widget>", "required": false, "default": "empty; pinned at the bottom start, wrapping onto more lines, each its own button" },
-        { "name": "onTap", "type": "VoidCallback?", "required": false, "default": "null: the tile is plain. Set: the tile is a focusable button (tap, Enter, Space), with a press layer and a 2 px ink focus ring outside the shape" }
+        { "name": "onTap", "type": "VoidCallback?", "required": false, "default": "null: the tile is plain. Set: the tile is a focusable button (tap, Enter, Space), with a press layer and a 2 px ink focus ring outside the shape" },
+        { "name": "draw", "type": "bool", "required": false, "default": "false: the tile is as before. true: the draw form of a bedroom in the result of a room draw, with the name alone on top and, at the bottom, the pebbles at the start of the line and the caption beside them (wrapping under them when the line is full); no beacons" }
       ],
       "variants": ["tile"],
       "states": ["home", "away", "occupied", "free"],
@@ -418,7 +419,8 @@
       "key": "floorplan.room.<roomId>, roomTile.pebble.<memberId>",
       "notes": [
         "onTap is optional: without it the tile is plain, as before. With it the tile node itself is the button (label, button role, tap action and focus all on the one node) and the beacons are its children, so a screen reader meets the room first and its items inside it. The focus ring is 2 px of ink outside the shape, drawn only for the tile that holds the primary focus (not while a beacon does) and only in keyboard mode; the press layer is the surface state layer (8%) over the wall. A press that starts on a beacon is the beacon's: the tile shows no press layer for it, from the first moment to the release (a Listener around each beacon, as Material's markChildInkResponsePressed does). The node also has the focus action (not on iOS), so screen-reader focus moves the input focus. Going from no onTap to one, or back, remounts the tile and drops its focus. A parent that clips needs 2 px of room, and a neighbor must not paint over the ring.",
-        "The contract states archived and draw are not drawn: the board shows neither, and the floorplan hides archived rooms. The RoomDrawBoard organism draws the tile in its draw form."
+        "The contract state archived is not drawn: the board shows no archived tile, and the floorplan hides archived rooms.",
+        "The contract variant draw is the draw prop, not a manifest variant: the form only makes sense for a bedroom that receives people (home) or stays empty (free), and a variant here would need a fixed use case for away and occupied too, which a draw never produces. RoomDrawBoard shows it in both states, and the draw tests of this molecule cover all four. In the draw form the caption moves from under the name to the bottom line beside the pebbles; the wall, the edge, the lock and the semantics are the same, and a debug assert says the spoken label holds the visible name and that there are no beacons. Nothing changes for a tile without draw."
       ],
       "stories": [
         "Molecules/RoomTile/tile-home",

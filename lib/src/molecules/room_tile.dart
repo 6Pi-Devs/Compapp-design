@@ -56,8 +56,16 @@ import 'package:flutter/material.dart';
 /// the plain tile is a different widget; keep it non-null for the life of a
 /// screen.
 ///
-/// Not here: the `archived` and `draw` states of the contract (`RoomDrawBoard`
-/// draws the tile in its draw form).
+/// With [draw] the tile takes its draw form, the one of a bedroom in the
+/// result of a room draw: the name alone on top, and at the bottom the pebbles
+/// of the people who go there at the start of the line with the [caption]
+/// ("from Bedroom 3", "Stays free") beside them, wrapping under them when the
+/// line is full. The look still follows [state] (a bedroom with people is
+/// `home`, one that stays empty is `free`), and the caption says it in words.
+/// The draw form has no beacons. Without [draw] the tile is exactly as it was.
+///
+/// Not here: the `archived` state of the contract, which the board does not
+/// draw.
 ///
 /// It fills the height it is given and otherwise takes the height of its
 /// content. A row of the plan is a least height (`FloorplanMap` uses
@@ -75,6 +83,7 @@ class RoomTile extends StatelessWidget {
     this.occupants = const [],
     this.beacons = const [],
     this.onTap,
+    this.draw = false,
     super.key,
   }) : assert(semanticLabel != '', 'The tile needs a spoken label');
 
@@ -95,8 +104,18 @@ class RoomTile extends StatelessWidget {
   /// plain.
   final VoidCallback? onTap;
 
+  /// Draws the tile in its draw form: the caption sits at the bottom, beside
+  /// the pebbles, instead of under the name.
+  final bool draw;
+
   @override
   Widget build(BuildContext context) {
+    assert(!draw || beacons.isEmpty, 'The draw form of a tile has no beacons');
+    assert(
+      !draw || semanticLabel.contains(room.name),
+      'The spoken label of a draw tile contains its visible name (label in '
+      'name)',
+    );
     final scheme = Theme.of(context).colorScheme;
     final colors = context.appColors;
     const edge = AppDecor.roomEdge;
@@ -162,12 +181,28 @@ class RoomTile extends StatelessWidget {
               ],
             ],
           ),
-          Text(
-            caption,
-            style: AppTypography.caption.copyWith(color: captionColor),
-          ),
+          if (!draw)
+            Text(
+              caption,
+              style: AppTypography.caption.copyWith(color: captionColor),
+            ),
         ],
       ),
+    );
+
+    Widget pebble(MemberView member) => AppPebble(
+      key: Key('roomTile.pebble.${member.id}'),
+      initials: member.initials,
+      joinOrder: member.joinOrder,
+      semanticLabel: member.semanticLabel,
+      size: AppPebbleSize.s36,
+      status: switch (member.status) {
+        MemberStatus.home => AppPebbleStatus.home,
+        MemberStatus.away => AppPebbleStatus.away,
+        MemberStatus.invited => AppPebbleStatus.invited,
+      },
+      isYou: member.isYou,
+      isAdmin: member.isAdmin,
     );
 
     final pebbles = occupants.isEmpty
@@ -177,23 +212,7 @@ class RoomTile extends StatelessWidget {
               spacing: AppSpacing.xs,
               runSpacing: AppSpacing.xs,
               alignment: WrapAlignment.end,
-              children: [
-                for (final member in occupants)
-                  AppPebble(
-                    key: Key('roomTile.pebble.${member.id}'),
-                    initials: member.initials,
-                    joinOrder: member.joinOrder,
-                    semanticLabel: member.semanticLabel,
-                    size: AppPebbleSize.s36,
-                    status: switch (member.status) {
-                      MemberStatus.home => AppPebbleStatus.home,
-                      MemberStatus.away => AppPebbleStatus.away,
-                      MemberStatus.invited => AppPebbleStatus.invited,
-                    },
-                    isYou: member.isYou,
-                    isAdmin: member.isAdmin,
-                  ),
-              ],
+              children: [for (final member in occupants) pebble(member)],
             ),
           );
     final pinned = beacons.isEmpty
@@ -218,7 +237,25 @@ class RoomTile extends StatelessWidget {
     // line while both fit, and wraps the pebbles under the beacons when they
     // do not. A Wrap measures its intrinsic sizes, which the golden harness
     // needs, and a beacon cannot shrink below its glyph.
-    final footer = (pinned == null && pebbles == null)
+    // The draw form puts the pebbles at the start of the line and the caption
+    // beside them, as one Wrap, so the caption drops under the pebbles when
+    // the line is full and no word is cut.
+    final footer = draw
+        ? ExcludeSemantics(
+            child: Wrap(
+              spacing: AppSpacing.xs,
+              runSpacing: AppSpacing.xs,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                for (final member in occupants) pebble(member),
+                Text(
+                  caption,
+                  style: AppTypography.caption.copyWith(color: captionColor),
+                ),
+              ],
+            ),
+          )
+        : (pinned == null && pebbles == null)
         ? null
         : Wrap(
             spacing: AppSpacing.xs,

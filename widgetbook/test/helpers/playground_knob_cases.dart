@@ -480,6 +480,7 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       'true',
       (t) => expect(_widget<RoomTile>(t).onTap, isNotNull),
     ),
+    KnobCase('draw', 'true', (t) => expect(_widget<RoomTile>(t).draw, isTrue)),
   ],
   'TaskRow': [
     KnobCase(

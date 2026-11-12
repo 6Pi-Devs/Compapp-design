@@ -430,6 +430,21 @@ void main() {
       );
     });
 
+    testWidgets('a draw tile has no beacons and its label holds its name', (
+      tester,
+    ) async {
+      await _open(
+        tester,
+        _pathOf('RoomTile'),
+        knobs: {'draw': 'true', 'beacons': '2', 'semanticLabel': 'Carlos'},
+      );
+      final tile = tester.widget<RoomTile>(find.byType(RoomTile));
+      expect(tile.draw, isTrue);
+      expect(tile.beacons, isEmpty);
+      expect(tile.semanticLabel, "Ana's room, Carlos");
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('a task row falls back to the sample label and clamps the '
         'age', (tester) async {
       await _open(
