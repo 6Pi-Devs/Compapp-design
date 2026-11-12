@@ -27,8 +27,11 @@ import 'package:flutter/services.dart';
 /// and the clock, and the route that shows the sheet.
 ///
 /// The sheet is modal and meant for `showModalBottomSheet(isScrollControlled:
-/// true, backgroundColor: Colors.transparent, ...)`: the sheet draws its own
-/// surface, and `isScrollControlled` lets it use the height it needs. The
+/// true, useSafeArea: true, backgroundColor: Colors.transparent, ...)`: the
+/// sheet draws its own surface, `isScrollControlled` lets it use the height it
+/// needs, and `useSafeArea` keeps it under the status bar (by default the
+/// route removes the top inset, and at large text on a short screen the
+/// header slides under the status bar). The
 /// header stays pinned and the body (the person, the message and the button)
 /// scrolls inside the sheet when the height is bounded, so at large text on a
 /// short screen the button is reached by scrolling and nothing is clipped. When
