@@ -56,7 +56,7 @@ lib/
     atoms/                single-purpose controls (AppButton, AppPebble, AppChip)
     molecules/            atoms composed into a unit (MemberRow, RoomTile)
     organisms/            sections made of molecules (FloorplanMap, PresencePanel)
-    templates/            page scaffolds with slots and plain data, no data access and no routing (AppSheet)
+    templates/            page scaffolds with slots and plain data, no data access and no routing (AppSheet, AppFormPage, AppHomeShell)
 tokens/compapp.tokens.json   source of truth for every token (DTCG-style JSON)
 components.json             machine-readable component manifest
 widgetbook/                 catalog app (path dependency on this package)
@@ -92,11 +92,12 @@ It is internal: the barrel does not export it, so an app cannot reach it, and it
 
 A template is a layout skeleton: it arranges slots (widgets the app passes in) and plain data, and owns only the layout and the accessibility of that layout (insets, scrolling, focus order, how a modal names its route). It has no routing, no navigation stack and no state beyond what the layout needs: the app owns `GoRouter` and the cubits, and fills the slots. A template composes the levels below it and never another template, so two templates never depend on each other. Code two templates share moves to `foundation/`. A slot is typed as narrowly as it can be (`AppTopBar` for a bar, `List<Widget>` for fields) so the app cannot put in something the layout does not expect.
 
-A page template may own a `Scaffold` (`AppFormPage` does), and then it owns what a `Scaffold` brings, which the template documents and tests:
+A page template may own a `Scaffold` (`AppFormPage` does, and so does the shell, `AppHomeShell`), and then it owns what a `Scaffold` brings, which the template documents and tests:
 
 - **Insets.** The body is laid out above the keyboard, so the template takes the safe-area insets it needs from `MediaQuery` (top for the bar, bottom for the bottom bar) and needs no `SafeArea` around it. A modal template has no `Scaffold`: the route that hosts it must keep the top inset (`showModalBottomSheet(useSafeArea: true)`), or the header slides under the status bar once the keyboard is up.
 - **SnackBars.** A `SnackBar` sits above the `Scaffold`'s bottom bar, so a pinned action goes in `bottomNavigationBar`, never in the body, or the `SnackBar` covers it.
 - **Nesting.** A page template is a route of its own, pushed above the shell. A tab body inside a shell must not contain one: two `Scaffold`s would both take the insets and the `SnackBar` would go to the wrong one.
+- **Shell.** A shell template (`AppHomeShell`) is the outer `Scaffold` of the main screens: the home bar, the body of the selected tab and the nav bar. It takes the selected index and reports taps, and owns no tab state, no routing and no navigator: the app's router supplies the body. A page pushed from a tab goes on the root navigator, above the shell, and owns its own `Scaffold`; a tab body is not a page template and holds no `Scaffold`. The shell takes the top and bottom insets out of what the body sees, keeps the nav bar under the keyboard (out of the focus order and the semantics while it is covered) and gives the body the room, and puts the bar out of the layout when it alone would take more than half of the room the keyboard leaves. It announces nothing on a tab change, as Material's `NavigationBar` does not.
 - **Focus.** Traversal order is set by the template where position on screen would lie (a field scrolled below the bottom bar), in its own `FocusTraversalGroup`, and stays local to it: an order the app sets inside a slot never reaches the template's own order.
 
 ### Naming

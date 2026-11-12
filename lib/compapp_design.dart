@@ -79,6 +79,7 @@ export 'src/organisms/room_draw_board.dart';
 export 'src/organisms/room_editor.dart';
 export 'src/organisms/task_composer.dart';
 export 'src/templates/app_form_page.dart';
+export 'src/templates/app_home_shell.dart';
 export 'src/templates/app_sheet.dart';
 export 'src/theme/compapp_theme.dart';
 export 'src/tokens/app_colors.dart';
