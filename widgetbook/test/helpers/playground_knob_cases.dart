@@ -63,6 +63,17 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       (t) => expect(_widget<AppButton>(t).loadingSemanticLabel, 'Busy'),
     ),
     KnobCase(
+      'disclosure',
+      'true',
+      (t) => expect(_widget<AppButton>(t).expanded, isFalse),
+    ),
+    KnobCase(
+      'expanded',
+      'true',
+      (t) => expect(_widget<AppButton>(t).expanded, isTrue),
+      also: {'disclosure': 'true'},
+    ),
+    KnobCase(
       'forced state',
       'pressed',
       (t) => expect(
@@ -1258,6 +1269,120 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       'usageSubtitle',
       'Zed',
       (t) => expect(_widget<ItemSheet>(t).view.usage!.subtitle, 'Zed'),
+    ),
+  ],
+  'RoomEditor': [
+    KnobCase(
+      'bedrooms',
+      '1',
+      (t) => expect(_widget<RoomEditor>(t).view.bedrooms.length, 1),
+    ),
+    KnobCase(
+      'commonAreas',
+      '1',
+      (t) => expect(_widget<RoomEditor>(t).view.commonAreas.length, 1),
+    ),
+    KnobCase(
+      'archived',
+      '1',
+      (t) => expect(_widget<RoomEditor>(t).view.archived.length, 1),
+    ),
+    KnobCase('occupants', '2', (t) {
+      final first = _widget<RoomEditor>(t).view.bedrooms.first;
+      expect(first.occupants.length, 2);
+      expect(first.subtitle, 'Ana (you), Luis · 2 of 2 beds');
+    }),
+    KnobCase(
+      'assignOptions',
+      '1',
+      (t) => expect(
+        _widget<RoomEditor>(t).view.bedrooms.first.assignOptions.length,
+        1,
+      ),
+    ),
+    KnobCase(
+      'bedroomsTitle',
+      'Zed',
+      (t) => expect(_widget<RoomEditor>(t).view.bedroomsTitle, 'Zed'),
+    ),
+    KnobCase(
+      'commonAreasTitle',
+      'Zed',
+      (t) => expect(_widget<RoomEditor>(t).view.commonAreasTitle, 'Zed'),
+    ),
+    KnobCase(
+      'addLabel',
+      'Zed',
+      (t) => expect(_widget<RoomEditor>(t).view.addLabel, 'Zed'),
+    ),
+    KnobCase(
+      'assignLabel',
+      'Zed',
+      (t) => expect(_widget<RoomEditor>(t).view.assignLabel, 'Zed'),
+    ),
+    KnobCase(
+      'limitMessage',
+      'Zed',
+      (t) => expect(_widget<RoomEditor>(t).view.limitMessage, 'Zed'),
+    ),
+    KnobCase(
+      'archivedTitle',
+      'Zed',
+      (t) => expect(_widget<RoomEditor>(t).view.archivedTitle, 'Zed'),
+      also: {'archived': '1'},
+    ),
+    KnobCase(
+      'subtitle',
+      'Zed',
+      (t) => expect(_widget<RoomEditor>(t).view.bedrooms.first.subtitle, 'Zed'),
+    ),
+    KnobCase(
+      'assignOpen',
+      'true',
+      (t) => expect(
+        _widget<RoomEditor>(t).initialAssignOpen,
+        contains('bedroom-1'),
+      ),
+    ),
+    KnobCase(
+      'editLabel',
+      'Zed',
+      (t) =>
+          expect(_widget<RoomEditor>(t).view.bedrooms.first.editLabel, 'Zed'),
+    ),
+    KnobCase(
+      'archiveLabel',
+      'Zed',
+      (t) => expect(
+        _widget<RoomEditor>(t).view.bedrooms.first.archiveLabel,
+        'Zed',
+      ),
+    ),
+    KnobCase(
+      'roomAssignLabel',
+      'Zed',
+      (t) => expect(
+        _widget<RoomEditor>(t).view.bedrooms.first.assignLabel,
+        'Assign Zed',
+      ),
+    ),
+    KnobCase(
+      'restoreLabel',
+      'Zed',
+      (t) => expect(
+        _widget<RoomEditor>(t).view.archived.firstOrNull?.restoreLabel,
+        'Zed',
+      ),
+      also: {'archived': '1'},
+    ),
+    KnobCase(
+      'archivedSubtitle',
+      'Zed',
+      (t) => expect(
+        _widget<RoomEditor>(t).view.archived.firstOrNull?.subtitle,
+        'Zed',
+      ),
+      also: {'archived': '1'},
     ),
   ],
 };

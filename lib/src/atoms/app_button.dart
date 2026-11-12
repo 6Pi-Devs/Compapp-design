@@ -51,6 +51,10 @@ enum AppButtonSize {
 /// [semanticLabel] replaces the label for assistive technology only.
 /// [statesController] is Material's: holding `WidgetState.pressed` in it
 /// renders the pressed look without a gesture, which stories and goldens use.
+/// [focusNode] is the caller's, for a parent that has to hand focus to the
+/// button or read whether it has it. The caller creates and disposes it.
+/// [expanded] makes the button a disclosure: it says whether what the button
+/// opens is shown, on the button's own node. Null, the default, says nothing.
 class AppButton extends StatelessWidget {
   const new({
     required this.label,
@@ -62,6 +66,8 @@ class AppButton extends StatelessWidget {
     this.semanticLabel,
     this.loadingSemanticLabel,
     this.statesController,
+    this.focusNode,
+    this.expanded,
     super.key,
   });
 
@@ -79,6 +85,8 @@ class AppButton extends StatelessWidget {
   /// "Loading".
   final String? loadingSemanticLabel;
   final WidgetStatesController? statesController;
+  final FocusNode? focusNode;
+  final bool? expanded;
 
   static void _ignore() {}
 
@@ -118,6 +126,7 @@ class AppButton extends StatelessWidget {
     // stays the same in every state.
     final content = Semantics(
       label: semanticLabel,
+      expanded: expanded,
       value: loading ? loadingSemanticLabel : null,
       liveRegion: loading,
       excludeSemantics: semanticLabel != null,
@@ -141,18 +150,21 @@ class AppButton extends StatelessWidget {
         onPressed: effectiveOnPressed,
         style: style,
         statesController: statesController,
+        focusNode: focusNode,
         child: content,
       ),
       AppButtonVariant.secondary => OutlinedButton(
         onPressed: effectiveOnPressed,
         style: style,
         statesController: statesController,
+        focusNode: focusNode,
         child: content,
       ),
       AppButtonVariant.ghost => TextButton(
         onPressed: effectiveOnPressed,
         style: style,
         statesController: statesController,
+        focusNode: focusNode,
         child: content,
       ),
     };
