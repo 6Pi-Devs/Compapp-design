@@ -1307,6 +1307,51 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       expect(actions[1].label, 'Zed');
     }, also: {'actions': '2'}),
   ],
+  'AppFormPage': [
+    KnobCase(
+      'title',
+      'Zed',
+      (t) => expect(_widget<AppFormPage>(t).title, 'Zed'),
+    ),
+    KnobCase(
+      'backLabel',
+      'Zed',
+      (t) => expect(_widget<AppFormPage>(t).backLabel, 'Zed'),
+    ),
+    KnobCase(
+      'fields',
+      '5',
+      (t) => expect(_widget<AppFormPage>(t).fields, hasLength(5)),
+    ),
+    KnobCase(
+      'nameError',
+      'Zed',
+      (t) => expect(
+        (_widget<AppFormPage>(t).fields.first as AppTextField).errorText,
+        'Zed',
+      ),
+    ),
+    KnobCase(
+      'submitLabel',
+      'Zed',
+      (t) => expect(_widget<AppFormPage>(t).submitLabel, 'Zed'),
+    ),
+    KnobCase(
+      'submitEnabled',
+      'false',
+      (t) => expect(_widget<AppFormPage>(t).onSubmit, isNull),
+    ),
+    KnobCase(
+      'submitting',
+      'true',
+      (t) => expect(_widget<AppFormPage>(t).submitting, isTrue),
+    ),
+    KnobCase(
+      'submittingLabel',
+      'Zed',
+      (t) => expect(_widget<AppFormPage>(t).submittingLabel, 'Zed'),
+    ),
+  ],
   'RoomDrawBoard': [
     KnobCase(
       'status',

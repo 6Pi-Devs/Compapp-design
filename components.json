@@ -1095,6 +1095,44 @@
         "Templates/AppSheet/sheet-one-action",
         "Templates/AppSheet/sheet-two-actions"
       ]
+    },
+    {
+      "id": "app-form-page",
+      "level": "template",
+      "class": "AppFormPage",
+      "playground": "Templates/AppFormPage/playground",
+      "path": "templates/app_form_page.dart",
+      "props": [
+        { "name": "title", "type": "String", "required": true, "default": "the heading of the pushed bar; it names the route, so it is never empty" },
+        { "name": "backLabel", "type": "String", "required": true, "default": "spoken name of the back button, never empty" },
+        { "name": "onBack", "type": "VoidCallback", "required": true, "default": "called by the back button" },
+        { "name": "fields", "type": "List<Widget>", "required": true, "default": "the form: one widget per field, stacked in the order given, 16 apart and as wide as the page allows" },
+        { "name": "submitLabel", "type": "String", "required": true, "default": "the visible label of the submit button, never empty" },
+        { "name": "onSubmit", "type": "VoidCallback?", "required": true, "default": "called by the submit button; null disables it" },
+        { "name": "submitting", "type": "bool", "required": false, "default": "false; true shows the spinner of the button and ignores taps" },
+        { "name": "submittingLabel", "type": "String?", "required": false, "default": "null; what assistive technology reads as the value of the button while submitting, never empty when given" }
+      ],
+      "variants": ["form"],
+      "states": ["filled", "error", "submitting"],
+      "semantics": "A Scaffold holding the pushed AppTopBar (the title is a heading that names the route, the back button is a button named by backLabel), a form group (SemanticsRole.form) with the fields, which are the app's widgets and say what they are, and the submit button, a single button named by its visible label (disabled when onSubmit is null; while submitting it keeps its node and focus, announces submittingLabel as its value and ignores taps). Tab goes through the back button, the fields in the order given, then the submit button, also for fields that have scrolled out of sight: an OrderedTraversalPolicy sets the order, so it does not depend on where the fields are on the screen. The page never takes focus by itself",
+      "key": "formPage.fields (the column of fields) and formPage.submit (the button), topBar.back and topBar.title from the bar; the root key is the app's",
+      "notes": [
+        "Board gap: the board draws no page, no form and no template. The page is the pushed AppTopBar of the board over a column of fields with a bottom button, laid out as a pushed route would be: 16 of side padding, 16 between the fields, the button at the bottom with 12 above and 16 below it (plus the bottom inset of the screen) and a hairline over it.",
+        "The slots: the fields are a List<Widget> and the button is built by the page from submitLabel, onSubmit, submitting and submittingLabel, so the primary action is always an AppButton, large, full width, 48 or more tall. The board has no secondary action at the bottom. A form with two actions is not this page. The bar has no action text (the pushed bar can take one); the page does not expose it because a form has one way to send.",
+        "Keyboard: the page is a Scaffold with the default resizeToAvoidBottomInset, so the keyboard takes room from the body. The button is the Scaffold's bottomNavigationBar with the keyboard's height added under it (the Scaffold leaves that bar at the bottom of the screen, under the keyboard), so the body ends above it and it rides directly above the keyboard. The bottom inset (home indicator) is the padding MediaQuery reports, which a phone zeroes while the keyboard is up, so there is no extra gap above the keyboard. The fields scroll; a field that takes focus is scrolled into view above the button by Flutter's own ensureVisible.",
+        "Large text on a short screen: the bar is pinned over the scrolling fields. When the bar alone would take more than half of the room above the button (200% text on 320 by 568 with the keyboard up), the bar scrolls away with the fields (the foundation HeaderBody, as AppSheet does), so the fields keep the room and the button stays reachable. Nothing is clamped.",
+        "Focus: the traversal order is set (back, fields, submit) because the default reading order sorts by position on screen, and a field scrolled below the button would be visited after it. The fields are a FocusTraversalGroup of their own, so a FocusTraversalOrder a field sets (or a nested group with its own policy) orders only the fields and never moves one in front of the back button or behind the submit button. The page asks for no focus: a form that wants one puts autofocus on its field. When onSubmit becomes null while the button has focus, the page moves focus off the disabled button: to the back button (the first stop) for keyboard users, and to nothing for touch users, so focus never falls back to the last field and opens the keyboard. Submitting keeps the button enabled for focus, so it does not lose it.",
+        "Route name: the page sets AppTopBar.namesRoute (added in the commit before this one), so a screen reader announces the title when the page opens. The page does not push, pop or confirm discarding changes: the app owns the route and the back button's meaning.",
+        "Sample content follows the business rules: the admin renames the home (the name titles every push), the time zone cannot be changed yet (a read-only field that says so). The sample fields are AppTextField atoms; the board has no organism that is a form field.",
+        "SnackBars: the button is the bottom bar of the Scaffold, so a SnackBar shown through the ScaffoldMessenger sits above it and never covers it (also with the keyboard up). An AppSnackbar the app places itself must leave a bottom margin that clears the button, which is as tall as a large button plus 28 and the bottom inset. A page is a route of its own, pushed above the home shell: it owns its Scaffold, so a tab body inside a shell must not use one.",
+        "Semantics, the button and the form group: the form group (SemanticsRole.form, its own node, fields not merged) holds the fields only. The button stays outside it on purpose: it is pinned in the bottom bar, outside the scrolling area and in a different subtree, so no single node can hold both without making the pinned bar part of the scrolled content. It is read right after the last field and is a button named by its label.",
+        "Known gap, accepted: at 2.0 text on 320 by 568 with the keyboard up, the focus ring of the back button is clipped by 2 px at the top of the screen, because the bar has scrolled to the top of the viewport. The button stays fully usable."
+      ],
+      "stories": [
+        "Templates/AppFormPage/form-filled",
+        "Templates/AppFormPage/form-error",
+        "Templates/AppFormPage/form-submitting"
+      ]
     }
   ]
 }
