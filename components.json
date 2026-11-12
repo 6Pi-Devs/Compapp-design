@@ -510,7 +510,8 @@
         { "name": "backLabel", "type": "String", "required": true, "default": "pushed only; spoken name of the back button" },
         { "name": "onBack", "type": "VoidCallback", "required": true, "default": "pushed only" },
         { "name": "actionLabel", "type": "String?", "required": false, "default": "pushed only; null or empty leaves the action out" },
-        { "name": "onAction", "type": "VoidCallback?", "required": false, "default": "pushed only; null disables the action" }
+        { "name": "onAction", "type": "VoidCallback?", "required": false, "default": "pushed only; null disables the action" },
+        { "name": "namesRoute", "type": "bool", "required": false, "default": "false: set it for the bar of a screen, so the title names the route and assistive technology announces it when the screen opens (as the title of Material's AppBar does on Android); leave it off for a bar inside a card or a sheet" }
       ],
       "variants": ["home", "pushed"],
       "states": ["default", "long-text"],

@@ -736,6 +736,11 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       expect(bar.variant, AppTopBarVariant.pushed);
       expect(bar.onAction, isNull);
     }, also: {'form': 'pushed'}),
+    KnobCase(
+      'namesRoute',
+      'true',
+      (t) => expect(_widget<AppTopBar>(t).namesRoute, isTrue),
+    ),
   ],
   'AppNavBar': [
     KnobCase(

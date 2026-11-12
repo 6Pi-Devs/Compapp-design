@@ -245,6 +245,53 @@ void main() {
   });
 
   group('semantics', () {
+    testWidgets('the title names the route only when asked to', (tester) async {
+      final handle = tester.ensureSemantics();
+      for (final (bar, label) in [(_home(), 'home'), (_pushed(), 'pushed')]) {
+        await tester.pumpWidget(barHost(bar));
+        final title = find.byKey(const Key('topBar.title'));
+
+        expect(
+          tester.getSemantics(title).flagsCollection.namesRoute,
+          isFalse,
+          reason: label,
+        );
+      }
+
+      await tester.pumpWidget(
+        barHost(
+          AppTopBar.home(
+            title: 'Calle Luna 12',
+            activityLabel: 'Activity',
+            unreadCount: 0,
+            onActivity: () {},
+            me: _me,
+            accountLabel: 'Your account',
+            onAccount: () {},
+            namesRoute: true,
+          ),
+        ),
+      );
+      final home = tester.getSemantics(find.byKey(const Key('topBar.title')));
+      expect(home.flagsCollection.namesRoute, isTrue);
+      expect(home.flagsCollection.isHeader, isTrue);
+
+      await tester.pumpWidget(
+        barHost(
+          AppTopBar.pushed(
+            title: 'Activity',
+            backLabel: 'Back',
+            onBack: () {},
+            namesRoute: true,
+          ),
+        ),
+      );
+      final pushed = tester.getSemantics(find.byKey(const Key('topBar.title')));
+      expect(pushed.flagsCollection.namesRoute, isTrue);
+      expect(pushed.label, 'Activity');
+      handle.dispose();
+    });
+
     testWidgets('the title is a heading and the subtitle is plain text', (
       tester,
     ) async {
