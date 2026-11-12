@@ -411,7 +411,7 @@
         { "name": "occupants", "type": "List<MemberView>", "required": false, "default": "empty; drawn as s36 pebbles at the end of the footer line, wrapped under the beacons and start-aligned when they do not fit on one line" },
         { "name": "beacons", "type": "List<Widget>", "required": false, "default": "empty; pinned at the bottom start, wrapping onto more lines, each its own button" },
         { "name": "onTap", "type": "VoidCallback?", "required": false, "default": "null: the tile is plain. Set: the tile is a focusable button (tap, Enter, Space), with a press layer and a 2 px ink focus ring outside the shape" },
-        { "name": "draw", "type": "bool", "required": false, "default": "false: the tile is as before. true: the draw form of a bedroom in the result of a room draw, with the name alone on top and, at the bottom, the pebbles at the start of the line and the caption beside them (wrapping under them when the line is full); no beacons" }
+        { "name": "draw", "type": "bool", "required": false, "default": "false: the tile is as before. true: the draw form of a bedroom in the result of a room draw, with the name alone on top and, at the bottom, the pebbles at the start of the line and the caption beside them (wrapping under them when the line is full); no beacons. It can be combined with onTap (the tile is then the same button as before, with its ring and press layer), but RoomDrawBoard does not use that" }
       ],
       "variants": ["tile"],
       "states": ["home", "away", "occupied", "free"],
@@ -1004,6 +1004,63 @@
         "Organisms/RoomEditor/editor-archived-rooms",
         "Organisms/RoomEditor/editor-assign-open",
         "Organisms/RoomEditor/editor-limit-reached"
+      ]
+    },
+    {
+      "id": "room-draw-board",
+      "level": "organism",
+      "class": "RoomDrawBoard",
+      "playground": "Organisms/RoomDrawBoard/playground",
+      "path": "organisms/room_draw_board.dart",
+      "props": [
+        {
+          "name": "view",
+          "type": "RoomDrawView",
+          "required": true,
+          "default": "the draw (drawId that keys the result, RoomDrawStatus pending or applied and the word that says it), the bedrooms (RoomDrawRoom: a RoomView, the MemberViews that go there, none when it stays free, the caption under them and the whole spoken label), whether the person looking is the admin, the visible words of the two buttons and the note a member reads"
+        },
+        {
+          "name": "onDrawAgain",
+          "type": "VoidCallback?",
+          "required": false,
+          "default": "null: the Draw again button is not offered. Called by the button, which only the admin sees and which stays enabled while the app answers"
+        },
+        {
+          "name": "onApply",
+          "type": "VoidCallback?",
+          "required": false,
+          "default": "null: the Apply result button is not offered. Called by the button, which only the admin sees, only while the draw is pending, and which stays enabled while the app answers"
+        }
+      ],
+      "variants": [
+        "admin",
+        "member"
+      ],
+      "states": [
+        "pending",
+        "applied"
+      ],
+      "semantics": "A container holding the status node (the badge word, a live region so a change from pending to applied is announced; it is not a focusable node of its own, but a keyboard fallback target of focus), a list node with one item for each bedroom, each one a node named by the app (\"Bedroom 1: Carlos, from Bedroom 3\") that holds its name, caption and pebbles, and then, for the admin, the buttons named by their visible labels (Draw again, and Apply result while pending) or, for a member, the note that says who decides. The pebbles and captions add nothing of their own. Nothing is told by color alone: the status is a word, a bedroom that stays free says so and has a dashed outline, and an action that is not offered is not drawn, never drawn disabled",
+      "key": "roomDraw.board (also roomDraw.<drawId> on the list, roomDraw.room.<roomId> on each item, roomDraw.status, roomDraw.drawAgain, roomDraw.apply and roomDraw.note; the tiles are RoomTiles, so floorplan.room.<roomId> and roomTile.pebble.<memberId> also exist)",
+      "notes": [
+        "The board's contract is RoomDrawView(draw, bedrooms, members, isAdmin) with the events onDrawAgain() and onApply(), admin only. The members are inside each bedroom here (a draw puts a group in a bedroom), the draw is a drawId plus a status and the words are plain props, as in every organism.",
+        "Board gap, nullable callbacks: the contract types both callbacks VoidCallback?, and the house rule is that null means disabled. A disabled button differs from an enabled one by color alone (WCAG 1.4.1), so here a null callback means the action is not offered and the button is not drawn. A member gets the same: no buttons and the visible note. Nothing in the board is ever disabled.",
+        "Board gap, the status: the board draws no status and no badge, but the contract lists the states pending and applied and the composition lists AppBadge. Without a word, a pending and an applied result would differ only in whether Apply is there, so the board shows the status as an AppBadge.label (busy tone while pending, soft once applied) with the word the app passes. The badge is a guess at where the design wanted it.",
+        "Board gap, applied: the board draws only the pending result. An applied one shows the same bedrooms and the badge, and offers Draw again alone, because the backend lets the admin draw at any time and there is nothing left to apply (applying an applied draw changes nothing and answers 200).",
+        "Board gap, superseded and outdated: the backend knows a third status, SUPERSEDED (a newer draw replaced it, someone joined or left, or a bedroom changed, so applying it answers HOME_ROOM_DRAW_OUTDATED). The board draws no such state: the app draws the pending draw or none, and answers a 409 on apply in its own words (a snackbar), then offers Draw again. Any status the app does not know is treated as superseded, so it is not passed here.",
+        "Board gap, groups: the board draws one pebble for each bedroom, but people who share a bedroom are drawn together as a group (backend: assignments[].accountIds), so a tile takes several pebbles. The caption 'from Bedroom 3' is where the group came from, which the app words from the old bedroom of the group (all of them shared it). A bedroom that receives nobody has no pebble and the caption 'Stays free' on a dashed tile (RoomTileState.free).",
+        "Board gap, the pebble and the tile: the board's pebble is 32, which no pebble size has, so it is s36 as in every RoomTile, and the tiles are as tall as their content with 72 as the least (the board has a fixed 88). The gap between tiles is 8 and the card is padded 8 (the board uses 6 and 8). The tile is the draw form of RoomTile (the draw prop of the commit before this one): the name on top, and the pebbles with the caption beside them at the bottom.",
+        "Board gap, the draw is the app's: there is no clock and no randomness here. The server draws with cryptographic randomness, each draw notifies the home and the home has at most 10 draws in 24 hours (HOME_ROOM_DRAW_LIMIT_REACHED, a 429). The board knows none of it: it hands the tap to the app, which answers the limit in its own words, so both buttons stay enabled.",
+        "Board gap, in flight: the board has no loading state for Draw again or Apply. A repeated Draw again is a new draw (it counts toward the daily limit) and a repeated Apply is harmless, so the app should ignore a second tap while one request is in flight. AppButton has a loading look the board could use later.",
+        "Layout: the bedrooms sit in two columns of equal width, or in one when the longest word of a tile does not fit half the width, so no word is cut at 2.0 text scale. A lone last tile keeps the width of a column. The two buttons share a row (EqualPair) or stack when a word does not fit its half, and a single button takes the full width. A render object with intrinsic and dry layout does it, not a LayoutBuilder. It copies the idea of the FloorplanMap layout, which an organism cannot import, and could move to foundation.",
+        "Focus (keyboard users only, once the new view is laid out, and only to a node that is still attached): when the button that holds focus is no longer offered (applying makes the draw applied, the callback goes null, or the person stops being the admin) focus moves to the other button, and when there is none, to the status, which draws the 2 px ink ring outside its shape while it holds the primary focus. A new draw (another drawId) keeps the buttons mounted and so keeps their focus. A rebuild of the same view cancels nothing.",
+        "It checks in debug builds that a draw has a bedroom, that bedroom ids and member ids do not repeat (a person goes to one bedroom), that the spoken label of a bedroom holds its visible name and caption (label in name), and that a member has the note. RoomDrawView and its parts stay const."
+      ],
+      "stories": [
+        "Organisms/RoomDrawBoard/admin-pending",
+        "Organisms/RoomDrawBoard/admin-applied",
+        "Organisms/RoomDrawBoard/member-pending",
+        "Organisms/RoomDrawBoard/member-applied"
       ]
     }
   ]

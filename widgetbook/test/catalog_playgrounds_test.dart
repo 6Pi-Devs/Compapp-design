@@ -340,6 +340,22 @@ void main() {
       ('RoomEditor', {'bedrooms': '-3', 'commonAreas': '0', 'archived': '0'}),
       ('RoomEditor', {'bedrooms': '0', 'occupants': '0', 'assignOptions': '0'}),
       (
+        'RoomDrawBoard',
+        {
+          'bedrooms': '99',
+          'groupInFourth': '99',
+          'statusLabel': '',
+          'drawId': '',
+          'firstCaption': '',
+          'drawAgainLabel': '',
+          'applyLabel': '',
+          'readOnlyNote': '',
+          'isAdmin': 'false',
+        },
+      ),
+      ('RoomDrawBoard', {'bedrooms': '-3', 'groupInFourth': '-4'}),
+      ('RoomDrawBoard', {'status': 'applied', 'canDrawAgain': 'false'}),
+      (
         'ActivityList',
         {
           'unreadEntries': '0',
