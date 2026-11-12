@@ -1330,7 +1330,7 @@ void main() {
 
   group('layout under every constraint', () {
     final body = find.byWidgetPredicate(
-      (widget) => widget.runtimeType.toString() == '_HeaderBody',
+      (widget) => widget.runtimeType.toString() == 'HeaderBody',
     );
 
     Widget host({required double? maxHeight}) => barHost(
@@ -1493,7 +1493,7 @@ void main() {
 
       final box = tester.renderObject<RenderBox>(
         find.byWidgetPredicate(
-          (widget) => widget.runtimeType.toString() == '_HeaderBody',
+          (widget) => widget.runtimeType.toString() == 'HeaderBody',
         ),
       );
       expect(box.size.height, header * 2 - 1);
@@ -1508,7 +1508,7 @@ void main() {
 
   group('the viewport of a header that scrolls with the body', () {
     final headerBody = find.byWidgetPredicate(
-      (widget) => widget.runtimeType.toString() == '_HeaderBody',
+      (widget) => widget.runtimeType.toString() == 'HeaderBody',
     );
     final member = find.byKey(const Key('member.carlos'));
 
