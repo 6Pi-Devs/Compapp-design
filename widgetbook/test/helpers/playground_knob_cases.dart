@@ -1272,6 +1272,36 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       (t) => expect(_widget<ItemSheet>(t).view.usage!.subtitle, 'Zed'),
     ),
   ],
+  'AppSheet': [
+    KnobCase('title', 'Zed', (t) => expect(_widget<AppSheet>(t).title, 'Zed')),
+    KnobCase(
+      'closeLabel',
+      'Zed',
+      (t) => expect(_widget<AppSheet>(t).closeLabel, 'Zed'),
+    ),
+    KnobCase('bodyText', 'Zed', (t) {
+      final body = _widget<AppSheet>(t).body as Column;
+      expect((body.children.first as Text).data, 'Zed');
+    }),
+    KnobCase('bodyParagraphs', '3', (t) {
+      expect((_widget<AppSheet>(t).body as Column).children, hasLength(3));
+    }),
+    KnobCase(
+      'actions',
+      '2',
+      (t) => expect(_widget<AppSheet>(t).actions, hasLength(2)),
+    ),
+    KnobCase(
+      'primaryLabel',
+      'Zed',
+      (t) => expect(_widget<AppSheet>(t).actions.first.label, 'Zed'),
+    ),
+    KnobCase('secondaryLabel', 'Zed', (t) {
+      final actions = _widget<AppSheet>(t).actions;
+      expect(actions, hasLength(2));
+      expect(actions[1].label, 'Zed');
+    }, also: {'actions': '2'}),
+  ],
   'RoomDrawBoard': [
     KnobCase(
       'status',

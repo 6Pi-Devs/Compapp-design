@@ -1062,6 +1062,38 @@
         "Organisms/RoomDrawBoard/member-pending",
         "Organisms/RoomDrawBoard/member-applied"
       ]
+    },
+    {
+      "id": "app-sheet",
+      "level": "template",
+      "class": "AppSheet",
+      "playground": "Templates/AppSheet/playground",
+      "path": "templates/app_sheet.dart",
+      "props": [
+        { "name": "title", "type": "String", "required": true, "default": "the heading of the sheet; it names the route, so it is never empty" },
+        { "name": "closeLabel", "type": "String", "required": true, "default": "spoken name of the close button, never empty" },
+        { "name": "onClose", "type": "VoidCallback", "required": true, "default": "called by the close button and by the Escape key" },
+        { "name": "body", "type": "Widget", "required": true, "default": "the slot under the header; it scrolls with the actions" },
+        { "name": "actions", "type": "List<AppButton>", "required": false, "default": "[]: the buttons under the body, one under the other, as wide as the sheet, in the order given" }
+      ],
+      "variants": ["sheet"],
+      "states": ["plain", "one-action", "two-actions"],
+      "semantics": "A container holding the SheetHeader (the title is a heading that names the route that shows the sheet, so the route announces it once, and takes the initial focus, then the close button), then the body and the actions, which are the app's widgets and say what they are. Focus starts on the title once the sheet is laid out, only if the title is still attached; a rebuild never asks for it again. Tab goes title, close, body, actions in order. Escape closes. The sheet adds no node of its own to the body or the actions",
+      "key": "sheet.title, sheet.close and sheet.handle from the header, appSheet.body around the body slot and appSheet.actions around the actions (only when there are any); the root key is the app's",
+      "notes": [
+        "Board gap: the board draws no template, no page scaffold and no generic sheet, only the ItemSheet organism and the SheetHeader molecule. AppSheet is the layout of ItemSheet with the content left to the app, kept as close to it as possible: the same surface (24 top corners, the sheet fill and shadow), the same pinned header, 12 between the parts, the bottom inset of the screen under the last child.",
+        "Hosting: show it with showModalBottomSheet(isScrollControlled: true, useSafeArea: true, backgroundColor: Colors.transparent, ...). useSafeArea matters: by default the route removes the top inset, and once the keyboard is up at large text (320 by 568, 24 status bar, 250 keyboard, 2.0) the close button and the title sit under the status bar; with it the header clears the inset (a real-route test checks both). The route supplies the barrier, the focus scope and the one route semantics node; the title names that route. The barrier, a drag down and the route's DismissIntent bypass onClose, so the app treats the pop result as a close too.",
+        "Scrolling: as ItemSheet. The header stays pinned and the body with the actions scrolls when the height is bounded; a header taller than half of the bounded height scrolls with the body, so the last action is still reached (at exactly half it is pinned). The layout is the foundation HeaderBody, moved out of ItemSheet when this template became its second user. ItemSheet keeps its own Scrollable and its own content, and imports the same HeaderBody, so there is no duplicated code.",
+        "Keyboard: the height the keyboard takes (MediaQuery.viewInsets) is left under the sheet surface, so a field in the body is not covered and the actions are reached by scrolling the body. The surface is not drawn behind the keyboard. A route that already lifts the sheet above the keyboard must remove the view insets from the MediaQuery it gives the sheet, or the room is left twice. ItemSheet has no fields and does not do this.",
+        "Focus in the slots is the app's. The sheet takes focus to the title once, when it opens. A button of the actions that disables itself while it holds focus has to move focus first, because the sheet cannot know which action a view will disable (ItemSheet can, so it does it for its one button). Tab order is the order of the slots; a body with its own scrolling list scrolls inside the sheet.",
+        "Not a prop: a drag handle that closes, a barrier tap, a snap size or a drag-to-dismiss. Those belong to the route. The actions slot has no limit on how many buttons, but a sheet of more than two is a menu; the order given is the order read, the one that confirms first.",
+        "The sample bodies are the PresencePanel organism (who is home, the cooldown and the button are the organism's own) and two sentences from the business rules (archived rooms count toward the limit; anyone can leave, and an admin's role passes on). The sheet is not told which."
+      ],
+      "stories": [
+        "Templates/AppSheet/sheet-plain",
+        "Templates/AppSheet/sheet-one-action",
+        "Templates/AppSheet/sheet-two-actions"
+      ]
     }
   ]
 }
