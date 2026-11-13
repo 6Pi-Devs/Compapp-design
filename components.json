@@ -1133,6 +1133,57 @@
         "Templates/AppFormPage/form-error",
         "Templates/AppFormPage/form-submitting"
       ]
+    },
+    {
+      "id": "app-home-shell",
+      "level": "template",
+      "class": "AppHomeShell",
+      "playground": "Templates/AppHomeShell/playground",
+      "path": "templates/app_home_shell.dart",
+      "props": [
+        { "name": "title", "type": "String", "required": true, "default": "the heading of the home bar; it names the route, so it is never empty" },
+        { "name": "subtitle", "type": "String?", "required": false, "default": "null; the second line of the bar, such as who is home; empty or null draws none" },
+        { "name": "activityLabel", "type": "String", "required": true, "default": "spoken name of the bell with the unread count in words, never empty" },
+        { "name": "unreadCount", "type": "int", "required": true, "default": "the count on the bell; zero draws no badge, never negative" },
+        { "name": "onActivity", "type": "VoidCallback", "required": true, "default": "called by the bell" },
+        { "name": "me", "type": "MemberView", "required": true, "default": "the signed-in member the account pebble is drawn from" },
+        { "name": "accountLabel", "type": "String", "required": true, "default": "spoken name of the account button, the action it does, never empty" },
+        { "name": "onAccount", "type": "VoidCallback", "required": true, "default": "called by the account button" },
+        { "name": "destinations", "type": "List<NavDestinationView>", "required": true, "default": "the tabs, one to four; their ids key the body and their badge counts are drawn by the nav bar as given" },
+        { "name": "selectedIndex", "type": "int", "required": true, "default": "index of the selected tab, inside the destinations; the shell never changes it" },
+        { "name": "onTabSelected", "type": "ValueChanged<int>", "required": true, "default": "called with the index of the tapped destination, the selected one too" },
+        { "name": "navigationLabel", "type": "String", "required": true, "default": "name of the navigation landmark, never empty" },
+        { "name": "body", "type": "Widget", "required": true, "default": "the body of the selected tab; it sees no top or bottom inset, has a bounded height and holds no Scaffold" }
+      ],
+      "variants": ["home", "things", "tasks", "calendar"],
+      "states": ["default", "badges"],
+      "semantics": "A Scaffold holding the home AppTopBar (the title is a heading that names the route, the bell and the account pebble are buttons named by activityLabel and accountLabel), the body of the selected tab (the app's widgets, which say what they are) and the AppNavBar (a navigation landmark named by navigationLabel, one button per destination with its selected state). The shell announces nothing when the tab changes: the selected state is the cue, as for Material's NavigationBar. While the keyboard covers the nav bar, and while the bar is out of the layout because it is too tall for the room the keyboard leaves, those parts are out of the semantics and the focus order. Tab goes through the bell, the account, the body, then the destinations: an OrderedTraversalPolicy sets the order, so it does not depend on where things are on the screen",
+      "key": "topBar.title, topBar.activity and topBar.account from the bar, nav.<id> from the nav bar; the body and the root key are the app's",
+      "notes": [
+        "Board gap: the board draws no shell, no tab screen and no template. The shell is the home AppTopBar over a body over the AppNavBar of the board, laid out as the main screens of an app are: the bar pinned on top, the nav bar pinned at the bottom, the body in between. The sample bodies are the organisms and molecules of the board (FloorplanMap, ItemBeacon, TaskRow, CalendarStrip); the board has no screen that composes them.",
+        "The slots: the bar and the nav bar are built by the shell from plain data (title, subtitle, the bell and account props, the destinations), so the top of a main screen is always the home bar and its bottom always the nav bar. The body is a Widget. The shell has no secondary action, no floating button and no drawer: the board has none.",
+        "Tab state: none. The selected index comes in and onTabSelected goes out. The shell owns no routing and no navigators: the app's GoRouter StatefulShellRoute supplies the body. The shell is the outer Scaffold of the main screens, so a page pushed from a tab (AppFormPage, a detail) goes on the root navigator, above the shell, and owns a Scaffold of its own. A tab body is not a page template and must not hold a Scaffold: two Scaffolds would both take the insets and a SnackBar would go to the wrong one.",
+        "Insets: the bar takes the status bar and the nav bar paints under the home indicator, so the shell needs no SafeArea. The top and bottom insets are taken out of the MediaQuery the body sees, so a SafeArea or a padding inside a tab does not count them twice (the Scaffold already takes the bottom one out because it has a bottom bar; the top one is the shell's). The sides of the screen (a landscape cutout) are not handled: the board is a portrait phone and the bars paint edge to edge.",
+        "Keyboard: the body is laid out above the keyboard (the Scaffold's default resizeToAvoidBottomInset) and the nav bar is left where it is, at the bottom of the screen, under the keyboard. It takes no room from the body, so the room is not counted twice, and while it is covered it is out of the semantics and the focus order, so Tab and a screen reader never land on a button that cannot be seen. A SnackBar rides above the keyboard. When the bar alone would take more than half of the room above the keyboard (the keyboard is up at 200% text on 320 by 568) the shell takes it out of the layout, the paint, the hit test, the semantics and, one frame later, the focus order, and the body takes all the room; it comes back with the room. Without a keyboard the bar always stays, however tall, because it is the title of the screen. Hiding it was chosen over scrolling it away with the body (as AppFormPage does) because a tab body is the app's own scrollable and cannot share an offset with the shell.",
+        "Large text: the bar and the body grow with the system text scale and are never clamped. The nav bar clamps its labels and badge counts at 1.3, as AppNavBar defines, and the shell leaves that as it is. The shell supports 360 wide. 320 is unsupported, as for AppNavBar, though it was checked with four short labels (Casa, Cosas, Tareas, Plan); the Spanish word Calendario does not fit a 320 wide column, which is the limit AppNavBar already documents.",
+        "Route name: the shell sets AppTopBar.namesRoute, so a screen reader announces the title when the shell opens. The shell adds no announcement when the tab changes, as Material's NavigationBar does not: the selected state of the destination is the cue. If the app changes the title with the tab, the platform treats the new route name as it always does (Android reads a new window title); the shell adds nothing to it. The title is the app's choice: the home name on every tab, or the name of the tab.",
+        "Focus: Tab goes through the bar, the body, then the destinations, in an OrderedTraversalPolicy set by the shell. The body is a FocusTraversalGroup of its own, so a FocusTraversalOrder the app sets inside it never moves anything in front of the bar or behind the nav bar. The shell never takes focus by itself. A tap or an Enter on a destination leaves focus on that button.",
+        "Body state: the shell does not key the body. The app decides whether a tab change gives a fresh body, by keying its own: a body with a GlobalKey, such as the StatefulNavigationShell of go_router, keeps everything it has (stacks and scroll positions), a custom IndexedStack keeps its branches, and a body keyed by tab is a fresh subtree. Keying the body inside the shell would cost a full reparent of every branch of a GlobalKey body on each tab change, and would destroy the branches of a body that has no GlobalKey.",
+        "Focus hand-over: when focus is in the body and a keyboard is in use (traditional navigation), the shell checks after the frame whether focus was lost, and if so, or whenever the tab changed, moves it to the first stop of the body, then of the nav bar, only to attached nodes. Focus is lost when the node that held it is gone or can no longer take focus (a branch that went offstage, a body that was reparented), which happens with a tab change and also with a rebuild with the same tab that removes the focused field. A rebuild that leaves focus where it was moves nothing. The same hand-over runs when the bar leaves the layout while focus is in it and when the keyboard covers the nav bar while focus is in it. Focus in the bar or the nav bar is otherwise left alone, and with touch nothing moves, so a field never opens the keyboard by itself.",
+                "SnackBars: the nav bar is the bottom bar of the Scaffold, so a SnackBar shown through the ScaffoldMessenger from a tab body sits directly above it, and above the keyboard when it is up. An AppSnackbar the app places itself must leave a bottom margin that clears the nav bar.",
+        "Badges: a count on a NavDestinationView and unreadCount are plain data, passed through to AppNavBar and AppTopBar as given. The shell caps, rounds and words nothing: the spoken label with the count in words is the app's (NavDestinationView.semanticLabel, activityLabel).",
+        "Sample content follows the business rules: the plan shows who is home and who is away, with the absence of Luis from the calendar; the washer is in use by one person at a time, a task shows when and by whom it was last done and never who is behind, and the calendar is informational."
+      ],
+      "stories": [
+        "Templates/AppHomeShell/home-default",
+        "Templates/AppHomeShell/home-badges",
+        "Templates/AppHomeShell/things-default",
+        "Templates/AppHomeShell/things-badges",
+        "Templates/AppHomeShell/tasks-default",
+        "Templates/AppHomeShell/tasks-badges",
+        "Templates/AppHomeShell/calendar-default",
+        "Templates/AppHomeShell/calendar-badges"
+      ]
     }
   ]
 }

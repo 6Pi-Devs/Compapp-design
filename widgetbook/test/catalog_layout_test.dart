@@ -35,6 +35,7 @@ const _leastWidthOf = <String, double>{
   'RoomDrawBoard': 300,
   'AppSheet': 300,
   'AppFormPage': 300,
+  'AppHomeShell': 300,
 };
 
 /// Lays every molecule, organism and template use case out the way the

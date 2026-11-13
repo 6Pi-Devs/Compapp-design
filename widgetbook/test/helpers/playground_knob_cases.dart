@@ -1352,6 +1352,53 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       (t) => expect(_widget<AppFormPage>(t).submittingLabel, 'Zed'),
     ),
   ],
+  'AppHomeShell': [
+    KnobCase(
+      'title',
+      'Zed',
+      (t) => expect(_widget<AppHomeShell>(t).title, 'Zed'),
+    ),
+    KnobCase(
+      'subtitle',
+      'Zed',
+      (t) => expect(_widget<AppHomeShell>(t).subtitle, 'Zed'),
+    ),
+    KnobCase(
+      'unreadCount',
+      '7',
+      (t) => expect(_widget<AppHomeShell>(t).unreadCount, 7),
+    ),
+    KnobCase(
+      'activityLabel',
+      'Zed',
+      (t) => expect(_widget<AppHomeShell>(t).activityLabel, 'Zed'),
+    ),
+    KnobCase(
+      'accountLabel',
+      'Zed',
+      (t) => expect(_widget<AppHomeShell>(t).accountLabel, 'Zed'),
+    ),
+    KnobCase(
+      'navigationLabel',
+      'Zed',
+      (t) => expect(_widget<AppHomeShell>(t).navigationLabel, 'Zed'),
+    ),
+    KnobCase(
+      'destinations',
+      '3',
+      (t) => expect(_widget<AppHomeShell>(t).destinations, hasLength(3)),
+    ),
+    KnobCase(
+      'selectedIndex',
+      '2',
+      (t) => expect(_widget<AppHomeShell>(t).selectedIndex, 2),
+    ),
+    KnobCase(
+      'calendarBadgeCount',
+      '42',
+      (t) => expect(_widget<AppHomeShell>(t).destinations[3].badgeCount, 42),
+    ),
+  ],
   'RoomDrawBoard': [
     KnobCase(
       'status',
