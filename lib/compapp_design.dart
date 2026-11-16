@@ -57,6 +57,7 @@ export 'src/models/task_suggestion.dart';
 export 'src/models/task_target.dart';
 export 'src/models/task_view.dart';
 export 'src/molecules/activity_row.dart';
+export 'src/molecules/app_confirm_dialog.dart';
 export 'src/molecules/app_empty_state.dart';
 export 'src/molecules/app_nav_bar.dart';
 export 'src/molecules/app_snackbar.dart';

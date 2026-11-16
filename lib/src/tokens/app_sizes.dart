@@ -159,6 +159,10 @@ abstract final class AppSizes {
   /// Side of the ring of the knock button while it waits (`size.knock-ring`).
   static const double knockRing = 24;
 
+  /// Widest a dialog grows on a tablet or in landscape
+  /// (`size.dialog-max-width`).
+  static const double dialogMaxWidth = 560;
+
   /// Every token by its JSON name, checked by the parity test.
   static const Map<String, double> values = {
     'target.min': minTarget,
@@ -209,5 +213,6 @@ abstract final class AppSizes {
     'size.presence-control': presenceControl,
     'size.knock-width': knockWidth,
     'size.knock-ring': knockRing,
+    'size.dialog-max-width': dialogMaxWidth,
   };
 }

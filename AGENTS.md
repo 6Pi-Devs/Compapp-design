@@ -80,6 +80,8 @@ fonts/                      bundled Bricolage Grotesque and Instrument Sans, wit
 
 `BuildContext` is read only for `Theme`, `IconTheme`, `MediaQuery` and `Directionality`. View models (`MemberView`, `RoomView`) and shared enums (`AppIcons`) live in `lib/src/models/`: plain immutable data owned by this package, importable from every level, exempt from the manifest. The app maps its business objects to them. Nothing in `models` imports upward.
 
+One exception: the static `AppConfirmDialog.show` reads the `Navigator` and `MaterialLocalizations` of its context, because `showDialog` needs both to push the route and pop the answer. It is the only way to hand the app a `Future<bool>` without a router dependency. The widget itself stays pure presentation. A new exception needs the same written reason here.
+
 Imports under `lib/` are `package:compapp_design/...`. Tests may import `test/helpers/` and `tool/` with a relative path (`tool/` sits outside `lib/`, so it has no package URI).
 
 ### Foundation
@@ -292,6 +294,7 @@ To add or update a golden (a new atom, or an intentional visual change):
 | `size.activity-tile` | `AppSizes.activityTile` (40): glyph tile of `ActivityRow` |
 | `size.presence-control` | `AppSizes.presenceControl` (64, grows with its text): least height of `PresenceSwitch` and `KnockButton` |
 | `size.knock-width`, `knock-ring` | `AppSizes.knockWidth` (96, grows with its text), `knockRing` (24): least width of `KnockButton` and the ring it shows while it waits |
+| `size.dialog-max-width` | `AppSizes.dialogMaxWidth` (560): widest an `AppConfirmDialog` grows on a tablet or in landscape |
 | `size.border-emphasis`, `focus-ring` | `AppSizes.borderEmphasis` (2, selected, focus and error borders), `focusRing` (4, primary-soft ring around a focused field) |
 | `size.code-cell-width`, `code-cell-height` | `AppSizes.codeCellWidth` (56), `codeCellHeight` (60) |
 | `state-layer.*` | `AppStateLayers`: ink opacity over a fill when pressed (primary 12%, surface 8%, danger 16%) and the spinner track (35%). The surface ink of `pressed-secondary` is reused for the hover and focus of a snackbar action over its own soft primary |

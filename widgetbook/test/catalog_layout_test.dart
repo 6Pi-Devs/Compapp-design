@@ -25,6 +25,7 @@ const _leastWidthOf = <String, double>{
   'SheetHeader': 300,
   'AppEmptyState': 200,
   'AppSnackbar': 300,
+  'AppConfirmDialog': 250,
   'ActivityList': 300,
   'PresencePanel': 300,
   'CalendarStrip': 300,
