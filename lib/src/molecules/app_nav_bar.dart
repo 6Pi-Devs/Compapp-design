@@ -22,7 +22,7 @@ import 'package:flutter/semantics.dart';
 ///
 /// A [NavDestinationView.badgeCount] above zero draws a count badge beside the
 /// icon, never over it. The badge is only a visual copy: the destination reads
-/// its `semanticLabel` ("Tasks, 2 to do") once, as one button.
+/// its `semanticLabel` ("Calendar, 2 new events") once, as one button.
 ///
 /// For assistive technology the bar is a navigation landmark named by
 /// [semanticLabel]. Each destination is a focusable button with a selected

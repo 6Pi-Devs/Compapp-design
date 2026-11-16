@@ -63,69 +63,7 @@ List<(String, ThemeData)> get themes => [
   ('dark', CompappTheme.dark),
 ];
 
-/// The colors painted inside [rect] (in the coordinates of the host boundary),
-/// read from the rendered pixels in one pass.
-Future<List<Color>> paintedRegion(WidgetTester tester, Rect rect) async {
-  final boundary = tester.renderObject<RenderRepaintBoundary>(
-    find.byKey(barBoundaryKey),
-  );
-  final colors = await tester.runAsync(() async {
-    final image = await boundary.toImage();
-    final data = (await image.toByteData())!;
-    final found = <Color>[];
-    for (var y = rect.top.floor(); y < rect.bottom.ceil(); y++) {
-      for (var x = rect.left.floor(); x < rect.right.ceil(); x++) {
-        if (x < 0 || y < 0 || x >= image.width || y >= image.height) continue;
-        final offset = (y * image.width + x) * 4;
-        found.add(
-          Color.fromARGB(
-            data.getUint8(offset + 3),
-            data.getUint8(offset),
-            data.getUint8(offset + 1),
-            data.getUint8(offset + 2),
-          ),
-        );
-      }
-    }
-    return found;
-  });
-  return colors!;
-}
-
-/// How many of [colors] are [color].
-int countColor(List<Color> colors, Color color) => colors
-    .where((candidate) => isSameColorAs(color).matches(candidate, {}))
-    .length;
-
 /// The rectangle of [finder] in the coordinates of the host boundary.
 Rect inBarHost(WidgetTester tester, Finder finder) => tester
     .getRect(finder)
     .shift(-tester.getTopLeft(find.byKey(barBoundaryKey)));
-
-/// Fails when a word of the [Text] [finder] is wider than the text itself,
-/// which is when a line has to break inside a word. The text is as wide as
-/// its longest line, so every word fitting in it means no word was cut. It
-/// measures with the text scale and style the text really has, so load the
-/// bundled fonts first.
-void expectNoMidWordBreaks(
-  WidgetTester tester,
-  Finder finder, {
-  String reason = '',
-}) {
-  final element = tester.element(finder);
-  final text = tester.widget<Text>(finder);
-  final style = DefaultTextStyle.of(element).style.merge(text.style);
-  final scaler = MediaQuery.textScalerOf(element);
-  final width = tester.getSize(finder).width;
-  final cut = <String>[];
-  for (final word in text.data!.split(RegExp(r'\s+'))) {
-    final painter = TextPainter(
-      text: TextSpan(text: word, style: style),
-      textDirection: Directionality.of(element),
-      textScaler: scaler,
-    )..layout();
-    if (painter.width > width + 0.5) cut.add(word);
-    painter.dispose();
-  }
-  expect(cut, isEmpty, reason: 'words cut in "${text.data}" $reason');
-}

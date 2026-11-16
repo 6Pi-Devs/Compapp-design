@@ -8,21 +8,19 @@ import '../helpers/bar_host.dart';
 import '../helpers/bundled_fonts.dart';
 import '../helpers/contrast.dart';
 import '../helpers/painted_color.dart';
+import '../helpers/painted_pixels.dart';
+import '../helpers/word_breaks.dart';
 
 const _destinations = [
   NavDestinationView(id: 'home', icon: AppIcons.floorplan, label: 'Home'),
   NavDestinationView(id: 'things', icon: AppIcons.washer, label: 'Things'),
-  NavDestinationView(
-    id: 'tasks',
-    icon: AppIcons.tasks,
-    label: 'Tasks',
-    badgeCount: 2,
-    semanticLabel: 'Tasks, 2 to do',
-  ),
+  NavDestinationView(id: 'tasks', icon: AppIcons.tasks, label: 'Tasks'),
   NavDestinationView(
     id: 'calendar',
     icon: AppIcons.calendar,
     label: 'Calendar',
+    badgeCount: 2,
+    semanticLabel: 'Calendar, 2 new events',
   ),
 ];
 
@@ -252,7 +250,7 @@ void main() {
       await tester.pumpWidget(barHost(_bar()));
 
       final badge = find.descendant(
-        of: _destination('tasks'),
+        of: _destination('calendar'),
         matching: find.byType(AppBadge),
       );
       expect(tester.widget<AppBadge>(badge).count, 2);
@@ -266,9 +264,9 @@ void main() {
             destinations: [
               _destinations[0],
               const NavDestinationView(
-                id: 'tasks',
-                icon: AppIcons.tasks,
-                label: 'Tasks',
+                id: 'calendar',
+                icon: AppIcons.calendar,
+                label: 'Calendar',
                 badgeCount: 120,
               ),
             ],
@@ -298,7 +296,7 @@ void main() {
         final badge = tester.getRect(find.byType(AppBadge));
         final icon = tester.getRect(
           find.descendant(
-            of: _destination('tasks'),
+            of: _destination('calendar'),
             matching: find.byType(AppIcon),
           ),
         );
@@ -360,12 +358,12 @@ void main() {
       await tester.pumpWidget(barHost(_bar()));
 
       final labels = [for (final n in labeledNodes(tester)) n.label];
-      expect(labels, contains('Tasks, 2 to do'));
+      expect(labels, contains('Calendar, 2 new events'));
       expect(labels.where((label) => label.contains('2')), [
-        'Tasks, 2 to do',
+        'Calendar, 2 new events',
       ], reason: 'no separate node for the badge text');
       expect(
-        labels.where((label) => label == 'Tasks'),
+        labels.where((label) => label == 'Calendar'),
         isEmpty,
         reason: 'the visible label is not a second node either',
       );
@@ -510,12 +508,13 @@ void main() {
 
       final bar = inBarHost(tester, find.byType(AppNavBar));
       expect(bar.height, plain + 34);
-      final pixels = await paintedRegion(
+      final pixels = await paintedPixels(
         tester,
-        Rect.fromLTWH(bar.center.dx, bar.bottom - 4, 1, 3),
+        barBoundaryKey,
+        region: Rect.fromLTWH(bar.center.dx, bar.bottom - 4, 1, 3),
       );
       expect(
-        countColor(
+        countPixels(
           pixels,
           CompappTheme.light.colorScheme.surfaceContainerLowest,
         ),
@@ -572,13 +571,13 @@ void main() {
         id: 'tasks',
         icon: AppIcons.tasks,
         label: 'Tareas de hoy',
-        badgeCount: 120,
-        semanticLabel: 'Tareas de hoy, 120 por hacer',
       ),
       NavDestinationView(
         id: 'calendar',
         icon: AppIcons.calendar,
         label: 'Calendario común',
+        badgeCount: 120,
+        semanticLabel: 'Calendario común, 120 eventos nuevos',
       ),
     ];
 
@@ -650,7 +649,10 @@ void main() {
       expect(AppNavBar.maxLabelTextScale, 1.3);
       expect(capped, closeTo(base * 1.3, 1));
       expect(doubled, capped, reason: 'the one documented cap');
-      expect(_node(tester, 'tasks').label, 'Tareas de hoy, 120 por hacer');
+      expect(
+        _node(tester, 'calendar').label,
+        'Calendario común, 120 eventos nuevos',
+      );
       handle.dispose();
     });
 

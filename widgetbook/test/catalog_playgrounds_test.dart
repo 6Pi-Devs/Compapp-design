@@ -180,7 +180,15 @@ void main() {
       ('MemberRow', {'semanticLabel': ''}),
       ('EventRibbon', {'semanticLabel': '', 'kind': 'other'}),
       ('TaskRow', {'logAgainSemanticLabel': '', 'ageDays': '-5'}),
-      ('RoomTile', {'semanticLabel': '', 'occupants': '9', 'beacons': '9'}),
+      (
+        'RoomTile',
+        {
+          'semanticLabel': '',
+          'occupants': '9',
+          'beacons': '9',
+          'tappable': 'true',
+        },
+      ),
       ('ItemBeacon', {'semanticLabel': '', 'inUse': 'true'}),
       ('AppTopBar', {'unreadCount': '-3'}),
       ('AppTopBar', {'accountLabel': ''}),
@@ -194,6 +202,226 @@ void main() {
       ('AppSnackbar', {'message': ''}),
       ('AppNavBar', {'destinationSemanticLabel': ''}),
       ('AppNavBar', {'destinations': '9'}),
+      ('ActivityRow', {'semanticLabel': ''}),
+      (
+        'ActivityList',
+        {
+          'unreadEntries': '-3',
+          'earlierEntries': '99',
+          'moreUnread': '-4',
+          'unreadPrefix': '',
+          'unreadTitle': '',
+          'unreadSemanticLabel': '',
+          'earlierTitle': '',
+          'markAllReadLabel': '',
+          'emptyTitle': '',
+          'emptyBody': '',
+        },
+      ),
+      (
+        'PresencePanel',
+        {
+          'homeMembers': '-3',
+          'awayMembers': '99',
+          'invitedMembers': '99',
+          'homeTitle': '',
+          'awayTitle': '',
+          'invitedTitle': '',
+          'knockLabel': '',
+          'cooldown': 'true',
+          'remaining': 'NaN',
+          'cooldownLabel': '',
+          'remainingLabel': '',
+          'cooldownSemanticLabel': '',
+        },
+      ),
+      (
+        'PresencePanel',
+        {
+          'homeMembers': '0',
+          'awayMembers': '0',
+          'emptyHomeLabel': '',
+          'awayEmptyLabel': 'Nobody away',
+          'invitedEmptyLabel': 'Nobody invited',
+        },
+      ),
+      (
+        'CalendarStrip',
+        {
+          'startOffset': '-5',
+          'todayIndex': '99',
+          'events': '9',
+          'todayLabel': '',
+          'firstEventTitle': '',
+          'firstEventLabel': '',
+        },
+      ),
+      (
+        'CalendarStrip',
+        {'startOffset': '999', 'todayIndex': '-9', 'events': '-2'},
+      ),
+      (
+        'TaskComposer',
+        {
+          'suggestions': '9',
+          'rooms': '-3',
+          'items': '99',
+          'linkedKind': 'room',
+          'linkedIndex': '2',
+          'query': '',
+          'label': '',
+          'suggestionsLabel': '',
+          'targetsLabel': '',
+          'submitLabel': '',
+          'submitting': 'true',
+          'helperText': '',
+        },
+      ),
+      (
+        'TaskComposer',
+        {'rooms': '0', 'items': '0', 'linkedKind': 'item', 'suggestions': '0'},
+      ),
+      (
+        'FloorplanMap',
+        {
+          'rooms': '99',
+          'archivedRooms': '99',
+          'absences': '99',
+          'washerInUse': 'false',
+          'firstRoomName': '',
+          'firstRoomCaption': '',
+          'awayLabel': '',
+          'emptyTitle': '',
+          'emptyBody': '',
+          'loadingLabel': '',
+        },
+      ),
+      ('FloorplanMap', {'rooms': '-3', 'absences': '0', 'loading': 'true'}),
+      ('FloorplanMap', {'rooms': '0', 'absences': '0'}),
+      (
+        'AppFormPage',
+        {
+          'title': '',
+          'backLabel': '',
+          'submitLabel': '',
+          'submittingLabel': '',
+          'submitting': 'true',
+        },
+      ),
+      ('AppFormPage', {'fields': '99'}),
+      ('AppFormPage', {'fields': '-3'}),
+      ('AppFormPage', {'fields': '0'}),
+      ('AppFormPage', {'fields': '0', 'nameError': 'Zed'}),
+      ('AppFormPage', {'fields': '1', 'nameError': ''}),
+      (
+        'AppHomeShell',
+        {
+          'title': '',
+          'activityLabel': '',
+          'accountLabel': '',
+          'navigationLabel': '',
+          'subtitle': '',
+        },
+      ),
+      ('AppHomeShell', {'destinations': '99', 'selectedIndex': '99'}),
+      ('AppHomeShell', {'destinations': '-3', 'selectedIndex': '-3'}),
+      ('AppHomeShell', {'destinations': '2', 'selectedIndex': '3'}),
+      ('AppHomeShell', {'unreadCount': '999', 'calendarBadgeCount': '999'}),
+      ('AppSheet', {'title': '', 'closeLabel': '', 'primaryLabel': ''}),
+      ('AppSheet', {'bodyParagraphs': '99', 'actions': '99'}),
+      ('AppSheet', {'bodyParagraphs': '-3', 'actions': '-3'}),
+      ('AppSheet', {'secondaryLabel': '', 'actions': '2'}),
+      (
+        'ItemSheet',
+        {
+          'memberJoinOrder': '99',
+          'title': '',
+          'confirmLabel': '',
+          'closeLabel': '',
+          'memberName': '',
+          'memberSemanticLabel': '',
+          'usageSubtitle': '',
+        },
+      ),
+      ('ItemSheet', {'mode': 'cooldown', 'message': ''}),
+      ('ItemSheet', {'memberIsYou': 'true'}),
+      ('ItemSheet', {'memberIsYou': 'true', 'mode': 'cooldown'}),
+      ('ItemSheet', {'memberIsYou': 'true', 'mode': 'start'}),
+      (
+        'RoomEditor',
+        {
+          'bedrooms': '99',
+          'commonAreas': '99',
+          'archived': '99',
+          'occupants': '99',
+          'assignOptions': '99',
+          'bedroomsTitle': '',
+          'commonAreasTitle': '',
+          'archivedTitle': '',
+          'addLabel': '',
+          'assignLabel': '',
+          'editLabel': '',
+          'archiveLabel': '',
+          'roomAssignLabel': '',
+          'subtitle': '',
+          'archivedSubtitle': '',
+          'restoreLabel': '',
+          'assignOpen': 'true',
+          'limitMessage': 'The home is full',
+        },
+      ),
+      ('RoomEditor', {'bedrooms': '-3', 'commonAreas': '0', 'archived': '0'}),
+      ('RoomEditor', {'bedrooms': '0', 'occupants': '0', 'assignOptions': '0'}),
+      (
+        'RoomDrawBoard',
+        {
+          'bedrooms': '99',
+          'groupInFourth': '99',
+          'statusLabel': '',
+          'drawId': '',
+          'firstCaption': '',
+          'drawAgainLabel': '',
+          'applyLabel': '',
+          'readOnlyNote': '',
+          'isAdmin': 'false',
+        },
+      ),
+      ('RoomDrawBoard', {'bedrooms': '-3', 'groupInFourth': '-4'}),
+      ('RoomDrawBoard', {'status': 'applied', 'canDrawAgain': 'false'}),
+      (
+        'ActivityList',
+        {
+          'unreadEntries': '0',
+          'earlierEntries': '0',
+          'emptyTitle': '',
+          'emptyBody': '',
+        },
+      ),
+      (
+        'CodeCard',
+        {
+          'code': '',
+          'label': '',
+          'copyLabel': '',
+          'copiedLabel': '',
+          'shareLabel': '',
+        },
+      ),
+      (
+        'KnockButton',
+        {
+          'label': '',
+          'cooldown': 'true',
+          'remaining': 'NaN',
+          'cooldownLabel': '',
+          'remainingLabel': '',
+          'cooldownSemanticLabel': '',
+        },
+      ),
+      (
+        'PresenceSwitch',
+        {'semanticLabel': '', 'homeLabel': '', 'awayLabel': ''},
+      ),
     ]) {
       testWidgets('$component $knobs', (tester) async {
         await _open(tester, _pathOf(component), knobs: knobs);
@@ -251,6 +479,21 @@ void main() {
       );
     });
 
+    testWidgets('a draw tile has no beacons and its label holds its name', (
+      tester,
+    ) async {
+      await _open(
+        tester,
+        _pathOf('RoomTile'),
+        knobs: {'draw': 'true', 'beacons': '2', 'semanticLabel': 'Carlos'},
+      );
+      final tile = tester.widget<RoomTile>(find.byType(RoomTile));
+      expect(tile.draw, isTrue);
+      expect(tile.beacons, isEmpty);
+      expect(tile.semanticLabel, "Ana's room, Carlos");
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('a task row falls back to the sample label and clamps the '
         'age', (tester) async {
       await _open(
@@ -276,6 +519,81 @@ void main() {
         tester.widget<EventRibbon>(find.byType(EventRibbon)).semanticLabel,
         'Visit, Marta, Saturday',
       );
+    });
+
+    testWidgets('an activity row falls back to the sample spoken label', (
+      tester,
+    ) async {
+      await _open(tester, _pathOf('ActivityRow'), knobs: {'semanticLabel': ''});
+
+      expect(
+        tester.widget<ActivityRow>(find.byType(ActivityRow)).semanticLabel,
+        'Unread. Carlos finished your washer',
+      );
+    });
+
+    testWidgets('a presence switch falls back to the sample texts', (
+      tester,
+    ) async {
+      await _open(
+        tester,
+        _pathOf('PresenceSwitch'),
+        knobs: {'semanticLabel': '', 'homeLabel': '', 'awayLabel': ''},
+      );
+
+      final switcher = tester.widget<PresenceSwitch>(
+        find.byType(PresenceSwitch),
+      );
+      expect(switcher.semanticLabel, 'Your presence');
+      expect(switcher.homeLabel, "I'm home");
+      expect(switcher.awayLabel, "I'm out");
+    });
+
+    testWidgets('a knock button falls back to the sample texts and keeps '
+        'the share in range', (tester) async {
+      await _open(
+        tester,
+        _pathOf('KnockButton'),
+        knobs: {
+          'label': '',
+          'cooldown': 'true',
+          'remaining': '7',
+          'cooldownLabel': '',
+          'remainingLabel': '',
+          'cooldownSemanticLabel': '',
+        },
+      );
+
+      final button = tester.widget<KnockButton>(find.byType(KnockButton));
+      expect(button.label, "Who's home?");
+      expect(button.cooldown!.label, 'Asked');
+      expect(button.cooldown!.remainingLabel, '11 min');
+      expect(
+        button.cooldown!.semanticLabel,
+        "Asked who's home. You can ask again in 11 minutes",
+      );
+      expect(button.cooldown!.ringValue, 1);
+    });
+
+    testWidgets('a code card falls back to the sample texts', (tester) async {
+      await _open(
+        tester,
+        _pathOf('CodeCard'),
+        knobs: {
+          'code': '',
+          'label': '',
+          'copyLabel': '',
+          'copiedLabel': '',
+          'shareLabel': '',
+        },
+      );
+
+      final card = tester.widget<CodeCard>(find.byType(CodeCard));
+      expect(card.code, '4829 1736');
+      expect(card.label, 'Your personal code');
+      expect(card.copyLabel, 'Copy');
+      expect(card.copiedLabel, 'Copied');
+      expect(card.shareLabel, 'Share');
     });
 
     testWidgets('an item beacon falls back to the sample spoken label', (
@@ -352,6 +670,45 @@ void main() {
       await _setKnob(tester, find.byType(AppSwitch), 'value', 'true');
 
       expect(tester.widget<AppSwitch>(find.byType(AppSwitch)).value, isTrue);
+    });
+
+    testWidgets('a presence switch changes side when tapped', (tester) async {
+      await _open(tester, _pathOf('PresenceSwitch'));
+      Presence value() =>
+          tester.widget<PresenceSwitch>(find.byType(PresenceSwitch)).value;
+      expect(value(), Presence.home);
+
+      await tester.tap(find.byKey(const Key('presence.switch.away')));
+      await tester.pump(const Duration(milliseconds: 100));
+
+      expect(value(), Presence.away);
+    });
+
+    testWidgets('a presence switch knob set before any tap shows at once', (
+      tester,
+    ) async {
+      await _open(tester, _pathOf('PresenceSwitch'));
+
+      await _setKnob(tester, find.byType(PresenceSwitch), 'value', 'away');
+
+      expect(
+        tester.widget<PresenceSwitch>(find.byType(PresenceSwitch)).value,
+        Presence.away,
+      );
+    });
+
+    testWidgets('a code card shows copied when its copy button is tapped', (
+      tester,
+    ) async {
+      await _open(tester, _pathOf('CodeCard'));
+      bool copied() => tester.widget<CodeCard>(find.byType(CodeCard)).copied;
+      expect(copied(), isFalse);
+
+      await tester.tap(find.byKey(const Key('account.code.copy')));
+      await tester.pump();
+
+      expect(copied(), isTrue);
+      expect(find.text('Copied'), findsOneWidget);
     });
 
     testWidgets('a chip selects when tapped', (tester) async {

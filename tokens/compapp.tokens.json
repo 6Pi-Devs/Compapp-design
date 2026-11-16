@@ -48,6 +48,7 @@
     "badge-label": { "$type": "typography", "$value": { "fontFamily": "Instrument Sans", "fontWeight": 600, "fontSize": "12px", "lineHeight": "16px" } },
     "nav-label": { "$type": "typography", "$value": { "fontFamily": "Instrument Sans", "fontWeight": 600, "fontSize": "12px", "lineHeight": "16px" }, "$description": "label under a navigation icon; same values as badge-label, kept apart because the two change for different reasons" },
     "ring-label": { "$type": "typography", "$value": { "fontFamily": "Instrument Sans", "fontWeight": 600, "fontSize": "15px", "lineHeight": "15px" } },
+    "code": { "$type": "typography", "$value": { "fontFamily": "Bricolage Grotesque", "fontWeight": 600, "fontSize": "34px", "lineHeight": "40px", "letterSpacing": "4px" }, "$description": "a code the person reads out or types, such as the personal code of the code card" },
     "caption": { "$type": "typography", "$value": { "fontFamily": "Instrument Sans", "fontWeight": 400, "fontSize": "12px", "lineHeight": "16px" } }
   },
   "space": {
@@ -127,6 +128,10 @@
     "beacon": { "$type": "dimension", "$value": "34px", "$description": "side of the glyph tile or of the breathing ring of an item beacon" },
     "border-room": { "$type": "dimension", "$value": "1.5px", "$description": "border of a room tile, solid or dashed" },
     "ribbon": { "$type": "dimension", "$value": "28px", "$description": "least height of an event ribbon, it grows with its text" },
+    "activity-tile": { "$type": "dimension", "$value": "40px", "$description": "side of the glyph tile of an activity row" },
+    "presence-control": { "$type": "dimension", "$value": "64px", "$description": "least height of the presence switch and of the knock button beside it, they grow with their text" },
+    "knock-width": { "$type": "dimension", "$value": "96px", "$description": "least width of the knock button, it grows with its text" },
+    "knock-ring": { "$type": "dimension", "$value": "24px", "$description": "side of the ring of the knock button while it waits" },
     "dialog-max-width": { "$type": "dimension", "$value": "560px", "$description": "widest a dialog grows on a tablet or in landscape, as on Material 3" }
   },
   "state-layer": {

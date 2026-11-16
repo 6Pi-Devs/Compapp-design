@@ -145,6 +145,20 @@ abstract final class AppSizes {
   /// Least height of an event ribbon (`size.ribbon`). It grows with its text.
   static const double ribbon = 28;
 
+  /// Side of the glyph tile of an activity row (`size.activity-tile`).
+  static const double activityTile = 40;
+
+  /// Least height of the presence switch, and of the knock button beside it
+  /// (`size.presence-control`). Both grow with their text.
+  static const double presenceControl = 64;
+
+  /// Least width of the knock button (`size.knock-width`). It grows with its
+  /// text.
+  static const double knockWidth = 96;
+
+  /// Side of the ring of the knock button while it waits (`size.knock-ring`).
+  static const double knockRing = 24;
+
   /// Widest a dialog grows on a tablet or in landscape
   /// (`size.dialog-max-width`).
   static const double dialogMaxWidth = 560;
@@ -195,6 +209,10 @@ abstract final class AppSizes {
     'size.beacon': beacon,
     'size.border-room': borderRoom,
     'size.ribbon': ribbon,
+    'size.activity-tile': activityTile,
+    'size.presence-control': presenceControl,
+    'size.knock-width': knockWidth,
+    'size.knock-ring': knockRing,
     'size.dialog-max-width': dialogMaxWidth,
   };
 }

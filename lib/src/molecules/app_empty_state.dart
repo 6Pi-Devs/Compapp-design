@@ -1,6 +1,5 @@
-import 'dart:math' as math;
-
 import 'package:compapp_design/src/atoms/app_button.dart';
+import 'package:compapp_design/src/foundation/dashed_outline_painter.dart';
 import 'package:compapp_design/src/tokens/app_radius.dart';
 import 'package:compapp_design/src/tokens/app_sizes.dart';
 import 'package:compapp_design/src/tokens/app_spacing.dart';
@@ -179,45 +178,8 @@ class _DashedBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
-      foregroundPainter: _DashedPainter(color, radius),
+      foregroundPainter: DashedOutlinePainter(color: color, radius: radius),
       child: child,
     );
   }
-}
-
-class _DashedPainter extends CustomPainter {
-  const new(this.color, this.radius);
-
-  final Color color;
-  final double radius;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    const width = AppSizes.borderDashed;
-    final outline = Path()
-      ..addRRect(
-        RRect.fromRectAndRadius(
-          Offset.zero & size,
-          Radius.circular(radius),
-        ).deflate(width / 2),
-      );
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = width;
-    const dash = width * AppSizes.dash;
-    const period = dash + width * AppSizes.dashGap;
-    for (final metric in outline.computeMetrics()) {
-      for (var start = 0.0; start < metric.length; start += period) {
-        canvas.drawPath(
-          metric.extractPath(start, math.min(start + dash, metric.length)),
-          paint,
-        );
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(_DashedPainter oldDelegate) =>
-      oldDelegate.color != color || oldDelegate.radius != radius;
 }

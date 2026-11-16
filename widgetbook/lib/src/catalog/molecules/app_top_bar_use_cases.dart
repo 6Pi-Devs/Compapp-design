@@ -182,6 +182,10 @@ WidgetbookUseCase _playground() {
         description: 'Pushed form. Off means a null onAction',
         initialValue: true,
       );
+      final namesRoute = context.knobs.boolean(
+        label: 'namesRoute',
+        description: 'Both forms. The title names the route that shows the bar',
+      );
 
       return useCaseFrame(
         child: home
@@ -194,6 +198,7 @@ WidgetbookUseCase _playground() {
                 me: _member(context, initials: initials, joinOrder: joinOrder),
                 accountLabel: accountLabel,
                 onAccount: _noop,
+                namesRoute: namesRoute,
               )
             : AppTopBar.pushed(
                 title: title,
@@ -201,6 +206,7 @@ WidgetbookUseCase _playground() {
                 onBack: _noop,
                 actionLabel: actionLabel,
                 onAction: actionEnabled ? _noop : null,
+                namesRoute: namesRoute,
               ),
       );
     },

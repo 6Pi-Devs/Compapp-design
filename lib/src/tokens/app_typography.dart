@@ -220,6 +220,20 @@ abstract final class AppTypography {
     fontFeatures: _tabular,
   );
 
+  /// A code the person reads out or types, such as the personal code of
+  /// `CodeCard`: Bricolage at 34 with 4 px of tracking, so the digits stand
+  /// apart.
+  static const TextStyle code = TextStyle(
+    fontFamily: displayFamily,
+    package: package,
+    fontWeight: FontWeight.w600,
+    fontSize: 34,
+    fontVariations: [FontVariation.opticalSize(34)],
+    height: 40 / 34,
+    letterSpacing: 4,
+    fontFeatures: _tabular,
+  );
+
   /// Every style by its JSON name, compared against the JSON by the parity
   /// test.
   static const Map<String, TextStyle> values = {
@@ -240,6 +254,7 @@ abstract final class AppTypography {
     'badge-label': badgeLabel,
     'nav-label': navLabel,
     'ring-label': ringLabel,
+    'code': code,
     'caption': caption,
   };
 

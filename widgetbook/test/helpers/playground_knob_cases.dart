@@ -63,6 +63,17 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       (t) => expect(_widget<AppButton>(t).loadingSemanticLabel, 'Busy'),
     ),
     KnobCase(
+      'disclosure',
+      'true',
+      (t) => expect(_widget<AppButton>(t).expanded, isFalse),
+    ),
+    KnobCase(
+      'expanded',
+      'true',
+      (t) => expect(_widget<AppButton>(t).expanded, isTrue),
+      also: {'disclosure': 'true'},
+    ),
+    KnobCase(
       'forced state',
       'pressed',
       (t) => expect(
@@ -464,6 +475,12 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       '2',
       (t) => expect(_widget<RoomTile>(t).beacons, hasLength(2)),
     ),
+    KnobCase(
+      'tappable',
+      'true',
+      (t) => expect(_widget<RoomTile>(t).onTap, isNotNull),
+    ),
+    KnobCase('draw', 'true', (t) => expect(_widget<RoomTile>(t).draw, isTrue)),
   ],
   'TaskRow': [
     KnobCase(
@@ -518,6 +535,139 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       'compact',
       'true',
       (t) => expect(_widget<EventRibbon>(t).compact, isTrue),
+    ),
+  ],
+  'ActivityRow': [
+    KnobCase(
+      'icon',
+      'oven',
+      (t) => expect(_widget<ActivityRow>(t).entry.icon, AppIcons.oven),
+    ),
+    KnobCase(
+      'tone',
+      'neutral',
+      (t) => expect(_widget<ActivityRow>(t).entry.tone, ActivityTone.neutral),
+    ),
+    KnobCase(
+      'before',
+      'Zed',
+      (t) => expect(_widget<ActivityRow>(t).entry.text.first.text, 'Zed'),
+    ),
+    KnobCase(
+      'strong',
+      'Zed',
+      (t) => expect(
+        _widget<ActivityRow>(t).entry.text
+            .where((run) => run.strong)
+            .map((run) => run.text),
+        ['Zed'],
+      ),
+    ),
+    KnobCase(
+      'after',
+      'Zed',
+      (t) => expect(_widget<ActivityRow>(t).entry.text.last.text, 'Zed'),
+    ),
+    KnobCase(
+      'meta',
+      'Zed',
+      (t) => expect(_widget<ActivityRow>(t).entry.meta, 'Zed'),
+    ),
+    KnobCase(
+      'unread',
+      'false',
+      (t) => expect(_widget<ActivityRow>(t).unread, isFalse),
+    ),
+    KnobCase(
+      'semanticLabel',
+      'Zed',
+      (t) => expect(_widget<ActivityRow>(t).semanticLabel, endsWith('Zed')),
+    ),
+  ],
+  'PresenceSwitch': [
+    KnobCase(
+      'value',
+      'away',
+      (t) => expect(_widget<PresenceSwitch>(t).value, Presence.away),
+    ),
+    KnobCase(
+      'homeLabel',
+      'Zed',
+      (t) => expect(_widget<PresenceSwitch>(t).homeLabel, 'Zed'),
+    ),
+    KnobCase(
+      'awayLabel',
+      'Zed',
+      (t) => expect(_widget<PresenceSwitch>(t).awayLabel, 'Zed'),
+    ),
+    KnobCase(
+      'semanticLabel',
+      'Zed',
+      (t) => expect(_widget<PresenceSwitch>(t).semanticLabel, 'Zed'),
+    ),
+  ],
+  'KnockButton': [
+    KnobCase(
+      'label',
+      'Zed',
+      (t) => expect(_widget<KnockButton>(t).label, 'Zed'),
+    ),
+    KnobCase(
+      'cooldown',
+      'true',
+      (t) => expect(_widget<KnockButton>(t).cooldown, isNotNull),
+    ),
+    KnobCase(
+      'remaining',
+      '0.4',
+      (t) => expect(_widget<KnockButton>(t).cooldown?.remaining, 0.4),
+      also: {'cooldown': 'true'},
+    ),
+    KnobCase(
+      'cooldownLabel',
+      'Zed',
+      (t) => expect(_widget<KnockButton>(t).cooldown?.label, 'Zed'),
+      also: {'cooldown': 'true'},
+    ),
+    KnobCase(
+      'remainingLabel',
+      'Zed',
+      (t) => expect(_widget<KnockButton>(t).cooldown?.remainingLabel, 'Zed'),
+      also: {'cooldown': 'true'},
+    ),
+    KnobCase(
+      'cooldownSemanticLabel',
+      'Zed',
+      (t) => expect(_widget<KnockButton>(t).cooldown?.semanticLabel, 'Zed'),
+      also: {'cooldown': 'true'},
+    ),
+  ],
+  'CodeCard': [
+    KnobCase(
+      'code',
+      '0000 1111',
+      (t) => expect(_widget<CodeCard>(t).code, '0000 1111'),
+    ),
+    KnobCase('label', 'Zed', (t) => expect(_widget<CodeCard>(t).label, 'Zed')),
+    KnobCase(
+      'copyLabel',
+      'Zed',
+      (t) => expect(_widget<CodeCard>(t).copyLabel, 'Zed'),
+    ),
+    KnobCase(
+      'copiedLabel',
+      'Zed',
+      (t) => expect(_widget<CodeCard>(t).copiedLabel, 'Zed'),
+    ),
+    KnobCase(
+      'shareLabel',
+      'Zed',
+      (t) => expect(_widget<CodeCard>(t).shareLabel, 'Zed'),
+    ),
+    KnobCase(
+      'copied',
+      'true',
+      (t) => expect(_widget<CodeCard>(t).copied, isTrue),
     ),
   ],
   'AppFreshnessBar': [
@@ -586,6 +736,11 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       expect(bar.variant, AppTopBarVariant.pushed);
       expect(bar.onAction, isNull);
     }, also: {'form': 'pushed'}),
+    KnobCase(
+      'namesRoute',
+      'true',
+      (t) => expect(_widget<AppTopBar>(t).namesRoute, isTrue),
+    ),
   ],
   'AppNavBar': [
     KnobCase(
@@ -634,6 +789,16 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       'closeLabel',
       'Zed',
       (t) => expect(_widget<SheetHeader>(t).closeLabel, 'Zed'),
+    ),
+    KnobCase(
+      'focused look',
+      'true',
+      (t) => expect(_widget<SheetHeader>(t).titleFocusNode, isNotNull),
+    ),
+    KnobCase(
+      'namesRoute',
+      'true',
+      (t) => expect(_widget<SheetHeader>(t).namesRoute, isTrue),
     ),
   ],
   'AppEmptyState': [
@@ -710,6 +875,737 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       'cancelLabel',
       'Zed',
       (t) => expect(_widget<AppConfirmDialog>(t).cancelLabel, 'Zed'),
+    ),
+  ],
+  'ActivityList': [
+    KnobCase(
+      'unreadEntries',
+      '1',
+      (t) => expect(_widget<ActivityList>(t).view.unread, hasLength(1)),
+    ),
+    KnobCase(
+      'earlierEntries',
+      '3',
+      (t) => expect(_widget<ActivityList>(t).view.earlier, hasLength(3)),
+    ),
+    KnobCase(
+      'moreUnread',
+      '5',
+      (t) => expect(
+        _widget<ActivityList>(t).view.unreadCount,
+        _widget<ActivityList>(t).view.unread.length + 5,
+      ),
+    ),
+    KnobCase(
+      'unreadPrefix',
+      'Zed',
+      (t) => expect(_widget<ActivityList>(t).view.unreadPrefix, 'Zed'),
+    ),
+    KnobCase(
+      'unreadTitle',
+      'Zed',
+      (t) => expect(_widget<ActivityList>(t).view.unreadTitle, 'Zed'),
+    ),
+    KnobCase(
+      'unreadSemanticLabel',
+      'Zed',
+      (t) => expect(_widget<ActivityList>(t).view.unreadSemanticLabel, 'Zed'),
+    ),
+    KnobCase(
+      'earlierTitle',
+      'Zed',
+      (t) => expect(_widget<ActivityList>(t).view.earlierTitle, 'Zed'),
+    ),
+    KnobCase(
+      'markAllReadLabel',
+      'Zed',
+      (t) => expect(_widget<ActivityList>(t).view.markAllReadLabel, 'Zed'),
+    ),
+    KnobCase(
+      'emptyTitle',
+      'Zed',
+      (t) => expect(_widget<ActivityList>(t).view.emptyTitle, 'Zed'),
+    ),
+    KnobCase(
+      'emptyBody',
+      'Zed',
+      (t) => expect(_widget<ActivityList>(t).view.emptyBody, 'Zed'),
+    ),
+  ],
+  'PresencePanel': [
+    KnobCase(
+      'homeMembers',
+      '3',
+      (t) => expect(_widget<PresencePanel>(t).view.home.entries, hasLength(3)),
+    ),
+    KnobCase(
+      'awayMembers',
+      '3',
+      (t) => expect(_widget<PresencePanel>(t).view.away.entries, hasLength(3)),
+    ),
+    KnobCase(
+      'invitedMembers',
+      '2',
+      (t) =>
+          expect(_widget<PresencePanel>(t).view.invited?.entries, hasLength(2)),
+    ),
+    KnobCase(
+      'homeTitle',
+      'Zed',
+      (t) => expect(_widget<PresencePanel>(t).view.home.title, 'Zed'),
+    ),
+    KnobCase(
+      'awayTitle',
+      'Zed',
+      (t) => expect(_widget<PresencePanel>(t).view.away.title, 'Zed'),
+    ),
+    KnobCase(
+      'invitedTitle',
+      'Zed',
+      (t) => expect(_widget<PresencePanel>(t).view.invited?.title, 'Zed'),
+      also: {'invitedMembers': '1'},
+    ),
+    KnobCase(
+      'emptyHomeLabel',
+      'Zed',
+      (t) => expect(_widget<PresencePanel>(t).view.home.emptyLabel, 'Zed'),
+      also: {'homeMembers': '0'},
+    ),
+    KnobCase(
+      'awayEmptyLabel',
+      'Zed',
+      (t) => expect(_widget<PresencePanel>(t).view.away.emptyLabel, 'Zed'),
+      also: {'awayMembers': '0'},
+    ),
+    KnobCase(
+      'invitedEmptyLabel',
+      'Zed',
+      (t) => expect(_widget<PresencePanel>(t).view.invited?.emptyLabel, 'Zed'),
+    ),
+    KnobCase(
+      'knockLabel',
+      'Zed',
+      (t) => expect(_widget<PresencePanel>(t).view.broadcast.knockLabel, 'Zed'),
+    ),
+    KnobCase(
+      'message',
+      'Zed',
+      (t) => expect(_widget<PresencePanel>(t).view.broadcast.message, 'Zed'),
+    ),
+    KnobCase(
+      'hint',
+      'Zed',
+      (t) => expect(_widget<PresencePanel>(t).view.broadcast.hint, 'Zed'),
+    ),
+    KnobCase(
+      'cooldown',
+      'true',
+      (t) =>
+          expect(_widget<PresencePanel>(t).view.broadcast.cooldown, isNotNull),
+    ),
+    KnobCase(
+      'remaining',
+      '0.4',
+      (t) => expect(
+        _widget<PresencePanel>(t).view.broadcast.cooldown?.remaining,
+        0.4,
+      ),
+      also: {'cooldown': 'true'},
+    ),
+    KnobCase(
+      'cooldownLabel',
+      'Zed',
+      (t) => expect(
+        _widget<PresencePanel>(t).view.broadcast.cooldown?.label,
+        'Zed',
+      ),
+      also: {'cooldown': 'true'},
+    ),
+    KnobCase(
+      'remainingLabel',
+      'Zed',
+      (t) => expect(
+        _widget<PresencePanel>(t).view.broadcast.cooldown?.remainingLabel,
+        'Zed',
+      ),
+      also: {'cooldown': 'true'},
+    ),
+    KnobCase(
+      'cooldownSemanticLabel',
+      'Zed',
+      (t) => expect(
+        _widget<PresencePanel>(t).view.broadcast.cooldown?.semanticLabel,
+        'Zed',
+      ),
+      also: {'cooldown': 'true'},
+    ),
+  ],
+  'CalendarStrip': [
+    KnobCase(
+      'startOffset',
+      '10',
+      (t) =>
+          expect(_widget<CalendarStrip>(t).view.days.first.date, '2026-11-11'),
+    ),
+    KnobCase(
+      'todayIndex',
+      '3',
+      (t) => expect(
+        _widget<CalendarStrip>(t).view.today,
+        _widget<CalendarStrip>(t).view.days[3].date,
+      ),
+    ),
+    KnobCase(
+      'events',
+      '1',
+      (t) => expect(_widget<CalendarStrip>(t).view.events, hasLength(1)),
+    ),
+    KnobCase(
+      'longWeekdays',
+      'true',
+      (t) => expect(
+        _widget<CalendarStrip>(t).view.days.first.weekday.length,
+        greaterThan(3),
+      ),
+    ),
+    KnobCase(
+      'todayLabel',
+      'Zed',
+      (t) => expect(
+        _widget<CalendarStrip>(t).view.days.first.semanticLabel,
+        endsWith('Zed'),
+      ),
+    ),
+    KnobCase(
+      'firstEventTitle',
+      'Zed',
+      (t) => expect(
+        _widget<CalendarStrip>(t).view.events.first.event.title,
+        'Zed',
+      ),
+    ),
+    KnobCase(
+      'firstEventLabel',
+      'Zed',
+      (t) => expect(
+        _widget<CalendarStrip>(t).view.events.first.semanticLabel,
+        contains('Zed'),
+      ),
+    ),
+  ],
+  'TaskComposer': [
+    KnobCase(
+      'query',
+      'Zed',
+      (t) => expect(_widget<TaskComposer>(t).view.query, 'Zed'),
+    ),
+    KnobCase(
+      'suggestions',
+      '3',
+      (t) => expect(_widget<TaskComposer>(t).view.suggestions, hasLength(3)),
+    ),
+    KnobCase(
+      'rooms',
+      '1',
+      (t) => expect(_widget<TaskComposer>(t).view.rooms, hasLength(1)),
+    ),
+    KnobCase(
+      'items',
+      '1',
+      (t) => expect(_widget<TaskComposer>(t).view.items, hasLength(1)),
+    ),
+    KnobCase(
+      'linkedKind',
+      'item',
+      (t) => expect(
+        _widget<TaskComposer>(t).view.linked?.kind,
+        TaskTargetKind.item,
+      ),
+    ),
+    KnobCase(
+      'linkedIndex',
+      '1',
+      (t) => expect(_widget<TaskComposer>(t).view.linked?.id, 'bathroom'),
+      also: {'linkedKind': 'room'},
+    ),
+    KnobCase(
+      'label',
+      'Zed',
+      (t) => expect(_widget<TaskComposer>(t).view.label, 'Zed'),
+    ),
+    KnobCase(
+      'hint',
+      'Zed',
+      (t) => expect(_widget<TaskComposer>(t).view.hint, 'Zed'),
+    ),
+    KnobCase(
+      'helperText',
+      'Zed',
+      (t) => expect(_widget<TaskComposer>(t).view.helperText, 'Zed'),
+    ),
+    KnobCase(
+      'suggestionsLabel',
+      'Zed',
+      (t) => expect(_widget<TaskComposer>(t).view.suggestionsLabel, 'Zed'),
+    ),
+    KnobCase(
+      'targetsLabel',
+      'Zed',
+      (t) => expect(_widget<TaskComposer>(t).view.targetsLabel, 'Zed'),
+    ),
+    KnobCase(
+      'submitLabel',
+      'Zed',
+      (t) => expect(_widget<TaskComposer>(t).view.submitLabel, 'Zed'),
+    ),
+    KnobCase(
+      'submitting',
+      'true',
+      (t) => expect(_widget<TaskComposer>(t).view.submitting, isTrue),
+    ),
+    KnobCase(
+      'loadingLabel',
+      'Zed',
+      (t) => expect(_widget<TaskComposer>(t).view.loadingLabel, 'Zed'),
+    ),
+  ],
+  'FloorplanMap': [
+    KnobCase(
+      'rooms',
+      '3',
+      (t) => expect(_widget<FloorplanMap>(t).view.rooms, hasLength(3)),
+    ),
+    KnobCase(
+      'archivedRooms',
+      '2',
+      (t) => expect(
+        _widget<FloorplanMap>(t).view.rooms.where((r) => r.archived),
+        hasLength(2),
+      ),
+    ),
+    KnobCase(
+      'absences',
+      '2',
+      (t) => expect(_widget<FloorplanMap>(t).view.absences, hasLength(2)),
+    ),
+    KnobCase(
+      'washerInUse',
+      'false',
+      (t) => expect(
+        _widget<FloorplanMap>(t).view.rooms
+            .firstWhere((r) => r.room.id == 'kitchen')
+            .items
+            .single
+            .inUse,
+        isFalse,
+      ),
+    ),
+    KnobCase(
+      'loading',
+      'true',
+      (t) => expect(_widget<FloorplanMap>(t).view.loading, isTrue),
+    ),
+    KnobCase(
+      'firstRoomName',
+      'Zed',
+      (t) => expect(_widget<FloorplanMap>(t).view.rooms.first.room.name, 'Zed'),
+    ),
+    KnobCase(
+      'firstRoomCaption',
+      'Zed',
+      (t) => expect(_widget<FloorplanMap>(t).view.rooms.first.caption, 'Zed'),
+    ),
+    KnobCase(
+      'awayLabel',
+      'Zed',
+      (t) => expect(_widget<FloorplanMap>(t).view.awayLabel, 'Zed'),
+    ),
+    KnobCase(
+      'emptyTitle',
+      'Zed',
+      (t) => expect(_widget<FloorplanMap>(t).view.emptyTitle, 'Zed'),
+    ),
+    KnobCase(
+      'emptyBody',
+      'Zed',
+      (t) => expect(_widget<FloorplanMap>(t).view.emptyBody, 'Zed'),
+    ),
+    KnobCase(
+      'loadingLabel',
+      'Zed',
+      (t) => expect(_widget<FloorplanMap>(t).view.loadingLabel, 'Zed'),
+    ),
+  ],
+  'ItemSheet': [
+    KnobCase(
+      'mode',
+      'start',
+      (t) => expect(_widget<ItemSheet>(t).view.mode, ItemSheetMode.start),
+    ),
+    KnobCase(
+      'title',
+      'Zed',
+      (t) => expect(_widget<ItemSheet>(t).view.title, 'Zed'),
+    ),
+    KnobCase(
+      'message',
+      'Zed',
+      (t) => expect(_widget<ItemSheet>(t).view.message, 'Zed'),
+    ),
+    KnobCase(
+      'confirmLabel',
+      'Zed',
+      (t) => expect(_widget<ItemSheet>(t).view.confirmLabel, 'Zed'),
+    ),
+    KnobCase(
+      'closeLabel',
+      'Zed',
+      (t) => expect(_widget<ItemSheet>(t).view.closeLabel, 'Zed'),
+    ),
+    KnobCase(
+      'memberIsYou',
+      'true',
+      (t) => expect(_widget<ItemSheet>(t).view.usage!.member.isYou, isTrue),
+      also: {'mode': 'finish'},
+    ),
+
+    KnobCase(
+      'memberName',
+      'Zed',
+      (t) => expect(_widget<ItemSheet>(t).view.usage!.member.name, 'Zed'),
+    ),
+    KnobCase(
+      'memberJoinOrder',
+      '5',
+      (t) => expect(_widget<ItemSheet>(t).view.usage!.member.joinOrder, 5),
+    ),
+    KnobCase(
+      'memberStatus',
+      'away',
+      (t) => expect(
+        _widget<ItemSheet>(t).view.usage!.member.status,
+        MemberStatus.away,
+      ),
+    ),
+    KnobCase(
+      'memberIsAdmin',
+      'true',
+      (t) => expect(_widget<ItemSheet>(t).view.usage!.member.isAdmin, isTrue),
+    ),
+    KnobCase(
+      'memberSemanticLabel',
+      'Zed',
+      (t) =>
+          expect(_widget<ItemSheet>(t).view.usage!.member.semanticLabel, 'Zed'),
+    ),
+    KnobCase(
+      'usageSubtitle',
+      'Zed',
+      (t) => expect(_widget<ItemSheet>(t).view.usage!.subtitle, 'Zed'),
+    ),
+  ],
+  'AppSheet': [
+    KnobCase('title', 'Zed', (t) => expect(_widget<AppSheet>(t).title, 'Zed')),
+    KnobCase(
+      'closeLabel',
+      'Zed',
+      (t) => expect(_widget<AppSheet>(t).closeLabel, 'Zed'),
+    ),
+    KnobCase('bodyText', 'Zed', (t) {
+      final body = _widget<AppSheet>(t).body as Column;
+      expect((body.children.first as Text).data, 'Zed');
+    }),
+    KnobCase('bodyParagraphs', '3', (t) {
+      expect((_widget<AppSheet>(t).body as Column).children, hasLength(3));
+    }),
+    KnobCase(
+      'actions',
+      '2',
+      (t) => expect(_widget<AppSheet>(t).actions, hasLength(2)),
+    ),
+    KnobCase(
+      'primaryLabel',
+      'Zed',
+      (t) => expect(_widget<AppSheet>(t).actions.first.label, 'Zed'),
+    ),
+    KnobCase('secondaryLabel', 'Zed', (t) {
+      final actions = _widget<AppSheet>(t).actions;
+      expect(actions, hasLength(2));
+      expect(actions[1].label, 'Zed');
+    }, also: {'actions': '2'}),
+  ],
+  'AppFormPage': [
+    KnobCase(
+      'title',
+      'Zed',
+      (t) => expect(_widget<AppFormPage>(t).title, 'Zed'),
+    ),
+    KnobCase(
+      'backLabel',
+      'Zed',
+      (t) => expect(_widget<AppFormPage>(t).backLabel, 'Zed'),
+    ),
+    KnobCase(
+      'fields',
+      '5',
+      (t) => expect(_widget<AppFormPage>(t).fields, hasLength(5)),
+    ),
+    KnobCase(
+      'nameError',
+      'Zed',
+      (t) => expect(
+        (_widget<AppFormPage>(t).fields.first as AppTextField).errorText,
+        'Zed',
+      ),
+    ),
+    KnobCase(
+      'submitLabel',
+      'Zed',
+      (t) => expect(_widget<AppFormPage>(t).submitLabel, 'Zed'),
+    ),
+    KnobCase(
+      'submitEnabled',
+      'false',
+      (t) => expect(_widget<AppFormPage>(t).onSubmit, isNull),
+    ),
+    KnobCase(
+      'submitting',
+      'true',
+      (t) => expect(_widget<AppFormPage>(t).submitting, isTrue),
+    ),
+    KnobCase(
+      'submittingLabel',
+      'Zed',
+      (t) => expect(_widget<AppFormPage>(t).submittingLabel, 'Zed'),
+    ),
+  ],
+  'AppHomeShell': [
+    KnobCase(
+      'title',
+      'Zed',
+      (t) => expect(_widget<AppHomeShell>(t).title, 'Zed'),
+    ),
+    KnobCase(
+      'subtitle',
+      'Zed',
+      (t) => expect(_widget<AppHomeShell>(t).subtitle, 'Zed'),
+    ),
+    KnobCase(
+      'unreadCount',
+      '7',
+      (t) => expect(_widget<AppHomeShell>(t).unreadCount, 7),
+    ),
+    KnobCase(
+      'activityLabel',
+      'Zed',
+      (t) => expect(_widget<AppHomeShell>(t).activityLabel, 'Zed'),
+    ),
+    KnobCase(
+      'accountLabel',
+      'Zed',
+      (t) => expect(_widget<AppHomeShell>(t).accountLabel, 'Zed'),
+    ),
+    KnobCase(
+      'navigationLabel',
+      'Zed',
+      (t) => expect(_widget<AppHomeShell>(t).navigationLabel, 'Zed'),
+    ),
+    KnobCase(
+      'destinations',
+      '3',
+      (t) => expect(_widget<AppHomeShell>(t).destinations, hasLength(3)),
+    ),
+    KnobCase(
+      'selectedIndex',
+      '2',
+      (t) => expect(_widget<AppHomeShell>(t).selectedIndex, 2),
+    ),
+    KnobCase(
+      'calendarBadgeCount',
+      '42',
+      (t) => expect(_widget<AppHomeShell>(t).destinations[3].badgeCount, 42),
+    ),
+  ],
+  'RoomDrawBoard': [
+    KnobCase(
+      'status',
+      'applied',
+      (t) =>
+          expect(_widget<RoomDrawBoard>(t).view.status, RoomDrawStatus.applied),
+    ),
+    KnobCase(
+      'statusLabel',
+      'Zed',
+      (t) => expect(_widget<RoomDrawBoard>(t).view.statusLabel, 'Zed'),
+    ),
+    KnobCase(
+      'drawId',
+      'Zed',
+      (t) => expect(_widget<RoomDrawBoard>(t).view.drawId, 'Zed'),
+    ),
+    KnobCase(
+      'bedrooms',
+      '3',
+      (t) => expect(_widget<RoomDrawBoard>(t).view.bedrooms.length, 3),
+    ),
+    KnobCase(
+      'groupInFourth',
+      '2',
+      (t) => expect(
+        _widget<RoomDrawBoard>(t).view.bedrooms.last.members.length,
+        2,
+      ),
+    ),
+    KnobCase(
+      'firstCaption',
+      'Zed',
+      (t) =>
+          expect(_widget<RoomDrawBoard>(t).view.bedrooms.first.caption, 'Zed'),
+    ),
+    KnobCase(
+      'isAdmin',
+      'false',
+      (t) => expect(_widget<RoomDrawBoard>(t).view.isAdmin, isFalse),
+    ),
+    KnobCase(
+      'drawAgainLabel',
+      'Zed',
+      (t) => expect(_widget<RoomDrawBoard>(t).view.drawAgainLabel, 'Zed'),
+    ),
+    KnobCase(
+      'applyLabel',
+      'Zed',
+      (t) => expect(_widget<RoomDrawBoard>(t).view.applyLabel, 'Zed'),
+    ),
+    KnobCase(
+      'readOnlyNote',
+      'Zed',
+      (t) => expect(_widget<RoomDrawBoard>(t).view.readOnlyNote, 'Zed'),
+      also: {'isAdmin': 'false'},
+    ),
+    KnobCase(
+      'canDrawAgain',
+      'false',
+      (t) => expect(_widget<RoomDrawBoard>(t).onDrawAgain, isNull),
+    ),
+    KnobCase(
+      'canApply',
+      'false',
+      (t) => expect(_widget<RoomDrawBoard>(t).onApply, isNull),
+    ),
+  ],
+  'RoomEditor': [
+    KnobCase(
+      'bedrooms',
+      '1',
+      (t) => expect(_widget<RoomEditor>(t).view.bedrooms.length, 1),
+    ),
+    KnobCase(
+      'commonAreas',
+      '1',
+      (t) => expect(_widget<RoomEditor>(t).view.commonAreas.length, 1),
+    ),
+    KnobCase(
+      'archived',
+      '1',
+      (t) => expect(_widget<RoomEditor>(t).view.archived.length, 1),
+    ),
+    KnobCase('occupants', '2', (t) {
+      final first = _widget<RoomEditor>(t).view.bedrooms.first;
+      expect(first.occupants.length, 2);
+      expect(first.subtitle, 'Ana (you), Luis · 2 of 2 beds');
+    }),
+    KnobCase(
+      'assignOptions',
+      '1',
+      (t) => expect(
+        _widget<RoomEditor>(t).view.bedrooms.first.assignOptions.length,
+        1,
+      ),
+    ),
+    KnobCase(
+      'bedroomsTitle',
+      'Zed',
+      (t) => expect(_widget<RoomEditor>(t).view.bedroomsTitle, 'Zed'),
+    ),
+    KnobCase(
+      'commonAreasTitle',
+      'Zed',
+      (t) => expect(_widget<RoomEditor>(t).view.commonAreasTitle, 'Zed'),
+    ),
+    KnobCase(
+      'addLabel',
+      'Zed',
+      (t) => expect(_widget<RoomEditor>(t).view.addLabel, 'Zed'),
+    ),
+    KnobCase(
+      'assignLabel',
+      'Zed',
+      (t) => expect(_widget<RoomEditor>(t).view.assignLabel, 'Zed'),
+    ),
+    KnobCase(
+      'limitMessage',
+      'Zed',
+      (t) => expect(_widget<RoomEditor>(t).view.limitMessage, 'Zed'),
+    ),
+    KnobCase(
+      'archivedTitle',
+      'Zed',
+      (t) => expect(_widget<RoomEditor>(t).view.archivedTitle, 'Zed'),
+      also: {'archived': '1'},
+    ),
+    KnobCase(
+      'subtitle',
+      'Zed',
+      (t) => expect(_widget<RoomEditor>(t).view.bedrooms.first.subtitle, 'Zed'),
+    ),
+    KnobCase(
+      'assignOpen',
+      'true',
+      (t) => expect(
+        _widget<RoomEditor>(t).initialAssignOpen,
+        contains('bedroom-1'),
+      ),
+    ),
+    KnobCase(
+      'editLabel',
+      'Zed',
+      (t) =>
+          expect(_widget<RoomEditor>(t).view.bedrooms.first.editLabel, 'Zed'),
+    ),
+    KnobCase(
+      'archiveLabel',
+      'Zed',
+      (t) => expect(
+        _widget<RoomEditor>(t).view.bedrooms.first.archiveLabel,
+        'Zed',
+      ),
+    ),
+    KnobCase(
+      'roomAssignLabel',
+      'Zed',
+      (t) => expect(
+        _widget<RoomEditor>(t).view.bedrooms.first.assignLabel,
+        'Assign Zed',
+      ),
+    ),
+    KnobCase(
+      'restoreLabel',
+      'Zed',
+      (t) => expect(
+        _widget<RoomEditor>(t).view.archived.firstOrNull?.restoreLabel,
+        'Zed',
+      ),
+      also: {'archived': '1'},
+    ),
+    KnobCase(
+      'archivedSubtitle',
+      'Zed',
+      (t) => expect(
+        _widget<RoomEditor>(t).view.archived.firstOrNull?.subtitle,
+        'Zed',
+      ),
+      also: {'archived': '1'},
     ),
   ],
 };

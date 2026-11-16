@@ -70,7 +70,8 @@ String _nonEmpty(String value, String fallback) =>
     value.isEmpty ? fallback : value;
 
 /// Every prop of [SheetHeader] as a knob. `onClose` is plumbing the story
-/// owns.
+/// owns, and the title node is a "focused look" knob: the ring itself also
+/// needs keyboard highlight.
 WidgetbookUseCase _playground() {
   return WidgetbookUseCase(
     name: playgroundUseCaseName,
@@ -94,9 +95,31 @@ WidgetbookUseCase _playground() {
         closeSample,
       );
 
+      final focused = context.knobs.boolean(
+        label: 'focused look',
+        description:
+            'Gives the title a focus node that reports focus. The ring '
+            'shows for keyboard users only',
+      );
+
+      final namesRoute = context.knobs.boolean(
+        label: 'namesRoute',
+        description: 'The title names the route that shows the sheet',
+      );
+
+      Widget header(FocusNode? node) => SheetHeader(
+        namesRoute: namesRoute,
+        title: title,
+        onClose: _noop,
+        closeLabel: closeLabel,
+        titleFocusNode: node,
+      );
+
       return useCaseFrame(
         child: _sheet(
-          SheetHeader(title: title, onClose: _noop, closeLabel: closeLabel),
+          focused
+              ? FocusedNodeHost(builder: (context, node) => header(node))
+              : header(null),
         ),
       );
     },

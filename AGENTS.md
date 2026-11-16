@@ -6,7 +6,7 @@ Rules for anyone writing code in this repo, human or AI agent. Read this before 
 
 `compapp_design` is the design system of [Compapp](https://github.com/6Pi-Devs/Compapp-app): design tokens, a Material 3 theme and reusable widgets, organized by atomic design and cataloged in Widgetbook. The look is "Living Floorplan", defined in the [Claude Design canvas](https://claude.ai/artifact/XRN3NJsKyxv3FgVhGgFPpo). The app consumes this package as a git dependency pinned to a release tag. Work is tracked in [Compapp-app#24](https://github.com/6Pi-Devs/Compapp-app/issues/24).
 
-1. **Compose down, never up.** `tokens, models <- atoms <- molecules <- organisms <- templates`. See [Import rules](#import-rules).
+1. **Compose down, never up.** `tokens, models <- foundation <- atoms <- molecules <- organisms <- templates`. See [Import rules](#import-rules).
 2. **Components are pure presentation.** Props are plain data and callbacks. No app or feature types, no repositories, cubits, use cases, `GetIt` or l10n delegates.
 3. **Every visible string is a prop.** The app owns localization and passes strings in. Stories pass English and Spanish samples.
 4. **Colors, sizes and motion come from tokens.** No `Color(0x...)` outside `lib/src/tokens/`, no magic numbers.
@@ -52,10 +52,11 @@ lib/
     tokens/               AppColors, AppSpacing, AppRadius, AppShadows, AppMotion, AppSizes, AppStateLayers, AppOpacity, AppProgress, AppDecor, AppTypography (AppPalette is internal)
     theme/                CompappTheme.light / dark
     models/               view models and shared enums (MemberView, RoomView, AppIcons)
+    foundation/           internal building blocks shared by components, not components (EqualPair, HeaderBody, DashedBorder, DashedOutlinePainter)
     atoms/                single-purpose controls (AppButton, AppPebble, AppChip)
     molecules/            atoms composed into a unit (MemberRow, RoomTile)
     organisms/            sections made of molecules (FloorplanMap, PresencePanel)
-    templates/            page scaffolds with no data access
+    templates/            page scaffolds with slots and plain data, no data access and no routing (AppSheet, AppFormPage, AppHomeShell)
 tokens/compapp.tokens.json   source of truth for every token (DTCG-style JSON)
 components.json             machine-readable component manifest
 widgetbook/                 catalog app (path dependency on this package)
@@ -70,10 +71,11 @@ fonts/                      bundled Bricolage Grotesque and Instrument Sans, wit
 | `tokens` | Flutter `painting` and `material` types | everything else in `src/` |
 | `models` | Dart SDK, Flutter `painting` and `foundation` types (`@immutable`), other `models` | `tokens` and everything above |
 | `theme` | `tokens` | atoms and above |
-| `atoms` | `tokens`, `models`, and `AppIcon` (the only atom an atom may use, so a button can show an icon) | every other atom, molecules and above |
-| `molecules` | `tokens`, `models`, `atoms` | other molecules, organisms and above |
-| `organisms` | `tokens`, `models`, `atoms`, `molecules` | other organisms, templates |
-| `templates` | everything below | app or feature code |
+| `foundation` | `tokens`, `models`, other `foundation` files | atoms and above, `theme` |
+| `atoms` | `tokens`, `models`, `foundation`, and `AppIcon` (the only atom an atom may use, so a button can show an icon) | every other atom, molecules and above |
+| `molecules` | `tokens`, `models`, `foundation`, `atoms` | other molecules, organisms and above |
+| `organisms` | `tokens`, `models`, `foundation`, `atoms`, `molecules` | other organisms, templates |
+| `templates` | `tokens`, `models`, `foundation`, `atoms`, `molecules`, `organisms` | other templates, app or feature code |
 | all levels | Flutter, Dart SDK, `path_parsing`, `package:compapp_design/...` | `flutter_bloc`, `get_it`, `dio`, `go_router`, l10n delegates, anything from Compapp-app |
 
 `BuildContext` is read only for `Theme`, `IconTheme`, `MediaQuery` and `Directionality`. View models (`MemberView`, `RoomView`) and shared enums (`AppIcons`) live in `lib/src/models/`: plain immutable data owned by this package, importable from every level, exempt from the manifest. The app maps its business objects to them. Nothing in `models` imports upward.
@@ -81,6 +83,24 @@ fonts/                      bundled Bricolage Grotesque and Instrument Sans, wit
 One exception: the static `AppConfirmDialog.show` reads the `Navigator` and `MaterialLocalizations` of its context, because `showDialog` needs both to push the route and pop the answer. It is the only way to hand the app a `Future<bool>` without a router dependency. The widget itself stays pure presentation. A new exception needs the same written reason here.
 
 Imports under `lib/` are `package:compapp_design/...`. Tests may import `test/helpers/` and `tool/` with a relative path (`tool/` sits outside `lib/`, so it has no package URI).
+
+### Foundation
+
+`lib/src/foundation/` holds the building blocks that more than one component needs and that are not components themselves: a render object (`RenderEqualPair`, with its widget `EqualPair`; `RenderHeaderBody`, with `HeaderBody`, a header over a body that scrolls together when the header is too tall), a border (`DashedBorder`), a painter (`DashedOutlinePainter`). It exists so a layout or a drawing is written once instead of copied into each component that needs it. Atoms, molecules, organisms and templates may import it, and it imports only tokens, models, its own files and what every level may import (Flutter, the Dart SDK), never a component.
+
+It is internal: the barrel does not export it, so an app cannot reach it, and it is not in `components.json` (it has no widget to catalog, no story and no golden of its own). `test/manifest_test.dart` skips it on purpose and fails if `components.json` lists a file in it or any `export` under `lib/` points into it. What it draws is covered by the tests of the components that use it and by its own tests in `test/foundation/`. A piece moves here when a second component needs the same code, not before, and the pieces of one family move together: `DashedOutlinePainter` has one user (`AppEmptyState`), but it draws through the same `paintDashedOutline` as `DashedBorder`, which three components use.
+
+### Templates
+
+A template is a layout skeleton: it arranges slots (widgets the app passes in) and plain data, and owns only the layout and the accessibility of that layout (insets, scrolling, focus order, how a modal names its route). It has no routing, no navigation stack and no state beyond what the layout needs: the app owns `GoRouter` and the cubits, and fills the slots. A template composes the levels below it and never another template, so two templates never depend on each other. Code two templates share moves to `foundation/`. A slot is typed as narrowly as it can be (`AppTopBar` for a bar, `List<Widget>` for fields) so the app cannot put in something the layout does not expect.
+
+A page template may own a `Scaffold` (`AppFormPage` does, and so does the shell, `AppHomeShell`), and then it owns what a `Scaffold` brings, which the template documents and tests:
+
+- **Insets.** The body is laid out above the keyboard, so the template takes the safe-area insets it needs from `MediaQuery` (top for the bar, bottom for the bottom bar) and needs no `SafeArea` around it. A modal template has no `Scaffold`: the route that hosts it must keep the top inset (`showModalBottomSheet(useSafeArea: true)`), or the header slides under the status bar once the keyboard is up.
+- **SnackBars.** A `SnackBar` sits above the `Scaffold`'s bottom bar, so a pinned action goes in `bottomNavigationBar`, never in the body, or the `SnackBar` covers it.
+- **Nesting.** A page template is a route of its own, pushed above the shell. A tab body inside a shell must not contain one: two `Scaffold`s would both take the insets and the `SnackBar` would go to the wrong one.
+- **Shell.** A shell template (`AppHomeShell`) is the outer `Scaffold` of the main screens: the home bar, the body of the selected tab and the nav bar. It takes the selected index and reports taps, and owns no tab state, no routing and no navigator: the app's router supplies the body. A page pushed from a tab goes on the root navigator, above the shell, and owns its own `Scaffold`; a tab body is not a page template and holds no `Scaffold`. The shell takes the top and bottom insets out of what the body sees, keeps the nav bar under the keyboard (out of the focus order and the semantics while it is covered) and gives the body the room, and puts the bar out of the layout when it alone would take more than half of the room the keyboard leaves. It announces nothing on a tab change, as Material's `NavigationBar` does not.
+- **Focus.** Traversal order is set by the template where position on screen would lie (a field scrolled below the bottom bar), in its own `FocusTraversalGroup`, and stays local to it: an order the app sets inside a slot never reaches the template's own order.
 
 ### Naming
 
@@ -107,7 +127,7 @@ The analyzer enforces the Dart 3.13 shorthand. Write `const new(this.x)` for the
 
 ### Manifest
 
-`components.json` holds one entry per widget. `test/manifest_test.dart` fails when an entry's `path` does not exist, when a Dart file under `lib/src/{atoms,molecules,organisms,templates}/` has no entry, when `id`s or classes repeat, or when a `playground` is missing, is not `<Level>/<Class>/playground`, repeats or is also a story. The schema version is 2: version 2 added the required `playground` field.
+`components.json` holds one entry per widget. `test/manifest_test.dart` fails when an entry's `path` does not exist, when `components.json` lists a file of the internal `foundation/` folder or any `export` under `lib/` points into it (see [Foundation](#foundation)), when a Dart file under `lib/src/{atoms,molecules,organisms,templates}/` has no entry, when `id`s or classes repeat, or when a `playground` is missing, is not `<Level>/<Class>/playground`, repeats or is also a story. The schema version is 2: version 2 added the required `playground` field.
 
 ```json
 {
@@ -130,21 +150,21 @@ The analyzer enforces the Dart 3.13 shorthand. Write `const new(this.x)` for the
 }
 ```
 
-`path` is relative to `lib/src/`. `level` is `atom`, `molecule`, `organism` or `template`, and the path starts with its folder.
+`path` is relative to `lib/src/`. `level` is `atom`, `molecule`, `organism` or `template`, and the path starts with its folder. `notes` is optional, an array of strings: each records a known gap with the board or a decision a reader would otherwise have to rediscover.
 
 ### Widgetbook and golden tests
 
 - One fixed use case per variant x state listed in the manifest, no more, no fewer, plus exactly one `playground` per component (see [Playgrounds](#playgrounds)).
 - Use case names follow `<Level>/<Class>/<variant>-<state>` (`Atoms/AppButton/primary-disabled`). The manifest `stories`, the Widgetbook tree and the golden file names use the same string.
 - A fixed use case is a plain builder with fixed props, no knobs. The same builder feeds the Widgetbook tree and the tests, so the catalog and the goldens cannot drift. Knobs live only in the `playground`.
-- The tree is written by hand in `widgetbook/lib/src/catalog/` (`catalog.dart` composes `atoms.dart` and `molecules.dart`, one file of use cases per component under `atoms/` and `molecules/`). There is no `widgetbook_generator` and no `build_runner`: generated files are never committed, and an explicit tree is easier for agents to read.
+- The tree is written by hand in `widgetbook/lib/src/catalog/` (`catalog.dart` composes `atoms.dart`, `molecules.dart`, `organisms.dart` and `templates.dart`, one file of use cases per component under `atoms/`, `molecules/`, `organisms/` and `templates/`). There is no `widgetbook_generator` and no `build_runner`: generated files are never committed, and an explicit tree is easier for agents to read.
 - Strings in use cases come in English and Spanish: `context.sample(en: ..., es: ...)` picks one by the locale the Widgetbook localization addon sets. Goldens render `en` only.
-- Generic tests in `widgetbook/test/` loop over the catalog, so a new atom or molecule is covered without touching them:
+- Generic tests in `widgetbook/test/` loop over the catalog, so a new atom, molecule, organism or template is covered without touching them:
   - `catalog_contract_test.dart`: the fixed use case paths equal the union of every manifest `stories` entry, in both directions, follow the naming pattern, and each manifest entry has exactly one story per variant x state. The playgrounds in the tree equal the manifest `playground` paths, one per component.
   - `catalog_goldens_test.dart`: one golden per fixed use case, named after its path, holding four scenarios (light and dark, text scale 1.0 and 2.0).
   - `catalog_semantics_test.dart`: every fixed use case, light and dark, meets `androidTapTargetGuideline`, `iOSTapTargetGuideline` and `labeledTapTargetGuideline`. It also runs `textContrastGuideline`, which finds a text by its semantics label and so is blind to a merged or replaced label: do not rely on it for contrast.
   - `catalog_text_contrast_test.dart`: owns the contrast of every rendered text. It walks the `RenderParagraph`s of every fixed use case, light and dark, reads the text color (`color` or `foreground`, times the opacity of its ancestors) and the nearest opaque fill among the render ancestors (the painted pixels around it when the nearest painting ancestor is a custom painter), and holds each text to 4.5:1. A text it cannot read is reported, not skipped, and a fully transparent one is not painted, so it is not read. `widgetbook/test/helpers/rendered_text_contrast_test.dart` holds the cases it must pass and fail.
-  - `catalog_molecules_layout_test.dart`: every fixed molecule use case is laid out the way the goldens do (intrinsic sizing, real fonts), draws at a visible size in all four scenarios and overflows nowhere. A molecule that expands (a row) gets a fixed width in its use case, and must not use `LayoutBuilder` (the golden harness measures intrinsic sizes).
+  - `catalog_layout_test.dart`: every fixed molecule, organism and template use case is laid out the way the goldens do (intrinsic sizing, real fonts), draws at a visible size in all four scenarios and overflows nowhere. A component that expands (a row, an organism) gets a fixed width in its use case (`barFrame`), and must not use `LayoutBuilder` (the golden harness measures intrinsic sizes). An organism may be tall: a scenario is as tall as its content, so the golden shows all of it, and an organism that scrolls gets a bounded height in its use case instead.
 - States a static builder cannot reach by gesture are rendered deterministically without a test-only prop on the component, so every golden scenario shows them. Buttons take Material's `statesController` holding `WidgetState.pressed` or `WidgetState.focused` (`StatesControllerHost`). Fields and the code input take a `FocusNode` that reports focus (`FocusedNodeHost`), because only one widget can really hold the primary focus and the four scenarios of a golden render side by side. Spinners freeze under `FrozenMotion` (`MediaQuery.disableAnimations`), so `pumpAndSettle` can finish. The helpers live in `widgetbook/lib/src/support/story_support.dart`.
 - alchemist draws the text of an editable field as blocks, so a golden never proves its text color: component widget tests read the painted pixel instead.
 - Widgetbook shows light and dark (`CompappTheme`), `en` and `es`, text scale and phone viewports through addons.
@@ -196,7 +216,7 @@ To add or update a golden (a new atom, or an intentional visual change):
 
 1. Add its entry to `components.json` first (level, class, playground, path, props, variants, states, semantics, key, stories). `playground` is `<Level>/<Class>/playground`.
 2. Create `lib/src/<level>/<name>.dart` following the [Import rules](#import-rules). Export it from the barrel.
-3. Add `widgetbook/lib/src/catalog/<level>s/<name>_use_cases.dart` (`atoms/` or `molecules/`) with one use case per variant x state, and register it in `atoms.dart` or `molecules.dart`. The goldens and the semantics test pick it up on their own.
+3. Add `widgetbook/lib/src/catalog/<level>s/<name>_use_cases.dart` (`atoms/`, `molecules/`, `organisms/` or `templates/`) with one use case per variant x state, and register it in `atoms.dart`, `molecules.dart`, `organisms.dart` or `templates.dart`. The goldens and the semantics test pick it up on their own.
 4. In the same file add the `playground` use case with a knob for every prop (see [Playgrounds](#playgrounds)). The playground smoke test picks it up on its own.
 5. Push, let CI render the Linux golden, download the `ci-goldens` artifact, review the new PNGs and commit them (see [Golden tooling](#golden-tooling)).
 6. Run the [Definition of Done](#definition-of-done) checklist.
@@ -236,6 +256,7 @@ To add or update a golden (a new atom, or an intentional visual change):
 | `color.on-pebble` | `AppColors.onPebble`: initials and ring on a pebble. Dark in both themes, because the pebble colors are pastel in both |
 | `font.display`, `headline`, `title` | `TextTheme.displayMedium`, `headlineSmall`, `titleLarge` |
 | `font.body-lg`, `body`, `label`, `caption` | `TextTheme.bodyLarge`, `bodyMedium`, `labelLarge`, `bodySmall` |
+| `font.code` | `AppTypography.code` (Bricolage 600, 34, line 40, 4 px tracking, `opsz` 34): the code of `CodeCard`. No `TextTheme` slot |
 | `font.label-lg` | `AppTypography.labelLg` (15/22, 600). No `TextTheme` slot: the button themes use it for their label |
 | `space.xs` to `xxl` | `AppSpacing.xs`, `sm`, `md`, `lg`, `xl`, `xxl` (4, 8, 16, 24, 32, 48) |
 | `radius.xs` to `lg`, `radius.pebble` | `AppRadius.xs`, `sm`, `md`, `lg`, `AppRadius.pebble(size)` |
@@ -270,6 +291,9 @@ To add or update a golden (a new atom, or an intentional visual change):
 | `size.beacon` | `AppSizes.beacon` (34): glyph tile or breathing ring of `ItemBeacon` |
 | `size.border-room` | `AppSizes.borderRoom` (1.5): border of a `RoomTile`, solid or dashed |
 | `size.ribbon` | `AppSizes.ribbon` (28, grows with its text): least height of an `EventRibbon` |
+| `size.activity-tile` | `AppSizes.activityTile` (40): glyph tile of `ActivityRow` |
+| `size.presence-control` | `AppSizes.presenceControl` (64, grows with its text): least height of `PresenceSwitch` and `KnockButton` |
+| `size.knock-width`, `knock-ring` | `AppSizes.knockWidth` (96, grows with its text), `knockRing` (24): least width of `KnockButton` and the ring it shows while it waits |
 | `size.dialog-max-width` | `AppSizes.dialogMaxWidth` (560): widest an `AppConfirmDialog` grows on a tablet or in landscape |
 | `size.border-emphasis`, `focus-ring` | `AppSizes.borderEmphasis` (2, selected, focus and error borders), `focusRing` (4, primary-soft ring around a focused field) |
 | `size.code-cell-width`, `code-cell-height` | `AppSizes.codeCellWidth` (56), `codeCellHeight` (60) |

@@ -6,7 +6,7 @@ import 'package:compapp_design_widgetbook/src/support/story_support.dart';
 import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
 
-/// One use case per selected destination, plain and with a count on Tasks.
+/// One use case per selected destination, plain and with a count on Calendar.
 WidgetbookComponent buildAppNavBar() {
   return WidgetbookComponent(
     name: 'AppNavBar',
@@ -23,7 +23,7 @@ WidgetbookComponent buildAppNavBar() {
             name: '$name-$state',
             builder: (context) => barFrame(
               child: AppNavBar(
-                destinations: _destinations(context, tasksBadge: badge),
+                destinations: _destinations(context, calendarBadge: badge),
                 selectedIndex: index,
                 onSelected: _noop,
                 semanticLabel: _landmark(context),
@@ -41,7 +41,7 @@ String _landmark(BuildContext context) =>
 
 List<NavDestinationView> _destinations(
   BuildContext context, {
-  required int tasksBadge,
+  required int calendarBadge,
 }) => [
   NavDestinationView(
     id: 'home',
@@ -57,18 +57,18 @@ List<NavDestinationView> _destinations(
     id: 'tasks',
     icon: AppIcons.tasks,
     label: context.sample(en: 'Tasks', es: 'Tareas'),
-    badgeCount: tasksBadge,
-    semanticLabel: tasksBadge == 0
-        ? null
-        : context.sample(
-            en: 'Tasks, $tasksBadge to do',
-            es: 'Tareas, $tasksBadge por hacer',
-          ),
   ),
   NavDestinationView(
     id: 'calendar',
     icon: AppIcons.calendar,
     label: context.sample(en: 'Calendar', es: 'Calendario'),
+    badgeCount: calendarBadge,
+    semanticLabel: calendarBadge == 0
+        ? null
+        : context.sample(
+            en: 'Calendar, $calendarBadge new events',
+            es: 'Calendario, $calendarBadge eventos nuevos',
+          ),
   ),
 ];
 
@@ -86,7 +86,7 @@ WidgetbookUseCase _playground() {
   return WidgetbookUseCase(
     name: playgroundUseCaseName,
     builder: (context) {
-      final pool = _destinations(context, tasksBadge: 0);
+      final pool = _destinations(context, calendarBadge: 0);
       final count = context.knobs.int
           .slider(
             label: 'destinations',

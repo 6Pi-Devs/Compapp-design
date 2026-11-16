@@ -1,11 +1,18 @@
 import 'package:compapp_design/compapp_design.dart';
+import 'package:compapp_design/src/foundation/dashed_border.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers/bundled_fonts.dart';
 import '../helpers/contrast.dart';
 import '../helpers/host.dart';
 import '../helpers/painted_color.dart';
+import '../helpers/painted_pixels.dart';
+import '../helpers/word_breaks.dart';
 
 const _tileWidth = 168.0;
 const _cellHeight = 104.0;
@@ -38,6 +45,8 @@ RoomTile _tile({
   String label = 'Bathroom, occupied by Carlos, 12 minutes',
   List<MemberView> occupants = const [],
   List<Widget> beacons = const [],
+  bool draw = false,
+  VoidCallback? onTap,
 }) => RoomTile(
   room: RoomView(id: id, name: name),
   state: state,
@@ -45,6 +54,8 @@ RoomTile _tile({
   semanticLabel: label,
   occupants: occupants,
   beacons: beacons,
+  draw: draw,
+  onTap: onTap,
 );
 
 Widget _cell(
@@ -59,11 +70,9 @@ Widget _cell(
 Finder _key(String id) => find.byKey(Key('floorplan.room.$id'));
 Finder _pebble(String id) => find.byKey(Key('roomTile.pebble.$id'));
 
-ShapeDecoration _decoration(WidgetTester tester) {
+ShapeDecoration _decoration(WidgetTester tester, {String id = 'bathroom'}) {
   final box = tester.widget<DecoratedBox>(
-    find
-        .descendant(of: _key('bathroom'), matching: find.byType(DecoratedBox))
-        .first,
+    find.descendant(of: _key(id), matching: find.byType(DecoratedBox)).first,
   );
   return box.decoration as ShapeDecoration;
 }
@@ -357,8 +366,7 @@ void main() {
       for (final state in RoomTileState.values) {
         await tester.pumpWidget(host(_cell(_tile(state: state))));
 
-        final dashed =
-            _decoration(tester).shape.runtimeType.toString() == '_DashedBorder';
+        final dashed = _decoration(tester).shape is DashedBorder;
         expect(dashed, state == RoomTileState.free, reason: state.name);
       }
     });
@@ -763,5 +771,864 @@ void main() {
         }
       }
     });
+  });
+
+  group('draw form', () {
+    setUpAll(loadBundledFonts);
+
+    RoomTile drawTile({
+      RoomTileState state = RoomTileState.home,
+      String id = 'bedroom1',
+      String name = 'Bedroom 1',
+      String caption = 'from Bedroom 3',
+      String? label,
+      List<MemberView> occupants = const [_carlos],
+      VoidCallback? onTap,
+    }) => _tile(
+      state: state,
+      id: id,
+      name: name,
+      caption: caption,
+      label:
+          label ??
+          '$name: ${occupants.map((m) => m.name).join(' and ')}, $caption',
+      occupants: occupants,
+      onTap: onTap,
+      draw: true,
+    );
+
+    Finder bedroom() => _key('bedroom1');
+
+    testWidgets('the name is alone on top and the caption sits at the bottom, '
+        'beside the pebble', (tester) async {
+      await tester.pumpWidget(host(_cell(drawTile())));
+
+      final tile = tester.getRect(bedroom());
+      final name = tester.getRect(find.text('Bedroom 1'));
+      final caption = tester.getRect(find.text('from Bedroom 3'));
+      final pebble = tester.getRect(_pebble('carlos'));
+      expect(pebble.left, tile.left + AppSpacing.sm, reason: 'at the start');
+      expect(pebble.bottom, tile.bottom - AppSpacing.sm);
+      expect(
+        caption.left,
+        closeTo(pebble.right + AppSpacing.xs, 0.01),
+        reason: 'beside the pebble',
+      );
+      expect(caption.center.dy, closeTo(pebble.center.dy, 0.5));
+      expect(caption.top, greaterThan(name.bottom + 8), reason: 'not under it');
+    });
+
+    testWidgets('a group of people keeps its order, pebbles first', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        host(
+          _cell(
+            drawTile(
+              id: 'bedroom2',
+              name: 'Bedroom 2 · 2 beds',
+              occupants: const [_ana, _carlos],
+              caption: 'from Bedroom 4',
+            ),
+            width: 240,
+          ),
+        ),
+      );
+
+      final ana = tester.getRect(_pebble('ana'));
+      final carlos = tester.getRect(_pebble('carlos'));
+      final caption = tester.getRect(find.text('from Bedroom 4'));
+      expect(ana.right + AppSpacing.xs, closeTo(carlos.left, 0.01));
+      expect(carlos.right + AppSpacing.xs, closeTo(caption.left, 0.01));
+    });
+
+    testWidgets('a bedroom that stays free shows only the caption at the '
+        'bottom start, on the dashed wall', (tester) async {
+      await tester.pumpWidget(
+        host(
+          _cell(
+            drawTile(
+              state: RoomTileState.free,
+              occupants: const [],
+              caption: 'Stays free',
+              label: 'Bedroom 1, stays free',
+            ),
+          ),
+        ),
+      );
+
+      final tile = tester.getRect(bedroom());
+      final caption = tester.getRect(find.text('Stays free'));
+      expect(find.byType(AppPebble), findsNothing);
+      expect(caption.left, tile.left + AppSpacing.sm);
+      expect(caption.bottom, tile.bottom - AppSpacing.sm);
+      expect(
+        (_decoration(tester, id: 'bedroom1').shape as DashedBorder).side.color,
+        CompappTheme.light.colorScheme.outlineVariant,
+      );
+    });
+
+    testWidgets('every state keeps its wall in the draw form', (tester) async {
+      for (final state in RoomTileState.values) {
+        await tester.pumpWidget(
+          host(
+            _cell(drawTile(state: state)),
+            background: CompappTheme.light.colorScheme.surface,
+          ),
+        );
+        final size = tester.getSize(bedroom());
+
+        expect(
+          await paintedColorAt(
+            tester,
+            hostBoundaryKey,
+            Offset(size.width - 12, 12),
+          ),
+          isSameColorAs(_fillOf(CompappTheme.light, state)),
+          reason: state.name,
+        );
+        expect(
+          find.byWidgetPredicate(
+            (w) => w is AppIcon && w.icon == AppIcons.occupied,
+          ),
+          state == RoomTileState.occupied ? findsOneWidget : findsNothing,
+        );
+      }
+    });
+
+    testWidgets('without draw the caption stays under the name', (
+      tester,
+    ) async {
+      await tester.pumpWidget(host(_cell(_tile(occupants: const [_carlos]))));
+      final caption = tester.getRect(find.text('occupied'));
+      final name = tester.getRect(find.text('Bathroom'));
+
+      expect(caption.top, closeTo(name.bottom, 4));
+      expect(caption.left, name.left);
+    });
+
+    testWidgets('the caption wraps under the pebbles when the line is full', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        host(
+          _cell(
+            drawTile(occupants: const [_ana, _carlos]),
+            width: 128,
+            height: 140,
+          ),
+        ),
+      );
+
+      final carlos = tester.getRect(_pebble('carlos'));
+      final caption = tester.getRect(find.text('from Bedroom 3'));
+      expect(caption.top, greaterThanOrEqualTo(carlos.bottom));
+      expect(caption.left, tester.getRect(bedroom()).left + AppSpacing.sm);
+      expect(tester.takeException(), isNull);
+    });
+
+    for (final scale in [1.0, 1.3, 1.5, 2.0]) {
+      for (final (width, direction) in [
+        (_tileWidth, TextDirection.ltr),
+        (_tileWidth, TextDirection.rtl),
+        (320.0, TextDirection.ltr),
+        (360.0, TextDirection.rtl),
+      ]) {
+        testWidgets('Spanish text at ${scale}x in ${width.toInt()} '
+            '${direction.name} wraps whole words and stays inside', (
+          tester,
+        ) async {
+          const name = 'Dormitorio 4 · 2 camas';
+          const caption = 'desde Dormitorio 3';
+          await tester.pumpWidget(
+            host(
+              Align(
+                alignment: AlignmentDirectional.topStart,
+                child: SizedBox(
+                  width: width,
+                  child: drawTile(
+                    name: name,
+                    caption: caption,
+                    occupants: const [_ana, _carlos],
+                  ),
+                ),
+              ),
+              textScale: scale,
+              direction: direction,
+              width: 400,
+            ),
+          );
+
+          expect(tester.takeException(), isNull);
+          final tile = tester.getRect(bedroom());
+          for (final finder in [
+            find.text(name),
+            find.text(caption),
+            _pebble('ana'),
+            _pebble('carlos'),
+          ]) {
+            final box = tester.getRect(finder);
+            expect(
+              box.left,
+              greaterThanOrEqualTo(tile.left + AppSpacing.sm - 0.01),
+            );
+            expect(
+              box.right,
+              lessThanOrEqualTo(tile.right - AppSpacing.sm + 0.01),
+            );
+            expect(
+              box.bottom,
+              lessThanOrEqualTo(tile.bottom - AppSpacing.sm + 0.01),
+            );
+          }
+          expectNoMidWordBreaks(tester, find.text(name));
+          expectNoMidWordBreaks(tester, find.text(caption));
+          if (direction == TextDirection.rtl) {
+            expect(
+              tester.getRect(_pebble('ana')).right,
+              tile.right - AppSpacing.sm,
+              reason: 'the pebbles start at the right',
+            );
+          }
+        });
+      }
+    }
+
+    testWidgets('can be measured by intrinsic sizing, as the goldens do', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        host(
+          IntrinsicWidth(
+            child: IntrinsicHeight(
+              child: drawTile(occupants: const [_ana, _carlos]),
+            ),
+          ),
+        ),
+      );
+
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('its dry layout agrees with its real one', (tester) async {
+      await tester.pumpWidget(
+        host(
+          Align(
+            alignment: AlignmentDirectional.topStart,
+            child: SizedBox(
+              width: 150,
+              child: drawTile(occupants: const [_ana, _carlos]),
+            ),
+          ),
+        ),
+      );
+      final box = tester.renderObject<RenderBox>(bedroom());
+
+      expect(box.getDryLayout(const BoxConstraints(maxWidth: 150)), box.size);
+    });
+
+    testWidgets('is one node named by the label', (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(host(_cell(drawTile())));
+
+      expect(
+        tester.getSemantics(bedroom()),
+        isSemantics(label: 'Bedroom 1: Carlos, from Bedroom 3'),
+      );
+      expect(semanticsLabels(tester), ['Bedroom 1: Carlos, from Bedroom 3']);
+      handle.dispose();
+    });
+
+    testWidgets('with an onTap it is still a button named by the label', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      var taps = 0;
+      await tester.pumpWidget(host(_cell(drawTile(onTap: () => taps++))));
+
+      expect(
+        tester.getSemantics(bedroom()),
+        isSemantics(
+          label: 'Bedroom 1: Carlos, from Bedroom 3',
+          isButton: true,
+          isFocusable: true,
+          hasTapAction: true,
+          hasFocusAction: true,
+        ),
+      );
+      await tester.tap(bedroom());
+      expect(taps, 1);
+      handle.dispose();
+    });
+
+    testWidgets('a draw tile with beacons is refused', (tester) async {
+      await tester.pumpWidget(
+        host(
+          _cell(
+            RoomTile(
+              room: const RoomView(id: 'a', name: 'A'),
+              state: RoomTileState.free,
+              caption: 'free',
+              semanticLabel: 'A, free',
+              draw: true,
+              beacons: [_beacon('Oven')],
+            ),
+          ),
+        ),
+      );
+
+      expect(
+        tester.takeException(),
+        isA<AssertionError>().having(
+          (e) => e.message,
+          'message',
+          contains('no beacons'),
+        ),
+      );
+    });
+
+    testWidgets('a draw tile whose label lacks its name is refused', (
+      tester,
+    ) async {
+      await tester.pumpWidget(host(_cell(drawTile(label: 'Carlos goes here'))));
+
+      expect(
+        tester.takeException(),
+        isA<AssertionError>().having(
+          (e) => e.message,
+          'message',
+          contains('label in name'),
+        ),
+      );
+    });
+
+    for (final (name, theme) in themes) {
+      test('its caption reaches 4.5:1 on every wall ($name)', () {
+        final scheme = theme.colorScheme;
+        expectContrast(
+          {
+            for (final state in RoomTileState.values)
+              '${state.name} caption': (
+                switch (state) {
+                  RoomTileState.away ||
+                  RoomTileState.free => scheme.onSurfaceVariant,
+                  RoomTileState.home ||
+                  RoomTileState.occupied => scheme.onSurface,
+                },
+                _fillOf(theme, state),
+              ),
+          },
+          minimum: 4.5,
+          reason: name,
+        );
+      });
+    }
+  });
+
+  group('tapped', () {
+    RoomTile tappable({
+      VoidCallback? onTap,
+      List<Widget> beacons = const [],
+      RoomTileState state = RoomTileState.free,
+    }) => RoomTile(
+      room: const RoomView(id: 'bathroom', name: 'Bathroom'),
+      state: state,
+      caption: 'free',
+      semanticLabel: 'Bathroom, free',
+      beacons: beacons,
+      onTap: onTap ?? () {},
+    );
+
+    /// Room for the ring: it is drawn outside the tile, and the host clips at
+    /// its boundary.
+    Widget padded(Widget child) =>
+        Padding(padding: const EdgeInsets.all(AppSpacing.sm), child: child);
+
+    Future<void> tab(WidgetTester tester, [int times = 1]) async {
+      for (var i = 0; i < times; i++) {
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      }
+      await tester.pumpAndSettle();
+    }
+
+    Future<int> inkAbove(
+      WidgetTester tester,
+      ThemeData theme, {
+      double depth = AppSizes.borderEmphasis,
+    }) async {
+      final boundary = tester.getTopLeft(find.byKey(hostBoundaryKey));
+      final tile = tester.getRect(_key('bathroom')).shift(-boundary);
+      final strip = await paintedPixels(
+        tester,
+        hostBoundaryKey,
+        region: Rect.fromLTWH(
+          tile.left + 24,
+          tile.top - depth,
+          tile.width - 48,
+          depth,
+        ),
+      );
+      return countPixels(strip, theme.colorScheme.onSurface);
+    }
+
+    testWidgets('a tap on the tile calls onTap once, anywhere on it', (
+      tester,
+    ) async {
+      var taps = 0;
+      await tester.pumpWidget(
+        host(_cell(tappable(onTap: () => taps++), width: 200)),
+      );
+      final rect = tester.getRect(_key('bathroom'));
+
+      for (final point in [
+        rect.center,
+        rect.topLeft + const Offset(1, 1),
+        rect.bottomRight - const Offset(1, 1),
+      ]) {
+        await tester.tapAt(point);
+      }
+      expect(taps, 3);
+    });
+
+    testWidgets('a tile without onTap takes no focus and is no button', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(host(_cell(_tile(beacons: [_beacon('Oven')]))));
+
+      await tab(tester);
+
+      expect(FocusManager.instance.primaryFocus?.debugLabel, isNot('RoomTile'));
+      expect(
+        tester.getSemantics(_key('bathroom')),
+        isSemantics(
+          label: 'Bathroom, occupied by Carlos, 12 minutes',
+          isButton: false,
+          isFocusable: false,
+        ),
+      );
+      handle.dispose();
+    });
+
+    testWidgets('a tap on a beacon calls the beacon and not the tile', (
+      tester,
+    ) async {
+      var tile = 0;
+      var beacon = 0;
+      await tester.pumpWidget(
+        host(
+          _cell(
+            tappable(
+              onTap: () => tile++,
+              beacons: [
+                TextButton(
+                  key: const Key('beacon.Oven'),
+                  onPressed: () => beacon++,
+                  child: const Text('Oven'),
+                ),
+              ],
+            ),
+            height: 140,
+          ),
+        ),
+      );
+
+      await tester.tap(find.byKey(const Key('beacon.Oven')));
+
+      expect([tile, beacon], [0, 1]);
+    });
+
+    testWidgets('Enter and Space on the focused tile call onTap', (
+      tester,
+    ) async {
+      var taps = 0;
+      await tester.pumpWidget(
+        host(_cell(tappable(onTap: () => taps++), width: 200)),
+      );
+
+      await tab(tester);
+      expect(FocusManager.instance.primaryFocus?.debugLabel, 'RoomTile');
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+
+      expect(taps, 2);
+    });
+
+    testWidgets('Enter on a focused beacon is the beacon, not the tile', (
+      tester,
+    ) async {
+      var tile = 0;
+      var beacon = 0;
+      await tester.pumpWidget(
+        host(
+          _cell(
+            tappable(
+              onTap: () => tile++,
+              beacons: [
+                TextButton(
+                  key: const Key('beacon.Oven'),
+                  onPressed: () => beacon++,
+                  child: const Text('Oven'),
+                ),
+              ],
+            ),
+            height: 140,
+          ),
+        ),
+      );
+
+      await tab(tester, 2);
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+
+      expect([tile, beacon], [0, 1]);
+    });
+
+    testWidgets('a rebuild during a press neither cancels it nor keeps the '
+        'old callback', (tester) async {
+      var first = 0;
+      var second = 0;
+      await tester.pumpWidget(
+        host(_cell(tappable(onTap: () => first++), width: 200)),
+      );
+      final gesture = await tester.startGesture(
+        tester.getCenter(_key('bathroom')),
+      );
+      await tester.pump(kPressTimeout);
+
+      await tester.pumpWidget(
+        host(_cell(tappable(onTap: () => second++), width: 200)),
+      );
+      await gesture.up();
+
+      expect([first, second], [0, 1]);
+    });
+
+    group('the press layer', () {
+      RoomTile withBeacon() => RoomTile(
+        room: const RoomView(id: 'bathroom', name: 'Bathroom'),
+        state: RoomTileState.free,
+        caption: 'free',
+        semanticLabel: 'Bathroom, free',
+        beacons: [
+          TextButton(
+            key: const Key('beacon.Oven'),
+            onPressed: () {},
+            child: const Text('Oven'),
+          ),
+        ],
+        onTap: () {},
+      );
+
+      final scheme = CompappTheme.light.colorScheme;
+      final fill = scheme.surfaceContainerLowest;
+      final layer = Color.alphaBlend(
+        scheme.onSurface.withValues(alpha: AppStateLayers.pressedSecondary),
+        fill,
+      );
+      bool near(Color a, Color b) =>
+          (a.r - b.r).abs() < 0.01 &&
+          (a.g - b.g).abs() < 0.01 &&
+          (a.b - b.b).abs() < 0.01;
+
+      Future<bool> showsLayer(WidgetTester tester) async {
+        final boundary = tester.getTopLeft(find.byKey(hostBoundaryKey));
+        final point =
+            tester.getTopLeft(_key('bathroom')) -
+            boundary +
+            const Offset(40, 8);
+        final color = await paintedColorAt(tester, hostBoundaryKey, point);
+        expect(near(color, layer) || near(color, fill), isTrue);
+        return near(color, layer);
+      }
+
+      testWidgets('a press on a beacon shows no layer on the tile, held for '
+          'as long as you like', (tester) async {
+        await tester.pumpWidget(host(_cell(withBeacon(), height: 140)));
+        final gesture = await tester.startGesture(
+          tester.getCenter(find.byKey(const Key('beacon.Oven'))),
+        );
+
+        for (final held in [150, 300, 1000]) {
+          await tester.pump(Duration(milliseconds: held));
+          expect(await showsLayer(tester), isFalse, reason: 'held $held ms');
+        }
+        await gesture.up();
+        await tester.pump();
+        expect(await showsLayer(tester), isFalse);
+      });
+
+      testWidgets('the layer is back for the tile after a beacon was '
+          'pressed and released', (tester) async {
+        await tester.pumpWidget(host(_cell(withBeacon(), height: 140)));
+        await tester.tap(find.byKey(const Key('beacon.Oven')));
+        await tester.pump(kPressTimeout);
+
+        final gesture = await tester.startGesture(
+          tester.getTopLeft(_key('bathroom')) + const Offset(40, 8),
+        );
+        await tester.pump(kPressTimeout);
+        expect(await showsLayer(tester), isTrue);
+        await gesture.up();
+      });
+
+      testWidgets('a press held past 100 ms and then dragged away or '
+          'cancelled leaves no layer', (tester) async {
+        await tester.pumpWidget(host(_cell(withBeacon(), height: 140)));
+        final start = tester.getTopLeft(_key('bathroom')) + const Offset(40, 8);
+
+        final drag = await tester.startGesture(start);
+        await tester.pump(kPressTimeout);
+        expect(await showsLayer(tester), isTrue);
+        await drag.moveBy(const Offset(0, 80));
+        await tester.pump();
+        expect(await showsLayer(tester), isFalse, reason: 'dragged away');
+        await drag.up();
+
+        final cancelled = await tester.startGesture(start);
+        await tester.pump(kPressTimeout);
+        expect(await showsLayer(tester), isTrue);
+        await cancelled.cancel();
+        await tester.pump();
+        expect(await showsLayer(tester), isFalse, reason: 'cancelled');
+      });
+    });
+
+    group('semantics', () {
+      testWidgets('has the focus action, and screen-reader focus moves the '
+          'input focus', (tester) async {
+        final handle = tester.ensureSemantics();
+        await tester.pumpWidget(host(_cell(tappable(), width: 200)));
+
+        expect(
+          tester.getSemantics(_key('bathroom')),
+          isSemantics(hasFocusAction: true),
+        );
+        tester.semantics.performAction(
+          find.semantics.byLabel('Bathroom, free'),
+          SemanticsAction.focus,
+        );
+        await tester.pump();
+
+        expect(FocusManager.instance.primaryFocus?.debugLabel, 'RoomTile');
+        handle.dispose();
+      });
+
+      testWidgets('has no focus action on iOS, where VoiceOver keeps its own '
+          'focus', (tester) async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+        final handle = tester.ensureSemantics();
+        await tester.pumpWidget(host(_cell(tappable(), width: 200)));
+
+        expect(
+          tester.getSemantics(_key('bathroom')),
+          isSemantics(hasFocusAction: false),
+        );
+        debugDefaultTargetPlatformOverride = null;
+        handle.dispose();
+      });
+
+      testWidgets('is one focusable button node named by the label, with '
+          'a tap action', (tester) async {
+        final handle = tester.ensureSemantics();
+        await tester.pumpWidget(host(_cell(tappable(), width: 200)));
+
+        expect(
+          tester.getSemantics(_key('bathroom')),
+          isSemantics(
+            label: 'Bathroom, free',
+            isButton: true,
+            isFocusable: true,
+            isFocused: false,
+            hasTapAction: true,
+          ),
+        );
+        expect(semanticsLabels(tester), ['Bathroom, free']);
+        handle.dispose();
+      });
+
+      testWidgets('says it is focused only while the tile itself is', (
+        tester,
+      ) async {
+        final handle = tester.ensureSemantics();
+        await tester.pumpWidget(
+          host(_cell(tappable(beacons: [_beacon('Oven')]), height: 140)),
+        );
+
+        await tab(tester);
+        expect(
+          tester.getSemantics(_key('bathroom')),
+          isSemantics(isFocused: true),
+        );
+
+        await tab(tester);
+        expect(
+          tester.getSemantics(_key('bathroom')),
+          isSemantics(isFocused: false),
+          reason: 'the beacon has the focus now',
+        );
+        handle.dispose();
+      });
+
+      testWidgets('the beacon is still its own button, a child of the tile', (
+        tester,
+      ) async {
+        final handle = tester.ensureSemantics();
+        await tester.pumpWidget(
+          host(_cell(tappable(beacons: [_beacon('Oven')]), height: 140)),
+        );
+
+        final tile = tester.getSemantics(_key('bathroom'));
+        final oven = tester.getSemantics(find.byKey(const Key('beacon.Oven')));
+        expect(oven.parent, tile);
+        expect(oven.label, 'Oven');
+        expect(tile.label, 'Bathroom, free');
+        expect(oven, isSemantics(isButton: true, hasTapAction: true));
+        handle.dispose();
+      });
+
+      testWidgets('the semantics tap runs onTap', (tester) async {
+        final handle = tester.ensureSemantics();
+        var taps = 0;
+        await tester.pumpWidget(
+          host(_cell(tappable(onTap: () => taps++), width: 200)),
+        );
+
+        tester.semantics.tap(find.semantics.byLabel('Bathroom, free'));
+
+        expect(taps, 1);
+        handle.dispose();
+      });
+    });
+
+    for (final (name, theme) in themes) {
+      testWidgets('a focused tile has a 2 px ink ring outside its shape, '
+          'and none inside it ($name)', (tester) async {
+        await tester.pumpWidget(
+          host(padded(_cell(tappable(), width: 200)), theme: theme),
+        );
+        expect(await inkAbove(tester, theme), 0);
+
+        await tab(tester);
+
+        expect(
+          await inkAbove(tester, theme),
+          greaterThan(0),
+          reason: 'the ring is above the wall',
+        );
+        final boundary = tester.getTopLeft(find.byKey(hostBoundaryKey));
+        final tile = tester.getRect(_key('bathroom')).shift(-boundary);
+        final inside = await paintedPixels(
+          tester,
+          hostBoundaryKey,
+          region: Rect.fromLTWH(
+            tile.left + 24,
+            tile.top + 2,
+            tile.width - 48,
+            4,
+          ),
+        );
+        expect(
+          countPixels(inside, theme.colorScheme.onSurface),
+          lessThan(inside.length ~/ 2),
+          reason: 'the ring leaves the wall to its own fill',
+        );
+      });
+
+      testWidgets('the ring is not drawn when a beacon holds the focus, nor '
+          'after a touch ($name)', (tester) async {
+        await tester.pumpWidget(
+          host(
+            padded(
+              _cell(
+                tappable(beacons: [_beacon('Oven')]),
+                width: 200,
+                height: 140,
+              ),
+            ),
+            theme: theme,
+          ),
+        );
+
+        await tab(tester);
+        expect(await inkAbove(tester, theme), greaterThan(0));
+        await tab(tester);
+        expect(
+          await inkAbove(tester, theme),
+          0,
+          reason: 'the beacon has the focus, not the tile',
+        );
+
+        await tab(tester);
+        expect(await inkAbove(tester, theme), greaterThan(0));
+        await tester.tapAt(
+          tester.getTopLeft(_key('bathroom')) + const Offset(20, 100),
+        );
+        await tester.pumpAndSettle();
+        expect(
+          await inkAbove(tester, theme),
+          0,
+          reason: 'a touch ends the keyboard highlight',
+        );
+      });
+
+      testWidgets('a press shows the surface layer over the wall and lifts '
+          'with the finger ($name)', (tester) async {
+        await tester.pumpWidget(
+          host(padded(_cell(tappable(), width: 200)), theme: theme),
+        );
+        final boundary = tester.getTopLeft(find.byKey(hostBoundaryKey));
+        final point =
+            tester.getTopLeft(_key('bathroom')) -
+            boundary +
+            const Offset(40, 10);
+        final fill = theme.colorScheme.surfaceContainerLowest;
+        final pressed = Color.alphaBlend(
+          theme.colorScheme.onSurface.withValues(
+            alpha: AppStateLayers.pressedSecondary,
+          ),
+          fill,
+        );
+        bool near(Color a, Color b) =>
+            (a.r - b.r).abs() < 0.01 &&
+            (a.g - b.g).abs() < 0.01 &&
+            (a.b - b.b).abs() < 0.01;
+
+        expect(
+          near(await paintedColorAt(tester, hostBoundaryKey, point), fill),
+          isTrue,
+        );
+        final gesture = await tester.startGesture(point + boundary);
+        await tester.pump(kPressTimeout);
+        expect(
+          near(await paintedColorAt(tester, hostBoundaryKey, point), pressed),
+          isTrue,
+        );
+        await gesture.up();
+        await tester.pumpAndSettle();
+        expect(
+          near(await paintedColorAt(tester, hostBoundaryKey, point), fill),
+          isTrue,
+        );
+      });
+
+      test('the ring reaches 3:1 on the page and on every wall ($name)', () {
+        final scheme = theme.colorScheme;
+        final colors = theme.extension<AppColors>()!;
+        expectContrast(
+          {
+            for (final (wall, color) in [
+              ('page', scheme.surface),
+              ('free', scheme.surfaceContainerLowest),
+              ('away', scheme.surfaceContainerHigh),
+              ('home', scheme.primaryContainer),
+              ('occupied', colors.busySoft),
+            ])
+              wall: (scheme.onSurface, color),
+          },
+          minimum: 3,
+          reason: 'the focus ring of a tile ($name)',
+        );
+      });
+    }
   });
 }

@@ -27,8 +27,9 @@ class NavDestinationView {
   final int badgeCount;
 
   /// What assistive technology reads instead of [label], with the count in
-  /// words ("Tasks, 2 to do"). It must contain the visible [label], so people
-  /// who speak the label to a voice control can reach the button (WCAG 2.5.3).
+  /// words ("Calendar, 2 new events"). It must contain the visible [label], so
+  /// people who speak the label to a voice control can reach the button (WCAG
+  /// 2.5.3).
   /// Required to say the count: without it the destination reads [label]
   /// alone.
   final String? semanticLabel;

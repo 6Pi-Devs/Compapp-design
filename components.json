@@ -16,7 +16,9 @@
         { "name": "loading", "type": "bool", "required": false, "default": "false" },
         { "name": "semanticLabel", "type": "String?", "required": false },
         { "name": "loadingSemanticLabel", "type": "String?", "required": false },
-        { "name": "statesController", "type": "WidgetStatesController?", "required": false }
+        { "name": "statesController", "type": "WidgetStatesController?", "required": false },
+        { "name": "focusNode", "type": "FocusNode?", "required": false, "default": "the caller's node, for a parent that hands focus to the button or reads whether it has it" },
+        { "name": "expanded", "type": "bool?", "required": false, "default": "null says nothing; true or false makes it a disclosure that says whether what it opens is shown" }
       ],
       "variants": ["primary-lg", "primary-md", "secondary-lg", "secondary-md", "ghost-md", "danger-lg", "danger-md"],
       "states": ["default", "pressed", "focus", "disabled", "loading"],
@@ -356,14 +358,21 @@
         { "name": "trailing", "type": "String?", "required": false, "default": "text at the end of the row; a status dot sits before it (none while invited)" }
       ],
       "variants": ["row"],
-      "states": ["home", "away", "invited", "you"],
+      "states": ["home", "away", "invited", "you", "long"],
       "semantics": "One merged node, not interactive: member.semanticLabel (it names the member and says you, admin and away), then the subtitle, then the trailing text. The visible name, the pebble and the dot add nothing of their own, so nothing is said twice",
       "key": "member.<accountId>",
+      "notes": [
+        "Layout: the pebble and the texts take up to two thirds of the row and the trailing text one third, beside each other. When the longest word of the name or the subtitle does not fit beside the pebble in its share, or the longest word of the trailing text does not fit in its third, the trailing text and its dot move under the texts and the texts take the width the pebble leaves (as the home AppTopBar does with its buttons), so no word breaks at large text. At a text scale of 1.0 in a phone column the row is laid out as before.",
+        "A small private render object lays the row out, with intrinsic and dry layout, not a LayoutBuilder, so the golden harness can measure it.",
+        "One case is left: a word wider than the whole row. It wraps by its letters, so all of it stays visible at 200% (WCAG 1.4.4); the name is never cut with an ellipsis.",
+        "The row keeps the baseline of the name, so it lines up with a neighbor in a baseline-aligned Row. The status dot sits on the middle of the first line of the trailing text. The row-long state has a long name, subtitle and trailing text, so the large text scenarios of its golden show the stacked layout."
+      ],
       "stories": [
         "Molecules/MemberRow/row-home",
         "Molecules/MemberRow/row-away",
         "Molecules/MemberRow/row-invited",
-        "Molecules/MemberRow/row-you"
+        "Molecules/MemberRow/row-you",
+        "Molecules/MemberRow/row-long"
       ]
     },
     {
@@ -400,15 +409,18 @@
         { "name": "caption", "type": "String", "required": true, "default": "line under the name that says the state in words" },
         { "name": "semanticLabel", "type": "String", "required": true, "default": "spoken description of the whole tile" },
         { "name": "occupants", "type": "List<MemberView>", "required": false, "default": "empty; drawn as s36 pebbles at the end of the footer line, wrapped under the beacons and start-aligned when they do not fit on one line" },
-        { "name": "beacons", "type": "List<Widget>", "required": false, "default": "empty; pinned at the bottom start, wrapping onto more lines, each its own button" }
+        { "name": "beacons", "type": "List<Widget>", "required": false, "default": "empty; pinned at the bottom start, wrapping onto more lines, each its own button" },
+        { "name": "onTap", "type": "VoidCallback?", "required": false, "default": "null: the tile is plain. Set: the tile is a focusable button (tap, Enter, Space), with a press layer and a 2 px ink focus ring outside the shape" },
+        { "name": "draw", "type": "bool", "required": false, "default": "false: the tile is as before. true: the draw form of a bedroom in the result of a room draw, with the name alone on top and, at the bottom, the pebbles at the start of the line and the caption beside them (wrapping under them when the line is full); no beacons. It can be combined with onTap (the tile is then the same button as before, with its ring and press layer), but RoomDrawBoard does not use that" }
       ],
       "variants": ["tile"],
       "states": ["home", "away", "occupied", "free"],
-      "semantics": "One container node named by semanticLabel (\"Bathroom, occupied by Carlos, 12 minutes\"), not interactive; the name, caption, lock and pebbles add nothing of their own. Each beacon stays its own focusable button, a child of that node. The state is also said by the caption, never by color or outline alone",
+      "semantics": "One container node named by semanticLabel (\"Bathroom, occupied by Carlos, 12 minutes\"); the name, caption, lock and pebbles add nothing of their own. Without onTap it is not interactive. With onTap the same node is a focusable button with a tap action (focused only while the tile itself holds the focus). Each beacon stays its own focusable button, a child of that node, and a touch on it never reaches the tile. The state is also said by the caption, never by color or outline alone",
       "key": "floorplan.room.<roomId>, roomTile.pebble.<memberId>",
       "notes": [
-        "Not interactive: no onTap yet. The FloorplanMap organism needs one, and a tappable tile around its beacon buttons needs its own semantics design.",
-        "The contract states archived and draw are not drawn: the board shows neither, and the floorplan hides archived rooms. The RoomDrawBoard organism draws the tile in its draw form."
+        "onTap is optional: without it the tile is plain, as before. With it the tile node itself is the button (label, button role, tap action and focus all on the one node) and the beacons are its children, so a screen reader meets the room first and its items inside it. The focus ring is 2 px of ink outside the shape, drawn only for the tile that holds the primary focus (not while a beacon does) and only in keyboard mode; the press layer is the surface state layer (8%) over the wall. A press that starts on a beacon is the beacon's: the tile shows no press layer for it, from the first moment to the release (a Listener around each beacon, as Material's markChildInkResponsePressed does). The node also has the focus action (not on iOS), so screen-reader focus moves the input focus. Going from no onTap to one, or back, remounts the tile and drops its focus. A parent that clips needs 2 px of room, and a neighbor must not paint over the ring.",
+        "The contract state archived is not drawn: the board shows no archived tile, and the floorplan hides archived rooms.",
+        "The contract variant draw is the draw prop, not a manifest variant: the form only makes sense for a bedroom that receives people (home) or stays empty (free), and a variant here would need a fixed use case for away and occupied too, which a draw never produces. RoomDrawBoard shows it in both states, and the draw tests of this molecule cover all four. In the draw form the caption moves from under the name to the bottom line beside the pebbles; the wall, the edge, the lock and the semantics are the same, and a debug assert says the spoken label holds the visible name and that there are no beacons. Nothing changes for a tile without draw."
       ],
       "stories": [
         "Molecules/RoomTile/tile-home",
@@ -498,7 +510,8 @@
         { "name": "backLabel", "type": "String", "required": true, "default": "pushed only; spoken name of the back button" },
         { "name": "onBack", "type": "VoidCallback", "required": true, "default": "pushed only" },
         { "name": "actionLabel", "type": "String?", "required": false, "default": "pushed only; null or empty leaves the action out" },
-        { "name": "onAction", "type": "VoidCallback?", "required": false, "default": "pushed only; null disables the action" }
+        { "name": "onAction", "type": "VoidCallback?", "required": false, "default": "pushed only; null disables the action" },
+        { "name": "namesRoute", "type": "bool", "required": false, "default": "false: set it for the bar of a screen, so the title names the route and assistive technology announces it when the screen opens (as the title of Material's AppBar does on Android); leave it off for a bar inside a card or a sheet" }
       ],
       "variants": ["home", "pushed"],
       "states": ["default", "long-text"],
@@ -547,12 +560,18 @@
       "props": [
         { "name": "title", "type": "String", "required": true },
         { "name": "onClose", "type": "VoidCallback", "required": true },
-        { "name": "closeLabel", "type": "String", "required": true, "default": "spoken name of the close button" }
+        { "name": "closeLabel", "type": "String", "required": true, "default": "spoken name of the close button" },
+        { "name": "titleFocusNode", "type": "FocusNode?", "required": false, "default": "null: the title is plain text. With a node it takes focus (no Tab stop) and shows the house focus ring while a keyboard user has it" },
+        { "name": "namesRoute", "type": "bool", "required": false, "default": "false: with true the title heading node names the route that holds the header" }
       ],
       "variants": ["default"],
       "states": ["default", "long-title"],
-      "semantics": "The header is its own semantics group: under a Card or a list item the title stays a heading node of its own, read before the close button, and the button stays a button. The close button is a focusable button named by closeLabel, which is never empty, 44 drawn with a 48 hit area. The drag handle is decorative and excluded from semantics. A long title wraps and the header grows while the close button stays at the top end; the layout mirrors in right-to-left text. The title is centered on the 48 hit area of the close button (15 below the handle, board 12)",
-      "key": "sheet.<part> (title, close, handle)",
+      "semantics": "The header is its own semantics group: under a Card or a list item the title stays a heading node of its own, read before the close button, and the button stays a button. The close button is a focusable button named by closeLabel, which is never empty, 44 drawn with a 48 hit area. The drag handle is decorative and excluded from semantics. A long title wraps and the header grows while the close button stays at the top end; the layout mirrors in right-to-left text. The title is centered on the 48 hit area of the close button (15 below the handle, board 12). With a titleFocusNode the title node is focusable and reports focused, still the heading, and the ring (2 px of ink outside the text, shown only for keyboard highlight) is drawn above it",
+      "key": "sheet.<part> (title, close, handle, titleRing while the ring shows)",
+      "notes": [
+        "titleFocusNode exists for sheets that open with focus on the title (ItemSheet). The board draws no focus state for a title, so the ring is the house one of RoomTile and the buttons. The playground forces the focused look with a node that reports focus, but the ring itself also needs keyboard highlight, so it stays off while the catalog is driven by a pointer.",
+        "namesRoute puts the route-naming flag on the title's heading node, so a sheet shown in a route (showModalBottomSheet) names that route by its title instead of repeating the title in a node of its own. It is off by default, because the flag only means something under a route scope."
+      ],
       "stories": [
         "Molecules/SheetHeader/default-default",
         "Molecules/SheetHeader/default-long-title"
@@ -604,6 +623,119 @@
       ]
     },
     {
+      "id": "activity-row",
+      "level": "molecule",
+      "class": "ActivityRow",
+      "playground": "Molecules/ActivityRow/playground",
+      "path": "molecules/activity_row.dart",
+      "props": [
+        { "name": "entry", "type": "ActivityView", "required": true, "default": "id, glyph (icon), tone (neutral or busy), text (a list of runs, each with a strong flag, in the word order of the language) and meta (muted line under it)" },
+        { "name": "unread", "type": "bool", "required": true, "default": "unread: a dot at the end of the row" },
+        { "name": "semanticLabel", "type": "String", "required": true, "default": "spoken description of the entry: it says whether the entry is unread (\"Unread. Carlos finished your washer\") and holds the visible text in the same words (WCAG 2.5.3)" },
+        { "name": "onTap", "type": "VoidCallback", "required": true }
+      ],
+      "variants": ["neutral", "busy"],
+      "states": ["unread", "read"],
+      "semantics": "One focusable button named by semanticLabel, activated by tap, Enter and Space. The tile, the texts and the unread dot add nothing of their own, so nothing is said twice. Unread is a shape (the dot) and is in the spoken label, never color alone. Calm: busy is amber, never a danger color, never who is behind",
+      "key": "activity.<entryId>",
+      "notes": [
+        "Board gaps: the tile glyph is 18 (size.glyph-lg) where the board draws 20, and the tile corner is radius.sm (10) where the board draws 12.",
+        "Board gaps: the row is 64 tall with 12 of padding where the board draws 68 with 14, and the 2 px between the message and the meta line is not drawn. None of 14, 2 or 68 is a token, and a row that is 64 like the member row keeps the list rhythm.",
+        "The line is a list of runs (ActivityText with a strong flag) so the bold part can sit anywhere, as in 'Room draw: you got Bedroom 1'."
+      ],
+      "stories": [
+        "Molecules/ActivityRow/neutral-unread",
+        "Molecules/ActivityRow/neutral-read",
+        "Molecules/ActivityRow/busy-unread",
+        "Molecules/ActivityRow/busy-read"
+      ]
+    },
+    {
+      "id": "presence-switch",
+      "level": "molecule",
+      "class": "PresenceSwitch",
+      "playground": "Molecules/PresenceSwitch/playground",
+      "path": "molecules/presence_switch.dart",
+      "props": [
+        { "name": "value", "type": "Presence", "required": true, "default": "home or away: the selected side" },
+        { "name": "onChanged", "type": "ValueChanged<Presence>", "required": true, "default": "called with the other side only; choosing the selected side does nothing" },
+        { "name": "homeLabel", "type": "String", "required": true, "default": "label of the home side" },
+        { "name": "awayLabel", "type": "String", "required": true, "default": "label of the away side" },
+        { "name": "semanticLabel", "type": "String", "required": true, "default": "name of the group for assistive technology (\"Your presence\")" }
+      ],
+      "variants": ["switch"],
+      "states": ["home", "away"],
+      "semantics": "A radio group named by semanticLabel with two toggle buttons (homeLabel, awayLabel), exactly one checked and in a mutually exclusive group, each focusable and activated by tap, Enter and Space. The glyphs and the second drawing of each face (see notes) add nothing. The selected side is the only one under a filled thumb (3:1 against the track) and both sides have their own glyph and label, so the state is never color alone",
+      "key": "presence.switch, presence.switch.home, presence.switch.away",
+      "notes": [
+        "Board gaps: the board builds the sides from two AppButtons with a fill each, but the away side is filled with presence-away and AppButton has no variant for it, so the sides are Material TextButtons under one filled thumb that slides.",
+        "Board gaps: the track gets a 1 px outline border the board does not draw, so it keeps 3:1 against the page and a card. With it the sides are 54 tall where the board draws 56 (64 minus 4 and 4), and their corner is 11 where the board draws 12.",
+        "While the thumb slides every label and glyph is drawn twice, in the muted ink clipped to what is outside the thumb and in the on-color clipped to the thumb, so no color is blended and every pixel reads on every frame. At rest each face is drawn once. The second drawing is excluded from semantics, pointer and focus. The thumb jumps when animations are off. Each face sets its own text style, so a line limit, an italic or an underline around the switch does not change a label while the thumb slides.",
+        "The contract names a Presence type: it is a new two-value enum (home, away) because MemberStatus also has invited."
+      ],
+      "stories": [
+        "Molecules/PresenceSwitch/switch-home",
+        "Molecules/PresenceSwitch/switch-away"
+      ]
+    },
+    {
+      "id": "knock-button",
+      "level": "molecule",
+      "class": "KnockButton",
+      "playground": "Molecules/KnockButton/playground",
+      "path": "molecules/knock_button.dart",
+      "props": [
+        { "name": "label", "type": "String", "required": true, "default": "visible label of the ready button (\"Who's home?\"), which names it" },
+        { "name": "onKnock", "type": "VoidCallback", "required": true, "default": "called by a tap while the button is ready" },
+        { "name": "cooldown", "type": "KnockCooldown?", "required": false, "default": "null: ready. Set: inert, with the share of the wait left (remaining, 0 to 1, never NaN), a label (\"Asked\"), the time left (\"11 min\") and the spoken sentence (semanticLabel)" }
+      ],
+      "variants": ["button"],
+      "states": ["ready", "cooldown"],
+      "semantics": "One node in both states, never replaced: a button, focusable, with a focus action and a focused flag. Ready: enabled, named by label, a tap calls onKnock. Cooldown: the same node marked disabled, without the tap action, named by cooldown.semanticLabel (\"Asked who's home. You can ask again in 11 minutes\"). The visible texts, the ring and Material's own node add nothing. The Material button is the same widget in both states and stays focusable and inert in the wait, so keyboard focus stays on it when the wait starts and the next Tab goes to the next control. The wait is told by words and a ring, never color alone. Calm: no danger color, no blame",
+      "key": "presence.knock",
+      "notes": [
+        "The contract lists availableAt: DateTime? and now: DateTime. The design system keeps no clock and no dates, so the app counts the wait and passes KnockCooldown (remaining share, label, time left, spoken sentence) instead.",
+        "Board gaps: the glyph is 18 (size.glyph-lg) where the board draws 20, and the 2 px between the ring and the two lines of text, and between them, is not drawn (there is no 2 px token).",
+        "Board gaps: the ring is AppProgressRing at 24 with its 4 px stroke where the board draws a 2.5 px one, and its track has the same color as the sunken fill, so only the arc shows.",
+        "The semantics node is the same one before and after the wait starts (a test compares its id and checks it is still focused), so a screen reader keeps its cursor. How a given screen reader announces the change of name and enabled state is not verified on a device."
+      ],
+      "stories": [
+        "Molecules/KnockButton/button-ready",
+        "Molecules/KnockButton/button-cooldown"
+      ]
+    },
+    {
+      "id": "code-card",
+      "level": "molecule",
+      "class": "CodeCard",
+      "playground": "Molecules/CodeCard/playground",
+      "path": "molecules/code_card.dart",
+      "props": [
+        { "name": "code", "type": "String", "required": true, "default": "the code as shown, already grouped by the app (\"4829 1736\"); it wraps at the spaces and always reads left to right" },
+        { "name": "label", "type": "String", "required": true, "default": "caption over the code, which also names it for assistive technology (\"Your personal code\")" },
+        { "name": "copyLabel", "type": "String", "required": true, "default": "label of the copy button" },
+        { "name": "copiedLabel", "type": "String", "required": true, "default": "label of the copy button once copied" },
+        { "name": "shareLabel", "type": "String", "required": true, "default": "label of the share button" },
+        { "name": "copied", "type": "bool", "required": false, "default": "false; true shows copiedLabel and a check on the copy button. The app must announce the copy too, for example with an AppSnackbar" },
+        { "name": "onCopy", "type": "VoidCallback", "required": true, "default": "the app does the clipboard" },
+        { "name": "onShare", "type": "VoidCallback", "required": true, "default": "the app does the share sheet" }
+      ],
+      "variants": ["card"],
+      "states": ["default", "copied"],
+      "semantics": "The code is one node named by label whose value is the code spelled out character by character; the visible texts add nothing. Copy and share are their own focusable buttons named by their visible labels, activated by tap, Enter and Space. The card is not interactive. Copied is a label and a check, never color alone",
+      "key": "account.code, account.code.value, account.code.copy, account.code.share",
+      "notes": [
+        "The contract lists code, onCopy and onShare. Every visible string is a prop, so label, copyLabel, copiedLabel and shareLabel are added, with copied for the state the app sets.",
+        "Board gaps: the board's buttons have no glyphs and these show the copy, check and share ones; the buttons are AppButton secondary, 52 tall with a radius of 16, where the board draws 48 and 12; the card radius is radius.sm (10) where the board draws 12.",
+        "The buttons stack at large text, which the board's two-column grid cannot. The dashed edge is decoration in the hairline color, as on RoomTile, because the card is not a control.",
+        "A code that is not grouped (eight digits with no space) is one word: at 2.0x it can be wider than the card and is cut inside the word. The app groups it."
+      ],
+      "stories": [
+        "Molecules/CodeCard/card-default",
+        "Molecules/CodeCard/card-copied"
+      ]
+    },
+    {
       "id": "app-confirm-dialog",
       "level": "molecule",
       "class": "AppConfirmDialog",
@@ -627,6 +759,456 @@
         "Molecules/AppConfirmDialog/default-long-text",
         "Molecules/AppConfirmDialog/destructive-default",
         "Molecules/AppConfirmDialog/destructive-long-text"
+      ]
+    },
+    {
+      "id": "activity-list",
+      "level": "organism",
+      "class": "ActivityList",
+      "playground": "Organisms/ActivityList/playground",
+      "path": "organisms/activity_list.dart",
+      "props": [
+        { "name": "view", "type": "ActivityListView", "required": true, "default": "unread and earlier entries (each an ActivityEntry: an ActivityView and its spoken label, unread by the list it sits in), unreadCount (the number the badge shows, at least the unread entries listed, and the app's spoken heading must use the same number), unreadPrefix (the word put before the spoken label of every unread entry), the two headings, the spoken first heading with the count in words, the label of the mark-all action, and the title and body of the empty state" },
+        { "name": "onOpen", "type": "ValueChanged<String>", "required": true, "default": "called with the id of the tapped entry" },
+        { "name": "onMarkAllRead", "type": "VoidCallback", "required": true, "default": "called by the ghost action beside the first heading, which only shows while something is unread" }
+      ],
+      "variants": ["list"],
+      "states": ["new-and-earlier", "all-read", "empty"],
+      "semantics": "A container holding one container per group. Each group is a heading node (the first says the count in words, 'New, 2 unread'), then a list node whose items are single button nodes named by the entry's spoken label, with the view's unreadPrefix before it for the unread ones only, so nothing is said twice; the mark-all action is a button named by its visible label. The badge, the dividers and the card add nothing. A group with no entries is left out and both empty is an AppEmptyState with no action. Unread is the dot, the count and the spoken prefix, never color alone. The groups are keyed, so focus and the node of a row survive the first group appearing or leaving, and when the action is pressed with focus on it and the app takes it away, even after an await, focus moves to the second heading (only if that heading is mounted, and not if focus went elsewhere in between; a rebuild with the same view does not cancel it), and that heading draws a 2 px ink ring around itself while it has focus (it paints nothing otherwise). Calm: no danger color, never who is behind. ActivityList.sliver has the same tree",
+      "key": "activity.list, in both the list and the empty state, and a sliver in the sliver form, as is activity.card.<unread|earlier> there, so getRect does not apply to them (also activity.group.<unread|earlier> on a heading, activity.card.<unread|earlier>, activity.markAllRead, activity.empty, activity.item.<entryId> on the list item of a row, and activity.<entryId> on the row)",
+      "notes": [
+        "The contract lists ActivityListView(unread, earlier) and the board draws bare 'New' and 'Earlier' headings. The contract also asks for the unread count in the header and for onMarkAllRead, which the board does not place: the count is an AppBadge beside the first heading and the action is a ghost AppButton at the end of its line, wrapping under the heading at large text. Where the action sits is a design choice to confirm with the board's owner.",
+        "Board gaps: the rows are ActivityRow (64 tall, 40 tile, radius.sm) where the board draws a 36 tile at 12 of padding. The card has radius.md (16) as the board and 4 of padding all round (spacing.xs) so the focus ring of a row, drawn outside its shape, is not cut, which the board does not have. The gap between a heading, its card and the next group is 8 as on the board. The Earlier card is filled with the surface like the New one, where the board draws it with a border only. The dividers are 1 px hairlines in the line color between rows (the flat elevation token, which wins over the board's sunken color), with no inset.",
+        "Unread is not a field of the entry: it is the list the entry sits in, so an entry cannot be both, and the list adds unreadPrefix to the spoken label of the unread ones, so an earlier entry can never say it. The badge counts unreadCount, which is more than the entries listed when the app pages. The ids of both lists must be unique, an assert checks it in debug builds.",
+        "Two forms, one class. ActivityList(...) is a box: a plain column that builds every row it gets (200 rows took 2.2 s, 3000 took 25.6 s), for a short list inside a ListView, a SingleChildScrollView or a SliverToBoxAdapter. ActivityList.sliver(...) is a static method that returns the sliver form (SliverMainAxisGroup, DecoratedSliver and SliverList.builder with the same data, callbacks, looks and semantics), for the 90 days feed directly in a CustomScrollView: with 1000 entries it builds about 7 rows at the top and 8 at the end. It is a method and not a constructor because a sliver cannot be a box widget, and it adds no class to the manifest. The sliver looks the same, so it has no use case of its own.",
+        "The heading (a 13/600 muted text that may carry a badge and an action) is a private copy here and in PresencePanel, because an organism may not import another. Planned follow-up: a SectionHeader molecule, then both organisms use it.",
+        "Semantics use Flutter's list and listItem roles on the card and its items. How a given screen reader announces them is not verified on a device."
+      ],
+      "stories": [
+        "Organisms/ActivityList/list-new-and-earlier",
+        "Organisms/ActivityList/list-all-read",
+        "Organisms/ActivityList/list-empty"
+      ]
+    },
+    {
+      "id": "presence-panel",
+      "level": "organism",
+      "class": "PresencePanel",
+      "playground": "Organisms/PresencePanel/playground",
+      "path": "organisms/presence_panel.dart",
+      "props": [
+        { "name": "view", "type": "PresenceView", "required": true, "default": "home and away groups and an optional invited group (each a PresenceGroup: a title, PresenceEntry rows with a MemberView, subtitle and trailing text, and an optional label for when it is empty), and the broadcast (PresenceBroadcast: the label of the button, the optional KnockCooldown, an optional message and hint)" },
+        { "name": "onKnock", "type": "VoidCallback", "required": true, "default": "called by a tap on the button while the home can be asked" }
+      ],
+      "variants": ["panel"],
+      "states": ["ready", "cooldown", "everyone-away"],
+      "semantics": "A container holding one container per group and one for the asking part. Each group is a heading node, then a list node whose items each hold one merged MemberRow node (the member's spoken label, then the subtitle and the trailing text, so the visible name, the pebble and the dot add nothing). The asking part is the KnockButton's single node (ready: a button named by its label; waiting: the same node disabled and named by the cooldown sentence), then one merged node with the message and the hint. A group with no members says its empty label in place of the list, and one with neither is left out. Away and invited are told by words, a dot or ring and the pebble, never color alone. Calm: it says where people are, never who is behind or who did not answer",
+      "key": "presence.panel (also presence.section.<home|away|invited>, presence.card.<home|away|invited>, presence.empty.<home|away|invited>, presence.item.<memberId> on the list item of a member, member.<memberId> on the row, presence.broadcast, presence.message, presence.hint, and presence.knock on the button)",
+      "notes": [
+        "The brief for this slice named PresenceSwitch for the person using the app. The board and the contract do not: the contract is PresenceView and onKnock with no callback for a change of presence, and the board draws only the members and the knock card. The panel therefore has no switch: the person is one of the members (MemberView.isYou) and the app places the PresenceSwitch molecule on its own screen.",
+        "The contract lists PresenceView(home, away, invited, broadcast). The board draws no headings and only a home and an away member, while the contract says the sections are headers: each group has a title shown as a heading. The everyone-away state has no drawing on the board: it is the home group with no members and an empty label in place of its rows.",
+        "Board gaps: the board draws a 48 ring with the minutes inside and the words beside it, and the panel uses the KnockButton molecule (a 24 ring with 'Asked' and the time left, inside its own sunken button) with the message and the hint beside it, wrapping under it at large text. Rows are MemberRow (64 tall) where the board draws 60, and a 1 px hairline in the line color (the flat elevation token) separates rows, with no inset. The gap between cards is 12 as on the board; the board draws no headings, so the heading and its 8 of space are new.",
+        "The words beside the button are a Wrap child, not an expanded one, so they sit beside the button only when they fit whole and otherwise go under it: a long word is never cut. The button and the words sit in a card with 12 of padding (spacing.sm plus spacing.xs, as in ActivityRow).",
+        "The heading (a 13/600 muted text) is a private copy here and in ActivityList, because an organism may not import another. Planned follow-up: a SectionHeader molecule, then both organisms use it.",
+        "It is a plain column, not a scrollable: put it in the scrollable of the screen. A member must be in one group only and in the group of their status (home, away or invited), and asserts check both in debug builds. The groups are keyed, so a member's node survives another group gaining its first member.",
+        "Semantics use Flutter's list and listItem roles on the card and its items. How a given screen reader announces them, and the change of the button from ready to waiting, is not verified on a device."
+      ],
+      "stories": [
+        "Organisms/PresencePanel/panel-ready",
+        "Organisms/PresencePanel/panel-cooldown",
+        "Organisms/PresencePanel/panel-everyone-away"
+      ]
+    },
+    {
+      "id": "calendar-strip",
+      "level": "organism",
+      "class": "CalendarStrip",
+      "playground": "Organisms/CalendarStrip/playground",
+      "path": "organisms/calendar_strip.dart",
+      "props": [
+        { "name": "view", "type": "CalendarStripView", "required": true, "default": "the seven days (each a CalendarStripDay: its YYYY-MM-DD date, the visible weekday and number, and its spoken label), the events that touch them (each a CalendarStripEvent: a CalendarEventView, its first and last day as YYYY-MM-DD strings, which may lie outside the week, and its spoken label) and which date is today, or null" },
+        { "name": "onDayTap", "type": "ValueChanged<String>", "required": true, "default": "called with the YYYY-MM-DD date of the tapped day" },
+        { "name": "onEventTap", "type": "ValueChanged<String>", "required": true, "default": "called with the id of the tapped event" }
+      ],
+      "variants": ["strip"],
+      "states": ["with-events", "empty-week"],
+      "semantics": "A container holding one button per day and, when there are events, a list node with one list item per event. A day is a single button node named by the app's spoken label of the day followed by the spoken label of every event that covers it, so a day reads its events; the visible weekday and number add nothing of their own. An event is a single button node named by its spoken label, which contains the visible title (label in name); its glyph tile and title add nothing. The ribbons of the band under the days are decorative and say nothing. Today is the filled cell and the app's spoken label, never color alone; the kind of an event is its glyph and its title, never color alone. Calm: no danger color, never who is behind",
+      "key": "calendar.strip (also calendar.day.<yyyy-mm-dd> on the button of a day, calendar.events on the list, calendar.event.<eventId> on the button of an event, calendar.ribbon.<eventId>.<yyyy-mm-dd> on the piece of a ribbon, and event.<eventId> on the EventRibbon inside a piece and a button)",
+      "notes": [
+        "The contract lists CalendarStripView(days: List<LocalDate>, events, today). The design system has no LocalDate: dates are YYYY-MM-DD strings in the home's zone (the board's rule) that the strip only compares as strings, which order like the dates they spell. Every visible text is a prop, so a day carries its weekday, its number and its spoken label, and an event its first day, its last day and its spoken label. The ids of the events are the keys of their rows and the dates of the days the keys of the cells, and asserts check that both are unique, the dates in order and the week seven days long in debug builds. An event that touches none of the days is left out.",
+        "Board gap, the title: the board writes the title of an event on a ribbon that spans its days. EventRibbon cuts its title with an ellipsis, and a ribbon over 44 wide columns cannot hold a title at 200% text, which WCAG 1.4.4 does not allow us to lose. So the band under the days draws one compact ribbon (the glyph on the fill of the kind) on each day an event covers, the pieces joining where the event goes on and keeping a flat edge where it goes on past the week, and the whole title is in a list under the band, wrapped and never cut. The band is decoration (it says nothing to assistive technology); the list rows are the buttons of the events, so onEventTap is reachable at 48 tall, which a 28 tall ribbon is not.",
+        "Board gap, the cells: the board draws a 12 padding, a 4 gap between columns and a 44 tall day row, which makes a column about 40 wide in a phone. A day is a button and needs at least 44 drawn and 48 of hit area, so the card pads only 4 at the sides, the columns have no gap, a day is 48 tall, and a column is 44.3 wide at 320 and 45.4 at 328. The button of a day is 48 wide, so it spills over its column by up to 2 px on each side and overlaps its neighbors, and its semantics node is 48 wide. The touch area is the column, 44.3 px at 320 wide and at least 48 from 346 wide: a tap in the part of the button that spills over the next column goes to the next day, and the tap-target guideline passes on the node rect only. Material's date picker has the same 7 columns in 328.",
+        "Board gap, large text: seven columns cannot hold a weekday at 200% text (Wed is 49 wide at 11 px and 2.0, and the board's day cell is 44). When the longest word of a day cell does not fit its share of the width, the days move to two rows of four and three, and the ribbons go with their days. The board does not draw this. At 1.0 to 1.5 in a 320 column the strip is one row.",
+        "Board gap, lanes: events are placed in the first row of the band they do not overlap, in the order the app gives them. The board draws the one day events on the second row; here the overnight stay of Saturday goes on the first row beside the absence, because it does not overlap it. Two events side by side keep 4 between them (a 2 inset on each rounded end).",
+        "Today is the filled primary cell with on-primary text, as on the board, which draws no other cue: the fill is a shape and a luminance step and the spoken label carries it, so the app must say 'today' in the label of that day. It is not color alone, but it is the only visible cue.",
+        "A day reads the spoken labels of the events that cover it (the contract's 'each day reads its events'), and the event row says the same label again to be activated, so an event is said once on each day it covers and once in the list. A label must contain its visible texts (the weekday and the number for a day, the title for an event); asserts check it in debug builds.",
+        "The empty week has no text of its own: neither the board nor the contract draws one. It is the seven days alone.",
+        "The weekday is the short form the app chooses and is never cut by an ellipsis. A weekday wider than the whole row still wraps by its letters, as any text does. How a screen reader announces the list, the days and a change of today is not verified on a device."
+      ],
+      "stories": [
+        "Organisms/CalendarStrip/strip-with-events",
+        "Organisms/CalendarStrip/strip-empty-week"
+      ]
+    },
+    {
+      "id": "task-composer",
+      "level": "organism",
+      "class": "TaskComposer",
+      "playground": "Organisms/TaskComposer/playground",
+      "path": "organisms/task_composer.dart",
+      "props": [
+        { "name": "view", "type": "TaskComposerView", "required": true, "default": "the query typed so far, the suggestions found for it (each a TaskSuggestion: id, title and an optional subtitle), the rooms (RoomView) and items (ItemView) a task can be tied to, which of them is linked (a TaskTarget: its kind and id) or null, the label and the optional hint and helper text of the field, the spoken names of the list and of the chips, the label of the button, whether it is submitting and the spoken value of the button while it waits" },
+        { "name": "onQuery", "type": "ValueChanged<String>", "required": true, "default": "called with the text of the field every time it changes" },
+        { "name": "onPick", "type": "ValueChanged<String>", "required": true, "default": "called with the id of the chosen suggestion" },
+        { "name": "onLink", "type": "ValueChanged<TaskTarget?>", "required": true, "default": "called with the room or item of the pressed chip, or with null when the chip that is on is pressed again" },
+        { "name": "onSubmit", "type": "ValueChanged<TaskSubmission>", "required": true, "default": "called by the button, or the keyboard's done key, with a TaskSubmission (the name in the field without the spaces around it, and the link); only while the field has more than spaces and the view is not submitting" }
+      ],
+      "variants": ["composer"],
+      "states": ["empty", "typing", "match", "new-task", "submitting"],
+      "semantics": "A form container. The field is AppTextField, named by the visible label. The suggestions, when there are any, are a list node named by suggestionsLabel with one list item per suggestion, each a single button node whose name is its title and subtitle together, so the spoken name is the visible text (label in name). The chips are a container named by targetsLabel; each is an AppChip button named by its label, selected when linked, with the check and the border as the visible cue, and an item is dashed where a room is solid. The button is an AppButton named by its label, disabled until the name has more than spaces; while submitting it stays the same focusable button, ignores every activation and adds loadingLabel as its value in a live region, the field is read-only and the suggestions and chips are disabled. Calm: no danger color, never who is behind",
+      "key": "tasks.composer (also tasks.composer.field, tasks.composer.suggestions, tasks.composer.suggestion.<taskId> on the button of a suggestion, tasks.composer.targets, tasks.composer.room.<roomId> and tasks.composer.item.<itemId> on a chip, and tasks.composer.submit)",
+      "notes": [
+        "The contract lists TaskComposerView(query, suggestions, rooms, items, linked). The design system has no types for a suggestion or a link, so TaskSuggestion carries an id, a title and a subtitle, rooms and items are the RoomView and ItemView the floorplan already uses (the icon of an item is not drawn), and the link is a TaskTarget with a kind and an id, because a room and an item may share an id. Every visible text is a prop: the label, the hint, the helper text, the label of the button, and the spoken names of the list and the chips, which the board does not draw. The ids of each list are the keys of its rows and chips, and asserts check that each list has unique ids in debug builds.",
+        "The contract lists onSubmit(name, note, target) but the board draws no field for a note, so there is none: onSubmit gives a TaskSubmission with the name and the target, a value object so that a note can be added later without changing the signature. A note is a follow-up for the board's owner to confirm. onLink is told by the contract as onLink(target) and does not say how a link is removed: pressing the chip that is on calls onLink(null).",
+        "Board gap, the field: the board draws one box with the 2 px primary border that holds the text input and, under it, the one suggestion on the sunken color. AppTextField is a field with its own label above, its own border and focus ring, so the field and the suggestions are two things here: the field, then a sunken card with a hairline between suggestions, each at least 52 tall as on the board (a suggestion is a button with its title in 15/600 and its subtitle in 12 muted). The board shows one suggestion, and the composer shows as many as the app sends, in its order.",
+        "Board gaps, the states: the board draws only the match (the typed name, a suggestion that says it is the same task as before, the chosen room and the button). The other four are drawn from the contract's names: empty is an empty field with a hint and the button disabled, typing is a name still being typed with the suggestions found so far, new task is a name with no suggestion and a helper line under the field that the app passes to say it is new (the board draws no text for it), and submitting is the match with the button waiting, the field read-only and the rest disabled. Which of them a view is, is decided by what the app passes in.",
+        "The rule of the board, that matching ignores case and extra spaces like the backend catalog, is the app's, because the composer takes the suggestions already found. The composer also applies it to what it draws: a suggestion whose title is the same as an earlier one by that rule is left out, so the same task is never offered twice.",
+        "The field shows the text the person typed. The texts sent through onQuery are remembered until the app answers, and a query that comes back as one of them, even late and after more was typed, is an echo and leaves the field, its caret and its composing region alone. The field is replaced only by a query the app changed by itself (a picked suggestion, an emptied form after logging), caret at the end. The button and the done key log the text of the field, not the query of the view, so a key the app has not heard yet is not lost; the button is enabled from the field too. A debug assert checks that the linked target is one of the rooms or items.",
+        "The words put the chips under the field and the button last, as the board does, with 16 of padding and 12 between the parts. The chips are 44 tall AppChips that wrap onto more lines, so at large text a long name wraps inside its chip and the chips wrap under each other.",
+        "The list is announced as a list by its role and its name, and not as a live region: announcing every change of the suggestions would speak on every key. How a screen reader announces the list, the form role and the change of the button from ready to waiting is not verified on a device."
+      ],
+      "stories": [
+        "Organisms/TaskComposer/composer-empty",
+        "Organisms/TaskComposer/composer-typing",
+        "Organisms/TaskComposer/composer-match",
+        "Organisms/TaskComposer/composer-new-task",
+        "Organisms/TaskComposer/composer-submitting"
+      ]
+    },
+    {
+      "id": "floorplan-map",
+      "level": "organism",
+      "class": "FloorplanMap",
+      "playground": "Organisms/FloorplanMap/playground",
+      "path": "organisms/floorplan_map.dart",
+      "props": [
+        { "name": "view", "type": "FloorplanView", "required": true, "default": "the rooms (each a FloorplanRoom: a RoomView, its kind bedroom or common, its RoomTileState, the caption and the spoken label of the tile, the occupants as MemberView, the items pinned to it as FloorplanItem (an ItemView, whether it is in use, its status line and its spoken label) and whether it is archived), the members who are out (each a FloorplanAbsence: a MemberView and an optional label such as 'until Fri'), the heading of the away tray, the title and body of the empty state, the spoken name of the loading state and whether it is loading" },
+        { "name": "onRoomTap", "type": "ValueChanged<String>", "required": true, "default": "called with the id of the tapped room" },
+        { "name": "onItemTap", "type": "ValueChanged<String>", "required": true, "default": "called with the id of the tapped item (the beacon)" },
+        { "name": "onMemberTap", "type": "ValueChanged<String>", "required": true, "default": "called with the id of the tapped member of the away tray" }
+      ],
+      "variants": ["map"],
+      "states": ["populated", "empty", "loading"],
+      "semantics": "A container holding the plan, a list node whose list items each hold one room, and then the away tray. A room is a single focusable button node named by its spoken label (\"Ana's room, Ana is home, 3 hours\"), which contains the visible name; its caption, name and pebbles add nothing of their own. A beacon is its own button node, a child of its room, named by its spoken label (\"Washer, in use by Carlos, 34 minutes\"); a touch on it never reaches the room. The tray is a group named by its heading, holding one button for each absent member named by the spoken label of the member and then the words beside the pebble. Loading is one ring node named by the loading label and nothing else; empty is the empty state. The state of a room is said by its caption and label, and of a member in the tray by words and a moon, never by color alone. Calm: busy is amber, no danger color, never who is behind",
+      "key": "floorplan.map (also floorplan.room.<roomId> on the node of a tile, floorplan.item.<itemId> on a beacon, floorplan.awayTray on the tray, floorplan.member.<accountId> on the button of an absent member, roomTile.pebble.<memberId> on an occupant)",
+      "notes": [
+        "AwayTray is a private part of FloorplanMap, not an organism of its own. The board draws it inside the map card, gives it the key floorplan.awayTray in the map's key list and lists onMemberTap among the map's events, and an organism may not import another one, so a separate organism would make the app compose the two and place the tray by hand. If the app ever wants the tray on its own screen, promote it then.",
+        "The board lists the map's data as FloorplanView(rooms, members, items, usages, absences, meId, now). The design system keeps no clock and no snapshot, and every word is the app's, so the app hands over rooms that are already worded: each FloorplanRoom carries its state, caption, spoken label, occupants and its items, each FloorplanItem whether it is in use and its status line, and each FloorplanAbsence its label ('until Fri'). usages and now become those words and durations, meId becomes MemberView.isYou, and members and items are inside the rooms. Rooms that are archived have a flag and are not drawn, with their items. The ids of the rooms, of the items across every room and of the members of the tray are the keys, and asserts check that they are unique, and that the spoken label of a room and of an item contains its visible name (label in name), in debug builds. A tray button is named by the spoken label of the member and the words beside the pebble, so it contains them by construction.",
+        "Board gap, the layout rule: the board's picture puts the bathroom in the top row between two bedrooms, while its written rule says bedrooms fill the top and bottom rows and common areas the middle. The written rule is what is built: the bedrooms are split between a top section (the larger half when odd) and a bottom one, the common areas fill the middle, all in the order the app gives them. With the board's data the top is Ana and Luis, the middle the bathroom, the kitchen and the living room, and the bottom Carlos and Bedroom 4. A row holds at most three tiles that share the width equally, which is not the board's six column grid with spans of two and three.",
+        "Board gap, narrow columns and large text: the board's cells are about 90 wide in a phone, which cannot hold a word of a room at 200% text or the beacon of the kitchen without cutting it (WCAG 1.4.4). A row therefore takes fewer tiles when the longest word of a tile (or a beacon, or 48) does not fit its share, and the tiles of the section move to rows of two and then one, spread as evenly as possible. At 320 wide the board's data is already two across for the common areas at 1.0, and one column at 200%. A small render object with intrinsic and dry layout does it, not a LayoutBuilder.",
+        "Board gap, sizes: the board's rows are 100, 104 and 84 tall, with a 6 gap and 6 of padding. There is no token for the height of a plan row, so a row is as tall as its tallest tile and at least AppSizes.rowTall (72), the gap is spacing.sm (8) and the paddings are 8. The gap holds the 2 px focus ring of a tile and the 4 px glow of its neighbor side by side, so no tile paints over the ring of another and nothing has to paint last (CalendarStrip needs paintLast because its columns have no gap). The board's dotted floor texture is decoration and is left out. The card has the surface fill and a hairline edge, the plan sits on the page color.",
+        "A room tile is tappable and holds buttons. RoomTile gained an optional onTap for this (in the commit before this one): the one node of the tile is the button and the beacons are its children, so a screen reader meets the room first and the items inside it, and a touch on a beacon is the beacon's. The occupants drawn in a tile are not buttons: a touch on a pebble is a touch on the room. Only the members of the tray are tapped as members.",
+        "Board gap, 'the map is followed by the same facts as a list for screen readers': the plan is exposed as a list (list and listItem roles) whose items are the rooms, so the facts are the room nodes themselves, in reading order. A second hidden list repeating them would make a screen reader read every room twice, so none is drawn. How a screen reader announces the list, the rooms and the beacons inside them, and the order of focus (a tile, then its beacons, then the next tile) is not verified on a device.",
+        "Board gap, the tray: the board draws a moon and 'Away', then a pebble with only its initial and 'until Fri'. Each absent member is a button (48 by 48 at least, so it can open the member) named by the spoken label of the member followed by the words, which are the only visible text: the name is not drawn, as on the board. The tray wraps onto more lines when the members do not fit. It is left out when nobody is away, and the room of an absent member still shows as away in the plan.",
+        "Board gap, loading and empty: the board draws neither. Loading is the in-use ring (it breathes, and stands still when animations are off) named by the loading label, with nothing else; the plan with no room that is not archived is the empty state of the design system, and the tray is not drawn with it. Both words are props.",
+        "Touch targets: every tile is at least 48 by 48 and the whole wall is its target; a beacon is 44 drawn with a 48 hit area, inside its tile, so the tile answers everywhere else. Nothing in the geometry makes 48 impossible: at 320 wide and 200% text the tiles are a single column. A tile's wall is the hit area, so the glow and the focus ring outside it are not."
+      ],
+      "stories": [
+        "Organisms/FloorplanMap/map-populated",
+        "Organisms/FloorplanMap/map-empty",
+        "Organisms/FloorplanMap/map-loading"
+      ]
+    },
+    {
+      "id": "item-sheet",
+      "level": "organism",
+      "class": "ItemSheet",
+      "playground": "Organisms/ItemSheet/playground",
+      "path": "organisms/item_sheet.dart",
+      "props": [
+        { "name": "view", "type": "ItemSheetView", "required": true, "default": "the item (ItemView, which keys the sheet), the mode (start, finish, nudge, remind or cooldown), who is using it (ItemUsage: a MemberView and the worded subtitle, null exactly for a start), the title, the optional message (required for a cooldown), the label of the confirm button and the spoken label of the close button" },
+        { "name": "onConfirm", "type": "VoidCallback", "required": true, "default": "called by the confirm button, which is disabled in cooldown" },
+        { "name": "onClose", "type": "VoidCallback", "required": true, "default": "called by the close button and by the Escape key" }
+      ],
+      "variants": ["sheet"],
+      "states": ["start", "finish", "nudge", "remind", "cooldown"],
+      "semantics": "A container holding the SheetHeader (the title is a heading that names the route that shows the sheet, so the route announces the question once, and takes the initial focus, then the close button), the usage as one merged MemberRow node (the member's spoken label, then the subtitle), the message as a text and the confirm button, a single button node named by its visible label (disabled in cooldown, so it is announced as unavailable and the message before it says why). Focus starts on the title once the sheet is laid out, only if the title is still attached; a rebuild never asks for it again, and a view that disables the button while it has focus moves focus to the title instead of dropping it to the route. Escape closes. Nothing is told by color alone: the wait is in the message and the disabled button",
+      "key": "itemSheet.<itemId> (also sheet.title, sheet.close and sheet.handle from the header, member.<memberId> on the usage row, itemSheet.message and itemSheet.confirm)",
+      "notes": [
+        "The board's contract is ItemSheetView(item, usage, mode, nudgeAvailableAt). The design system has no clock, so there is no instant: the app words the wait into the message and sends the mode cooldown, as FloorplanMap and PresencePanel do. The view carries the visible words (title, message, confirm and close labels) because the app owns localization. nudgeAvailableAt is therefore not a prop, and a cooldown without a message is rejected in debug builds.",
+        "Board gap, the modes: the board draws only one sheet, a nudge (\"Ask Carlos to free the washer?\", Carlos started it 34 min ago, \"You can ask the same person once every 15 minutes.\", Send request) and lists \"start | finish | nudge | remind\" in its caption, with cooldown added by the contract. It says nothing of what start, finish and remind look like. They are built as the same sheet with other words: start has no usage (the item is free), finish, nudge and remind each have the person using the item, and cooldown is a nudge or a remind whose button waits. The business rules say the user of an item can be asked to free it or reminded with a cooldown, and that anyone can finish a use, which is what finish, nudge and remind follow. The mode decides which parts must be there and whether the button waits; the wording is the app's. The sheet does not tell a nudge from a remind visually.",
+        "Board gap, the usage row: the board's row has the item name (Washer) as the title and Carlos' pebble, with the usage text as the subtitle. MemberRow names the member, so the row shows the member's name with the subtitle the app words (\"Started 34 min ago\"), and the item is named by the title. ItemView.name and icon are not drawn; the item only keys the sheet. The row sits on the sunken card color with 12 of side padding and is 64 tall (board 60).",
+        "Board gap, the surface: the board draws the sheet with 24 top corners, a 12 radius at the bottom and the sheet shadow, over a page. The sheet here has 24 top corners only (it is anchored to the bottom of the screen by its route) and adds the bottom safe-area inset (MediaQuery.padding, so an ancestor SafeArea is not doubled) under the button. The message is the body style (15/22) where the board draws 13/20, because no 13/20 regular text token exists. Spacing is 12 between the parts as on the board.",
+        "SheetHeader gained an optional titleFocusNode for this (in the commit before this one): the title is the starting point of focus, so it is focusable without a Tab stop and has the house focus ring for keyboard users. The next Tab reaches the close button, then the confirm button.",
+        "Hosting: show it with showModalBottomSheet(isScrollControlled: true, useSafeArea: true, backgroundColor: Colors.transparent, ...). useSafeArea matters: by default the route removes the top inset, and at 2.0 text on 320 by 568 with a 24 status bar the close button sits under the status bar; with it the header clears the inset (a real-route test checks both). The sheet draws its own surface, the route supplies the barrier, the focus scope and the route semantics (one scopesRoute node), and the title heading names that route (SheetHeader.namesRoute), so the title is not said twice. On Android the route also carries Flutter's own 'Dialog' label on its node; which name a given screen reader prefers is not verified on a device. A new item id mounts the content again (focus falls back through the scope's history, to the title once it was there).",
+        "Scrolling: the header stays pinned and the body (the person, the message, the button) scrolls inside the sheet when the height is bounded, which is the case in showModalBottomSheet. When the header alone would take more than half of the bounded height (the default route caps a sheet at 9/16 of the screen, so at 2.0 text on 320 by 568 the title fills it), the header stops being pinned and scrolls together with the body, so the button is still reached; at exactly half it is still pinned. The outer scroll is a Scrollable around the private render object, which is a viewport (RenderAbstractViewport) so ensureVisible and screen-reader focus scroll it. A small private render object gives the body what the header leaves of a bounded height and is a plain column when the height is unbounded (a column with a flex child asserts there), so intrinsic sizes and dry layout still work for the golden harness. onClose is called by the close button and by Escape while focus is inside the sheet; the barrier, a drag down and the route's DismissIntent bypass it, so the app must treat the route's pop result as a close too.",
+        "Nudge message: the backend's nudge endpoint takes an optional message of up to 280 characters, and the sheet has no field for it because the board draws none. A text field (AppTextField) in the body and an onConfirm that carries the text is a follow-up. Remind follows the contract's REMINDER meaning (the washer finished hours ago); nudge, remind and cooldown cannot target the user's own use (the backend answers HOME_CANNOT_NUDGE_SELF), and ItemSheet asserts it in debug builds (ItemSheetView stays const, which cannot read the member)."
+      ],
+      "stories": [
+        "Organisms/ItemSheet/sheet-start",
+        "Organisms/ItemSheet/sheet-finish",
+        "Organisms/ItemSheet/sheet-nudge",
+        "Organisms/ItemSheet/sheet-remind",
+        "Organisms/ItemSheet/sheet-cooldown"
+      ]
+    },
+    {
+      "id": "room-editor",
+      "level": "organism",
+      "class": "RoomEditor",
+      "playground": "Organisms/RoomEditor/playground",
+      "path": "organisms/room_editor.dart",
+      "props": [
+        {
+          "name": "view",
+          "type": "RoomEditorView",
+          "required": true,
+          "default": "the headings and the words of the add and assign buttons, the bedrooms and common areas (RoomEditorRoom: a RoomView that keys the row, the subtitle, the occupants as MemberViews, the members that can be moved in as RoomAssignOptions with their spoken labels, and the spoken labels of the edit, archive and assign buttons), the archived rooms (RoomEditorArchivedRoom: a RoomView, a subtitle and the spoken label of the restore button), and an optional limit message"
+        },
+        {
+          "name": "onAdd",
+          "type": "VoidCallback",
+          "required": true,
+          "default": "called by the add button, which is disabled while the view has a limit message"
+        },
+        {
+          "name": "onEdit",
+          "type": "ValueChanged<String>",
+          "required": true,
+          "default": "called with the room id by its edit button"
+        },
+        {
+          "name": "onArchive",
+          "type": "ValueChanged<String>",
+          "required": true,
+          "default": "called with the room id by its archive button, which is always enabled"
+        },
+        {
+          "name": "onRestore",
+          "type": "ValueChanged<String>",
+          "required": true,
+          "default": "called with the room id by the restore button of an archived room, which the limit of rooms does not block"
+        },
+        {
+          "name": "onAssign",
+          "type": "void Function(String roomId, String accountId)",
+          "required": true,
+          "default": "called with the room id and the member id by an option of the assign list"
+        },
+        {
+          "name": "initialAssignOpen",
+          "type": "Set<String>",
+          "required": false,
+          "default": "empty: the ids of the bedrooms whose assign list is open when the editor is first built; only the rooms of that first view, so a room added or restored later stays closed"
+        }
+      ],
+      "variants": [
+        "editor"
+      ],
+      "states": [
+        "default",
+        "archived-rooms",
+        "assign-open",
+        "limit-reached"
+      ],
+      "semantics": "A container holding one container per list (bedrooms, common areas, archived), each a heading node then a list node. A room is a list item holding one merged node with its name and subtitle, then its buttons, each its own node named by the app so it says which room it acts on (Edit Bedroom 1, Archive Kitchen), then, for a bedroom with members to move in, the assign button (named by the app, with the expanded state on its own node) and, while it is open, a list node of items, each one button named by the app (Move Carlos to Bedroom 1). The pebbles are decorative: the subtitle says who sleeps there. An archived room is a list item with one merged node (name and subtitle) and a restore button named by the app (Restore Office). The add button sits in the bedrooms container, named by its visible label. Nothing is told by color alone: the limit is words, the disabled add button is announced, and every action has a label",
+      "key": "rooms.editor (also rooms.section.<bedrooms|commonAreas|archived>, rooms.<roomId> on the row, rooms.edit.<roomId>, rooms.archive.<roomId>, rooms.restore.<roomId>, rooms.assign.<roomId>, rooms.options.<roomId>, rooms.option.<roomId>.<accountId>, rooms.pebble.<roomId>.<accountId>, rooms.add and rooms.limit)",
+      "notes": [
+        "The board's contract is RoomEditorView(bedrooms, commonAreas, members) and the events onAdd, onEdit, onArchive and onAssign(roomId, accountId). The board draws no way to assign a member, so the assign button is new: it opens, under the row, one button for each member that can be moved into that bedroom, and a tap calls onAssign. The members are not a list of the view: each bedroom carries its own assignOptions, because every button needs a spoken label that names the member and the room, and only the app can word it. A bedroom that is full has no options and no assign button, so the editor does not know about capacity: the app decides. Escape inside the list closes it and puts focus on the assign button. initialAssignOpen is a seed for an app that restores what was open and for the assign-open story; tapping owns the list afterwards.",
+        "Board gap, restore: the board's contract has no restore, but the business rules let the admin restore a room and the backend has POST .../rooms/{id}/restore. Archived rooms still count toward the limit of 30, so without it an admin at the limit could never free a name or add a room. onRestore and a restore icon button on every archived row (44 drawn, 48 hit area, named by the app, for example 'Restore Office') are therefore added. Restoring does not change how many rooms there are, so the limit message never disables it. The restored room leaves the archived list for the active one: focus moves to the restore button of the next archived room, else the previous one, else the edit button of the restored room.",
+        "Board gap, which button is where: the board draws only Edit on the bedroom and only Archive on the kitchen. Every room here has both, as the business rules let the admin edit and archive any room. Archive is always enabled. The backend refuses to archive a bedroom someone sleeps in (HOME_BEDROOM_IN_USE), and a disabled icon would differ from an enabled one only by color (WCAG 1.4.1) and never say why, so the app answers a refused archive with the localized reason, for example in an AppSnackbar.",
+        "Board gap, the states: the board draws one editor and the contract lists 'default' and 'with archived rooms' without drawing the archived one. An archived room is a plain row (name and a subtitle the app words, in the muted ink) with a restore button, under its own heading. assign-open (the list open from the start) and limit-reached are not on the board.",
+        "Board gap, the limit: a home has at most 30 rooms, archived ones included (HOME_ROOM_LIMIT_REACHED). The design system does not know the limit and the app must not copy it, so the app passes the reason in limitMessage when the home is full: the add button is then disabled and the message is shown under the bedrooms heading.",
+        "Board gap, the add button: it is a ghost AppButton with a plus icon at 44 drawn (the board's text button is 44 tall with 13/600 text and no icon). It sits beside the bedrooms heading and wraps under it at large text. It adds a room of any kind: the board has one Add room button, in the bedrooms section.",
+        "Board gap, sizes: the pebble is 28 (the board draws 32, which no pebble size has), the row is as tall as its content with 8 of vertical padding (the board has a fixed 56), and the icon buttons are 44 drawn with a 48 hit area (the board draws 44 with no target padding). A shared bedroom draws every occupant as a pebble, wrapping inside three pebbles of width so the texts keep their room. Rows are separated by a 1 px hairline in the line color, as in PresencePanel, and the card has 12 of side padding.",
+        "AppButton gained an optional focusNode and expanded for this (in the commit before this one): the editor hands focus to the add button and the assign button, and the assign button says on its own node whether its list is shown.",
+        "Layout: the buttons of a row and the add button are Wrap children, not expanded ones, so they sit beside the texts (or the heading) only when those fit whole beside them, and otherwise go under them: a long word is never cut.",
+        "Focus (keyboard users only, once the new view is laid out, and only to a node that is still attached): when a view removes the room that holds focus, focus moves to the edit button of the next room, else of the previous one, else to the add button (when that is disabled, nothing is asked and focus falls to the route: the editor has no other stop to offer). When the add button holds focus and a limit message arrives, focus moves to the edit button of the first room (the restore button of the first archived room when every room is archived). When the assign list that holds focus loses every option, focus moves to the edit button, and when it loses only the option that holds it, to the assign button. A rebuild with the same view asks for nothing. Rows are keyed by room id, so an open assign list survives another room being added or removed above it. The two guards of the post-frame hand-over (the widget is still mounted, the node is still attached) cover each other: a mutant that drops either one survives, because a disposed node has no parent.",
+        "The editor is a plain column, not a scrollable: put it in the scrollable of the screen. It checks in debug builds that no room id repeats across the three lists, that archived rooms come with a heading, that a common area has no occupants or options, that no member is offered the room they already sleep in or twice, that a room with options has an assignLabel that holds the visible assignLabel of the view, and that the spoken label of an option holds the name of the member (label in name). The editor does not check the role: the app shows it to the admin only, as the board says."
+      ],
+      "stories": [
+        "Organisms/RoomEditor/editor-default",
+        "Organisms/RoomEditor/editor-archived-rooms",
+        "Organisms/RoomEditor/editor-assign-open",
+        "Organisms/RoomEditor/editor-limit-reached"
+      ]
+    },
+    {
+      "id": "room-draw-board",
+      "level": "organism",
+      "class": "RoomDrawBoard",
+      "playground": "Organisms/RoomDrawBoard/playground",
+      "path": "organisms/room_draw_board.dart",
+      "props": [
+        {
+          "name": "view",
+          "type": "RoomDrawView",
+          "required": true,
+          "default": "the draw (drawId that keys the result, RoomDrawStatus pending or applied and the word that says it), the bedrooms (RoomDrawRoom: a RoomView, the MemberViews that go there, none when it stays free, the caption under them and the whole spoken label), whether the person looking is the admin, the visible words of the two buttons and the note a member reads"
+        },
+        {
+          "name": "onDrawAgain",
+          "type": "VoidCallback?",
+          "required": false,
+          "default": "null: the Draw again button is not offered. Called by the button, which only the admin sees and which stays enabled while the app answers"
+        },
+        {
+          "name": "onApply",
+          "type": "VoidCallback?",
+          "required": false,
+          "default": "null: the Apply result button is not offered. Called by the button, which only the admin sees, only while the draw is pending, and which stays enabled while the app answers"
+        }
+      ],
+      "variants": [
+        "admin",
+        "member"
+      ],
+      "states": [
+        "pending",
+        "applied"
+      ],
+      "semantics": "A container holding the status node (the badge word, a live region so a change from pending to applied is announced; it is not a focusable node of its own, but a keyboard fallback target of focus), a list node with one item for each bedroom, each one a node named by the app (\"Bedroom 1: Carlos, from Bedroom 3\") that holds its name, caption and pebbles, and then, for the admin, the buttons named by their visible labels (Draw again, and Apply result while pending) or, for a member, the note that says who decides. The pebbles and captions add nothing of their own. Nothing is told by color alone: the status is a word, a bedroom that stays free says so and has a dashed outline, and an action that is not offered is not drawn, never drawn disabled",
+      "key": "roomDraw.board (also roomDraw.<drawId> on the list, roomDraw.room.<roomId> on each item, roomDraw.status, roomDraw.drawAgain, roomDraw.apply and roomDraw.note; the tiles are RoomTiles, so floorplan.room.<roomId> and roomTile.pebble.<memberId> also exist)",
+      "notes": [
+        "The board's contract is RoomDrawView(draw, bedrooms, members, isAdmin) with the events onDrawAgain() and onApply(), admin only. The members are inside each bedroom here (a draw puts a group in a bedroom), the draw is a drawId plus a status and the words are plain props, as in every organism.",
+        "Board gap, nullable callbacks: the contract types both callbacks VoidCallback?, and the house rule is that null means disabled. A disabled button differs from an enabled one by color alone (WCAG 1.4.1), so here a null callback means the action is not offered and the button is not drawn. A member gets the same: no buttons and the visible note. Nothing in the board is ever disabled.",
+        "Board gap, the status: the board draws no status and no badge, but the contract lists the states pending and applied and the composition lists AppBadge. Without a word, a pending and an applied result would differ only in whether Apply is there, so the board shows the status as an AppBadge.label (busy tone while pending, soft once applied) with the word the app passes. The badge is a guess at where the design wanted it.",
+        "Board gap, applied: the board draws only the pending result. An applied one shows the same bedrooms and the badge, and offers Draw again alone, because the backend lets the admin draw at any time and there is nothing left to apply (applying an applied draw changes nothing and answers 200).",
+        "Board gap, superseded and outdated: the backend knows a third status, SUPERSEDED (a newer draw replaced it, someone joined or left, or a bedroom changed, so applying it answers HOME_ROOM_DRAW_OUTDATED). The board draws no such state: the app draws the pending draw or none, and answers a 409 on apply in its own words (a snackbar), then offers Draw again. Any status the app does not know is treated as superseded, so it is not passed here.",
+        "Board gap, groups: the board draws one pebble for each bedroom, but people who share a bedroom are drawn together as a group (backend: assignments[].accountIds), so a tile takes several pebbles. The caption 'from Bedroom 3' is where the group came from, which the app words from the old bedroom of the group (all of them shared it). A bedroom that receives nobody has no pebble and the caption 'Stays free' on a dashed tile (RoomTileState.free).",
+        "Board gap, the pebble and the tile: the board's pebble is 32, which no pebble size has, so it is s36 as in every RoomTile, and the tiles are as tall as their content with 72 as the least (the board has a fixed 88). The gap between tiles is 8 and the card is padded 8 (the board uses 6 and 8). The tile is the draw form of RoomTile (the draw prop of the commit before this one): the name on top, and the pebbles with the caption beside them at the bottom.",
+        "Board gap, the draw is the app's: there is no clock and no randomness here. The server draws with cryptographic randomness, each draw notifies the home and the home has at most 10 draws in 24 hours (HOME_ROOM_DRAW_LIMIT_REACHED, a 429). The board knows none of it: it hands the tap to the app, which answers the limit in its own words, so both buttons stay enabled.",
+        "Board gap, in flight: the board has no loading state for Draw again or Apply. A repeated Draw again is a new draw (it counts toward the daily limit) and a repeated Apply is harmless, so the app should ignore a second tap while one request is in flight. AppButton has a loading look the board could use later.",
+        "Layout: the bedrooms sit in two columns of equal width, or in one when the longest word of a tile does not fit half the width, so no word is cut at 2.0 text scale. A lone last tile keeps the width of a column. The two buttons share a row (EqualPair) or stack when a word does not fit its half, and a single button takes the full width. A render object with intrinsic and dry layout does it, not a LayoutBuilder. It copies the idea of the FloorplanMap layout, which an organism cannot import, and could move to foundation.",
+        "Focus (keyboard users only, once the new view is laid out, and only to a node that is still attached): when the button that holds focus is no longer offered (applying makes the draw applied, the callback goes null, or the person stops being the admin) focus moves to the other button, and when there is none, to the status, which draws the 2 px ink ring outside its shape while it holds the primary focus. A new draw (another drawId) keeps the buttons mounted and so keeps their focus. A rebuild of the same view cancels nothing.",
+        "It checks in debug builds that a draw has a bedroom, that bedroom ids and member ids do not repeat (a person goes to one bedroom), that the spoken label of a bedroom holds its visible name and caption (label in name), and that a member has the note. RoomDrawView and its parts stay const."
+      ],
+      "stories": [
+        "Organisms/RoomDrawBoard/admin-pending",
+        "Organisms/RoomDrawBoard/admin-applied",
+        "Organisms/RoomDrawBoard/member-pending",
+        "Organisms/RoomDrawBoard/member-applied"
+      ]
+    },
+    {
+      "id": "app-sheet",
+      "level": "template",
+      "class": "AppSheet",
+      "playground": "Templates/AppSheet/playground",
+      "path": "templates/app_sheet.dart",
+      "props": [
+        { "name": "title", "type": "String", "required": true, "default": "the heading of the sheet; it names the route, so it is never empty" },
+        { "name": "closeLabel", "type": "String", "required": true, "default": "spoken name of the close button, never empty" },
+        { "name": "onClose", "type": "VoidCallback", "required": true, "default": "called by the close button and by the Escape key" },
+        { "name": "body", "type": "Widget", "required": true, "default": "the slot under the header; it scrolls with the actions" },
+        { "name": "actions", "type": "List<AppButton>", "required": false, "default": "[]: the buttons under the body, one under the other, as wide as the sheet, in the order given" }
+      ],
+      "variants": ["sheet"],
+      "states": ["plain", "one-action", "two-actions"],
+      "semantics": "A container holding the SheetHeader (the title is a heading that names the route that shows the sheet, so the route announces it once, and takes the initial focus, then the close button), then the body and the actions, which are the app's widgets and say what they are. Focus starts on the title once the sheet is laid out, only if the title is still attached; a rebuild never asks for it again. Tab goes title, close, body, actions in order. Escape closes. The sheet adds no node of its own to the body or the actions",
+      "key": "sheet.title, sheet.close and sheet.handle from the header, appSheet.body around the body slot and appSheet.actions around the actions (only when there are any); the root key is the app's",
+      "notes": [
+        "Board gap: the board draws no template, no page scaffold and no generic sheet, only the ItemSheet organism and the SheetHeader molecule. AppSheet is the layout of ItemSheet with the content left to the app, kept as close to it as possible: the same surface (24 top corners, the sheet fill and shadow), the same pinned header, 12 between the parts, the bottom inset of the screen under the last child.",
+        "Hosting: show it with showModalBottomSheet(isScrollControlled: true, useSafeArea: true, backgroundColor: Colors.transparent, ...). useSafeArea matters: by default the route removes the top inset, and once the keyboard is up at large text (320 by 568, 24 status bar, 250 keyboard, 2.0) the close button and the title sit under the status bar; with it the header clears the inset (a real-route test checks both). The route supplies the barrier, the focus scope and the one route semantics node; the title names that route. The barrier, a drag down and the route's DismissIntent bypass onClose, so the app treats the pop result as a close too.",
+        "Scrolling: as ItemSheet. The header stays pinned and the body with the actions scrolls when the height is bounded; a header taller than half of the bounded height scrolls with the body, so the last action is still reached (at exactly half it is pinned). The layout is the foundation HeaderBody, moved out of ItemSheet when this template became its second user. ItemSheet keeps its own Scrollable and its own content, and imports the same HeaderBody, so there is no duplicated code.",
+        "Keyboard: the height the keyboard takes (MediaQuery.viewInsets) is left under the sheet surface, so a field in the body is not covered and the actions are reached by scrolling the body. The surface is not drawn behind the keyboard. A route that already lifts the sheet above the keyboard must remove the view insets from the MediaQuery it gives the sheet, or the room is left twice. ItemSheet has no fields and does not do this.",
+        "Focus in the slots is the app's. The sheet takes focus to the title once, when it opens. A button of the actions that disables itself while it holds focus has to move focus first, because the sheet cannot know which action a view will disable (ItemSheet can, so it does it for its one button). Tab order is the order of the slots; a body with its own scrolling list scrolls inside the sheet.",
+        "Not a prop: a drag handle that closes, a barrier tap, a snap size or a drag-to-dismiss. Those belong to the route. The actions slot has no limit on how many buttons, but a sheet of more than two is a menu; the order given is the order read, the one that confirms first.",
+        "The sample bodies are the PresencePanel organism (who is home, the cooldown and the button are the organism's own) and two sentences from the business rules (archived rooms count toward the limit; anyone can leave, and an admin's role passes on). The sheet is not told which."
+      ],
+      "stories": [
+        "Templates/AppSheet/sheet-plain",
+        "Templates/AppSheet/sheet-one-action",
+        "Templates/AppSheet/sheet-two-actions"
+      ]
+    },
+    {
+      "id": "app-form-page",
+      "level": "template",
+      "class": "AppFormPage",
+      "playground": "Templates/AppFormPage/playground",
+      "path": "templates/app_form_page.dart",
+      "props": [
+        { "name": "title", "type": "String", "required": true, "default": "the heading of the pushed bar; it names the route, so it is never empty" },
+        { "name": "backLabel", "type": "String", "required": true, "default": "spoken name of the back button, never empty" },
+        { "name": "onBack", "type": "VoidCallback", "required": true, "default": "called by the back button" },
+        { "name": "fields", "type": "List<Widget>", "required": true, "default": "the form: one widget per field, stacked in the order given, 16 apart and as wide as the page allows" },
+        { "name": "submitLabel", "type": "String", "required": true, "default": "the visible label of the submit button, never empty" },
+        { "name": "onSubmit", "type": "VoidCallback?", "required": true, "default": "called by the submit button; null disables it" },
+        { "name": "submitting", "type": "bool", "required": false, "default": "false; true shows the spinner of the button and ignores taps" },
+        { "name": "submittingLabel", "type": "String?", "required": false, "default": "null; what assistive technology reads as the value of the button while submitting, never empty when given" }
+      ],
+      "variants": ["form"],
+      "states": ["filled", "error", "submitting"],
+      "semantics": "A Scaffold holding the pushed AppTopBar (the title is a heading that names the route, the back button is a button named by backLabel), a form group (SemanticsRole.form) with the fields, which are the app's widgets and say what they are, and the submit button, a single button named by its visible label (disabled when onSubmit is null; while submitting it keeps its node and focus, announces submittingLabel as its value and ignores taps). Tab goes through the back button, the fields in the order given, then the submit button, also for fields that have scrolled out of sight: an OrderedTraversalPolicy sets the order, so it does not depend on where the fields are on the screen. The page never takes focus by itself",
+      "key": "formPage.fields (the column of fields) and formPage.submit (the button), topBar.back and topBar.title from the bar; the root key is the app's",
+      "notes": [
+        "Board gap: the board draws no page, no form and no template. The page is the pushed AppTopBar of the board over a column of fields with a bottom button, laid out as a pushed route would be: 16 of side padding, 16 between the fields, the button at the bottom with 12 above and 16 below it (plus the bottom inset of the screen) and a hairline over it.",
+        "The slots: the fields are a List<Widget> and the button is built by the page from submitLabel, onSubmit, submitting and submittingLabel, so the primary action is always an AppButton, large, full width, 48 or more tall. The board has no secondary action at the bottom. A form with two actions is not this page. The bar has no action text (the pushed bar can take one); the page does not expose it because a form has one way to send.",
+        "Keyboard: the page is a Scaffold with the default resizeToAvoidBottomInset, so the keyboard takes room from the body. The button is the Scaffold's bottomNavigationBar with the keyboard's height added under it (the Scaffold leaves that bar at the bottom of the screen, under the keyboard), so the body ends above it and it rides directly above the keyboard. The bottom inset (home indicator) is the padding MediaQuery reports, which a phone zeroes while the keyboard is up, so there is no extra gap above the keyboard. The fields scroll; a field that takes focus is scrolled into view above the button by Flutter's own ensureVisible.",
+        "Large text on a short screen: the bar is pinned over the scrolling fields. When the bar alone would take more than half of the room above the button (200% text on 320 by 568 with the keyboard up), the bar scrolls away with the fields (the foundation HeaderBody, as AppSheet does), so the fields keep the room and the button stays reachable. Nothing is clamped.",
+        "Focus: the traversal order is set (back, fields, submit) because the default reading order sorts by position on screen, and a field scrolled below the button would be visited after it. The fields are a FocusTraversalGroup of their own, so a FocusTraversalOrder a field sets (or a nested group with its own policy) orders only the fields and never moves one in front of the back button or behind the submit button. The page asks for no focus: a form that wants one puts autofocus on its field. When onSubmit becomes null while the button has focus, the page moves focus off the disabled button: to the back button (the first stop) for keyboard users, and to nothing for touch users, so focus never falls back to the last field and opens the keyboard. Submitting keeps the button enabled for focus, so it does not lose it.",
+        "Route name: the page sets AppTopBar.namesRoute (added in the commit before this one), so a screen reader announces the title when the page opens. The page does not push, pop or confirm discarding changes: the app owns the route and the back button's meaning.",
+        "Sample content follows the business rules: the admin renames the home (the name titles every push), the time zone cannot be changed yet (a read-only field that says so). The sample fields are AppTextField atoms; the board has no organism that is a form field.",
+        "SnackBars: the button is the bottom bar of the Scaffold, so a SnackBar shown through the ScaffoldMessenger sits above it and never covers it (also with the keyboard up). An AppSnackbar the app places itself must leave a bottom margin that clears the button, which is as tall as a large button plus 28 and the bottom inset. A page is a route of its own, pushed above the home shell: it owns its Scaffold, so a tab body inside a shell must not use one.",
+        "Semantics, the button and the form group: the form group (SemanticsRole.form, its own node, fields not merged) holds the fields only. The button stays outside it on purpose: it is pinned in the bottom bar, outside the scrolling area and in a different subtree, so no single node can hold both without making the pinned bar part of the scrolled content. It is read right after the last field and is a button named by its label.",
+        "Known gap, accepted: at 2.0 text on 320 by 568 with the keyboard up, the focus ring of the back button is clipped by 2 px at the top of the screen, because the bar has scrolled to the top of the viewport. The button stays fully usable."
+      ],
+      "stories": [
+        "Templates/AppFormPage/form-filled",
+        "Templates/AppFormPage/form-error",
+        "Templates/AppFormPage/form-submitting"
+      ]
+    },
+    {
+      "id": "app-home-shell",
+      "level": "template",
+      "class": "AppHomeShell",
+      "playground": "Templates/AppHomeShell/playground",
+      "path": "templates/app_home_shell.dart",
+      "props": [
+        { "name": "title", "type": "String", "required": true, "default": "the heading of the home bar; it names the route, so it is never empty" },
+        { "name": "subtitle", "type": "String?", "required": false, "default": "null; the second line of the bar, such as who is home; empty or null draws none" },
+        { "name": "activityLabel", "type": "String", "required": true, "default": "spoken name of the bell with the unread count in words, never empty" },
+        { "name": "unreadCount", "type": "int", "required": true, "default": "the count on the bell; zero draws no badge, never negative" },
+        { "name": "onActivity", "type": "VoidCallback", "required": true, "default": "called by the bell" },
+        { "name": "me", "type": "MemberView", "required": true, "default": "the signed-in member the account pebble is drawn from" },
+        { "name": "accountLabel", "type": "String", "required": true, "default": "spoken name of the account button, the action it does, never empty" },
+        { "name": "onAccount", "type": "VoidCallback", "required": true, "default": "called by the account button" },
+        { "name": "destinations", "type": "List<NavDestinationView>", "required": true, "default": "the tabs, one to four; their ids key the body and their badge counts are drawn by the nav bar as given" },
+        { "name": "selectedIndex", "type": "int", "required": true, "default": "index of the selected tab, inside the destinations; the shell never changes it" },
+        { "name": "onTabSelected", "type": "ValueChanged<int>", "required": true, "default": "called with the index of the tapped destination, the selected one too" },
+        { "name": "navigationLabel", "type": "String", "required": true, "default": "name of the navigation landmark, never empty" },
+        { "name": "body", "type": "Widget", "required": true, "default": "the body of the selected tab; it sees no top or bottom inset, has a bounded height and holds no Scaffold" }
+      ],
+      "variants": ["home", "things", "tasks", "calendar"],
+      "states": ["default", "badges"],
+      "semantics": "A Scaffold holding the home AppTopBar (the title is a heading that names the route, the bell and the account pebble are buttons named by activityLabel and accountLabel), the body of the selected tab (the app's widgets, which say what they are) and the AppNavBar (a navigation landmark named by navigationLabel, one button per destination with its selected state). The shell announces nothing when the tab changes: the selected state is the cue, as for Material's NavigationBar. While the keyboard covers the nav bar, and while the bar is out of the layout because it is too tall for the room the keyboard leaves, those parts are out of the semantics and the focus order. Tab goes through the bell, the account, the body, then the destinations: an OrderedTraversalPolicy sets the order, so it does not depend on where things are on the screen",
+      "key": "topBar.title, topBar.activity and topBar.account from the bar, nav.<id> from the nav bar; the body and the root key are the app's",
+      "notes": [
+        "Board gap: the board draws no shell, no tab screen and no template. The shell is the home AppTopBar over a body over the AppNavBar of the board, laid out as the main screens of an app are: the bar pinned on top, the nav bar pinned at the bottom, the body in between. The sample bodies are the organisms and molecules of the board (FloorplanMap, ItemBeacon, TaskRow, CalendarStrip); the board has no screen that composes them.",
+        "The slots: the bar and the nav bar are built by the shell from plain data (title, subtitle, the bell and account props, the destinations), so the top of a main screen is always the home bar and its bottom always the nav bar. The body is a Widget. The shell has no secondary action, no floating button and no drawer: the board has none.",
+        "Tab state: none. The selected index comes in and onTabSelected goes out. The shell owns no routing and no navigators: the app's GoRouter StatefulShellRoute supplies the body. The shell is the outer Scaffold of the main screens, so a page pushed from a tab (AppFormPage, a detail) goes on the root navigator, above the shell, and owns a Scaffold of its own. A tab body is not a page template and must not hold a Scaffold: two Scaffolds would both take the insets and a SnackBar would go to the wrong one.",
+        "Insets: the bar takes the status bar and the nav bar paints under the home indicator, so the shell needs no SafeArea. The top and bottom insets are taken out of the MediaQuery the body sees, so a SafeArea or a padding inside a tab does not count them twice (the Scaffold already takes the bottom one out because it has a bottom bar; the top one is the shell's). The sides of the screen (a landscape cutout) are not handled: the board is a portrait phone and the bars paint edge to edge.",
+        "Keyboard: the body is laid out above the keyboard (the Scaffold's default resizeToAvoidBottomInset) and the nav bar is left where it is, at the bottom of the screen, under the keyboard. It takes no room from the body, so the room is not counted twice, and while it is covered it is out of the semantics and the focus order, so Tab and a screen reader never land on a button that cannot be seen. A SnackBar rides above the keyboard. When the bar alone would take more than half of the room above the keyboard (the keyboard is up at 200% text on 320 by 568) the shell takes it out of the layout, the paint, the hit test, the semantics and, one frame later, the focus order, and the body takes all the room; it comes back with the room. Without a keyboard the bar always stays, however tall, because it is the title of the screen. Hiding it was chosen over scrolling it away with the body (as AppFormPage does) because a tab body is the app's own scrollable and cannot share an offset with the shell.",
+        "Large text: the bar and the body grow with the system text scale and are never clamped. The nav bar clamps its labels and badge counts at 1.3, as AppNavBar defines, and the shell leaves that as it is. The shell supports 360 wide. 320 is unsupported, as for AppNavBar, though it was checked with four short labels (Casa, Cosas, Tareas, Plan); the Spanish word Calendario does not fit a 320 wide column, which is the limit AppNavBar already documents.",
+        "Route name: the shell sets AppTopBar.namesRoute, so a screen reader announces the title when the shell opens. The shell adds no announcement when the tab changes, as Material's NavigationBar does not: the selected state of the destination is the cue. If the app changes the title with the tab, the platform treats the new route name as it always does (Android reads a new window title); the shell adds nothing to it. The title is the app's choice: the home name on every tab, or the name of the tab.",
+        "Focus: Tab goes through the bar, the body, then the destinations, in an OrderedTraversalPolicy set by the shell. The body is a FocusTraversalGroup of its own, so a FocusTraversalOrder the app sets inside it never moves anything in front of the bar or behind the nav bar. The shell never takes focus by itself. A tap or an Enter on a destination leaves focus on that button.",
+        "Body state: the shell does not key the body. The app decides whether a tab change gives a fresh body, by keying its own: a body with a GlobalKey, such as the StatefulNavigationShell of go_router, keeps everything it has (stacks and scroll positions), a custom IndexedStack keeps its branches, and a body keyed by tab is a fresh subtree. Keying the body inside the shell would cost a full reparent of every branch of a GlobalKey body on each tab change, and would destroy the branches of a body that has no GlobalKey.",
+        "Focus hand-over: when focus is in the body and a keyboard is in use (traditional navigation), the shell checks after the frame whether focus was lost, and if so, or whenever the tab changed, moves it to the first stop of the body, then of the nav bar, only to attached nodes. Focus is lost when the node that held it is gone or can no longer take focus (a branch that went offstage, a body that was reparented), which happens with a tab change and also with a rebuild with the same tab that removes the focused field. A rebuild that leaves focus where it was moves nothing. The same hand-over runs when the bar leaves the layout while focus is in it and when the keyboard covers the nav bar while focus is in it. Focus in the bar or the nav bar is otherwise left alone, and with touch nothing moves, so a field never opens the keyboard by itself.",
+                "SnackBars: the nav bar is the bottom bar of the Scaffold, so a SnackBar shown through the ScaffoldMessenger from a tab body sits directly above it, and above the keyboard when it is up. An AppSnackbar the app places itself must leave a bottom margin that clears the nav bar.",
+        "Badges: a count on a NavDestinationView and unreadCount are plain data, passed through to AppNavBar and AppTopBar as given. The shell caps, rounds and words nothing: the spoken label with the count in words is the app's (NavDestinationView.semanticLabel, activityLabel).",
+        "Sample content follows the business rules: the plan shows who is home and who is away, with the absence of Luis from the calendar; the washer is in use by one person at a time, a task shows when and by whom it was last done and never who is behind, and the calendar is informational."
+      ],
+      "stories": [
+        "Templates/AppHomeShell/home-default",
+        "Templates/AppHomeShell/home-badges",
+        "Templates/AppHomeShell/things-default",
+        "Templates/AppHomeShell/things-badges",
+        "Templates/AppHomeShell/tasks-default",
+        "Templates/AppHomeShell/tasks-badges",
+        "Templates/AppHomeShell/calendar-default",
+        "Templates/AppHomeShell/calendar-badges"
       ]
     }
   ]

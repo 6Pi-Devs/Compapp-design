@@ -8,6 +8,7 @@ import '../helpers/bar_host.dart';
 import '../helpers/bundled_fonts.dart';
 import '../helpers/contrast.dart';
 import '../helpers/painted_color.dart';
+import '../helpers/word_breaks.dart';
 
 void _noop() {}
 

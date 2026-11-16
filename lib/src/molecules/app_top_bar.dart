@@ -35,12 +35,13 @@ enum AppTopBarVariant { home, pushed }
 ///
 /// The bar is its own semantics group, so it keeps its parts apart under a
 /// grouping parent such as a `Card` or a list item. The title is a heading
-/// node of its own, and the parts are read in order: the title, the subtitle,
-/// the bell, the account (the title, the back button, the action, on the
-/// pushed bar). The buttons are 44
-/// drawn with a 48 hit area. The bar has no router and no timers: the app
-/// passes the callbacks. A null [onAction] disables the action. It mirrors in
-/// right-to-left text, back arrow included.
+/// node of its own (and names the route that shows the bar when [namesRoute]
+/// is set: a screen's bar does, a bar inside a card or a sheet does not),
+/// and the parts are read in order: the title, the subtitle, the bell, the
+/// account (the title, the back button, the action, on the pushed bar). The
+/// buttons are 44 drawn with a 48 hit area. The bar has no router and no
+/// timers: the app passes the callbacks. A null [onAction] disables the
+/// action. It mirrors in right-to-left text, back arrow included.
 ///
 /// The bar takes the top inset of the screen (the status bar) into its own
 /// padding, as Material's `AppBar` does, so it needs no `SafeArea` above it.
@@ -61,6 +62,7 @@ class AppTopBar extends StatelessWidget {
     required String this.accountLabel,
     required VoidCallback this.onAccount,
     this.subtitle,
+    this.namesRoute = false,
     super.key,
   }) : variant = AppTopBarVariant.home,
        backLabel = null,
@@ -77,6 +79,7 @@ class AppTopBar extends StatelessWidget {
     required VoidCallback this.onBack,
     this.actionLabel,
     this.onAction,
+    this.namesRoute = false,
     super.key,
   }) : variant = AppTopBarVariant.pushed,
        subtitle = null,
@@ -116,6 +119,12 @@ class AppTopBar extends StatelessWidget {
   final String? actionLabel;
   final VoidCallback? onAction;
 
+  /// Whether the title names the route that holds the bar, as the title of
+  /// Material's `AppBar` does on Android: assistive technology then announces
+  /// the title when the screen opens. The route itself must be a route scope,
+  /// as any page route is.
+  final bool namesRoute;
+
   static const double _gap = AppSpacing.sm + AppSpacing.xs;
 
   /// Text scale above which the home bar puts its buttons under the title.
@@ -134,6 +143,7 @@ class AppTopBar extends StatelessWidget {
     final heading = Semantics(
       container: true,
       header: true,
+      namesRoute: namesRoute,
       sortKey: const OrdinalSortKey(0),
       child: Text(
         title,
