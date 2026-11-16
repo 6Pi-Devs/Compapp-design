@@ -39,7 +39,7 @@ Read colors from `Theme.of(context).colorScheme`, or `context.appColors` for pre
 
 ## Develop
 
-Requires Flutter 3.47.9 (see `pubspec.yaml`).
+Requires Flutter 3.47.8 (see `pubspec.yaml`).
 
 | Task | Command |
 |------|---------|
