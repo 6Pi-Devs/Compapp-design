@@ -213,6 +213,21 @@ void main() {
       expect(tester.widget<AppPebble>(_pebble).status, AppPebbleStatus.invited);
       expect(find.byKey(const Key('pebble.badge.away')), findsNothing);
     });
+
+    testWidgets('an unknown status draws the plain pebble, as home does', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        host(
+          _row(
+            member: _member(status: MemberStatus.unknown, label: 'Luis'),
+          ),
+        ),
+      );
+
+      expect(tester.widget<AppPebble>(_pebble).status, AppPebbleStatus.home);
+      expect(find.byKey(const Key('pebble.badge.away')), findsNothing);
+    });
   });
 
   group('status dot', () {
@@ -251,6 +266,19 @@ void main() {
         host(
           _row(
             member: _member(status: MemberStatus.invited, label: 'Marta'),
+          ),
+        ),
+      );
+
+      expect(_dot, findsNothing);
+      expect(find.text('since 3 h'), findsOneWidget);
+    });
+
+    testWidgets('an unknown status has no dot, only the text', (tester) async {
+      await tester.pumpWidget(
+        host(
+          _row(
+            member: _member(status: MemberStatus.unknown, label: 'Luis'),
           ),
         ),
       );

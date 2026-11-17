@@ -165,6 +165,25 @@ void main() {
       expect(box.bottom, tile.bottom - AppSpacing.sm);
     });
 
+    testWidgets('an occupant of unknown status gets the plain pebble', (
+      tester,
+    ) async {
+      const luis = MemberView(
+        id: 'luis',
+        name: 'Luis',
+        initials: 'L',
+        joinOrder: 2,
+        semanticLabel: 'Luis',
+        status: MemberStatus.unknown,
+      );
+      await tester.pumpWidget(host(_cell(_tile(occupants: const [luis]))));
+
+      expect(
+        tester.widget<AppPebble>(_pebble('luis')).status,
+        AppPebbleStatus.home,
+      );
+    });
+
     testWidgets('without occupants and beacons there is no footer', (
       tester,
     ) async {

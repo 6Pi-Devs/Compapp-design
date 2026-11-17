@@ -730,7 +730,7 @@ class _RoomRowState extends State<_RoomRow> {
     semanticLabel: member.semanticLabel,
     size: size,
     status: switch (member.status) {
-      MemberStatus.home => AppPebbleStatus.home,
+      MemberStatus.home || MemberStatus.unknown => AppPebbleStatus.home,
       MemberStatus.away => AppPebbleStatus.away,
       MemberStatus.invited => AppPebbleStatus.invited,
     },

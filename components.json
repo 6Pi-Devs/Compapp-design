@@ -355,7 +355,7 @@
       "props": [
         { "name": "member", "type": "MemberView", "required": true, "default": "name, initials, joinOrder, status, isYou, isAdmin and the spoken description (semanticLabel)" },
         { "name": "subtitle", "type": "String?", "required": false, "default": "second line under the name" },
-        { "name": "trailing", "type": "String?", "required": false, "default": "text at the end of the row; a status dot sits before it (none while invited)" }
+        { "name": "trailing", "type": "String?", "required": false, "default": "text at the end of the row; a status dot sits before it (none while invited or unknown)" }
       ],
       "variants": ["row"],
       "states": ["home", "away", "invited", "you", "long"],
@@ -671,7 +671,7 @@
         "Board gaps: the board builds the sides from two AppButtons with a fill each, but the away side is filled with presence-away and AppButton has no variant for it, so the sides are Material TextButtons under one filled thumb that slides.",
         "Board gaps: the track gets a 1 px outline border the board does not draw, so it keeps 3:1 against the page and a card. With it the sides are 54 tall where the board draws 56 (64 minus 4 and 4), and their corner is 11 where the board draws 12.",
         "While the thumb slides every label and glyph is drawn twice, in the muted ink clipped to what is outside the thumb and in the on-color clipped to the thumb, so no color is blended and every pixel reads on every frame. At rest each face is drawn once. The second drawing is excluded from semantics, pointer and focus. The thumb jumps when animations are off. Each face sets its own text style, so a line limit, an italic or an underline around the switch does not change a label while the thumb slides.",
-        "The contract names a Presence type: it is a new two-value enum (home, away) because MemberStatus also has invited."
+        "The contract names a Presence type: it is a new two-value enum (home, away) because MemberStatus also has invited and unknown."
       ],
       "stories": [
         "Molecules/PresenceSwitch/switch-home",
@@ -810,7 +810,7 @@
         "Board gaps: the board draws a 48 ring with the minutes inside and the words beside it, and the panel uses the KnockButton molecule (a 24 ring with 'Asked' and the time left, inside its own sunken button) with the message and the hint beside it, wrapping under it at large text. Rows are MemberRow (64 tall) where the board draws 60, and a 1 px hairline in the line color (the flat elevation token) separates rows, with no inset. The gap between cards is 12 as on the board; the board draws no headings, so the heading and its 8 of space are new.",
         "The words beside the button are a Wrap child, not an expanded one, so they sit beside the button only when they fit whole and otherwise go under it: a long word is never cut. The button and the words sit in a card with 12 of padding (spacing.sm plus spacing.xs, as in ActivityRow).",
         "The heading (a 13/600 muted text) is a private copy here and in ActivityList, because an organism may not import another. Planned follow-up: a SectionHeader molecule, then both organisms use it.",
-        "It is a plain column, not a scrollable: put it in the scrollable of the screen. A member must be in one group only and in the group of their status (home, away or invited), and asserts check both in debug builds. The groups are keyed, so a member's node survives another group gaining its first member.",
+        "It is a plain column, not a scrollable: put it in the scrollable of the screen. A member must be in one group only and in the group of their status (home, away or invited), and asserts check both in debug builds. It has no group for an unknown status (a member who has never said whether they are home): such a member is not passed to it, and the status assert reports one that is. The groups are keyed, so a member's node survives another group gaining its first member.",
         "Semantics use Flutter's list and listItem roles on the card and its items. How a given screen reader announces them, and the change of the button from ready to waiting, is not verified on a device."
       ],
       "stories": [

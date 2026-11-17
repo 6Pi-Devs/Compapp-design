@@ -129,6 +129,10 @@ MemberView _member(
     MemberStatus.home => context.sample(en: 'at home', es: 'en casa'),
     MemberStatus.away => context.sample(en: 'away', es: 'fuera'),
     MemberStatus.invited => context.sample(en: 'invited', es: 'invitado'),
+    MemberStatus.unknown => context.sample(
+      en: 'has not said',
+      es: 'no lo ha dicho',
+    ),
   };
   return MemberView(
     id: id,

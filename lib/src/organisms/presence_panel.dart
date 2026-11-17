@@ -26,6 +26,10 @@ import 'package:flutter/semantics.dart';
 /// alone, and the panel never says who is behind on anything or who did not
 /// answer: it says where people are.
 ///
+/// It has no group for [MemberStatus.unknown]: a member who has never said
+/// whether they are home is not passed to it, and the debug assert that checks
+/// each member is in the group of their status reports one that is.
+///
 /// For assistive technology every group is a container: a heading node, then a
 /// list whose items hold one merged node per member (the member's spoken
 /// label, then the subtitle and the trailing text). The asking part is a
