@@ -242,6 +242,32 @@ void main() {
       }
     });
 
+    testWidgets('gives an occupant of unknown status the home pebble', (
+      tester,
+    ) async {
+      const luis = MemberView(
+        id: 'luis',
+        name: 'Luis',
+        initials: 'L',
+        joinOrder: 4,
+        status: MemberStatus.unknown,
+        semanticLabel: 'Luis',
+      );
+      await _pump(
+        tester,
+        _view(
+          bedrooms: [
+            _room('b1', 'Dormitorio 1', occupants: [luis]),
+          ],
+        ),
+      );
+
+      expect(
+        tester.widget<AppPebble>(_k('rooms.pebble.b1.luis')).status,
+        AppPebbleStatus.home,
+      );
+    });
+
     testWidgets('wraps the pebbles of a crowded room inside three pebbles of '
         'width', (tester) async {
       final crowd = [

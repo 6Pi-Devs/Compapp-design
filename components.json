@@ -358,7 +358,7 @@
         { "name": "trailing", "type": "String?", "required": false, "default": "text at the end of the row; a status dot sits before it (none while invited or unknown)" }
       ],
       "variants": ["row"],
-      "states": ["home", "away", "invited", "you", "long"],
+      "states": ["home", "away", "invited", "you", "long", "unknown"],
       "semantics": "One merged node, not interactive: member.semanticLabel (it names the member and says you, admin and away), then the subtitle, then the trailing text. The visible name, the pebble and the dot add nothing of their own, so nothing is said twice",
       "key": "member.<accountId>",
       "notes": [
@@ -372,7 +372,8 @@
         "Molecules/MemberRow/row-away",
         "Molecules/MemberRow/row-invited",
         "Molecules/MemberRow/row-you",
-        "Molecules/MemberRow/row-long"
+        "Molecules/MemberRow/row-long",
+        "Molecules/MemberRow/row-unknown"
       ]
     },
     {
