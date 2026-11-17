@@ -18,8 +18,9 @@ import 'package:flutter/rendering.dart';
 /// label names the member, so the visible name is left out of semantics, and
 /// the pebble and the dot are decorative here. The row is not interactive.
 /// The dot follows the member's status (primary at home, a hollow ring away,
-/// none while invited) and only appears beside a [trailing] text, which is
-/// what names the status for everyone: the dot is never the only cue.
+/// none while invited or unknown) and only appears beside a [trailing] text,
+/// which is what names the status for everyone: the dot is never the only
+/// cue.
 ///
 /// The row is at least `AppSizes.row` tall and grows with large text, and
 /// nothing is clamped. Beside the texts, the trailing text takes only the
