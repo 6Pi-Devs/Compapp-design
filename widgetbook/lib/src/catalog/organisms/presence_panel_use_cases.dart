@@ -156,6 +156,9 @@ PresenceEntry _entry(BuildContext context, _Sample sample) {
       context.sample(en: 'Invited by Ana', es: 'Invitado por Ana'),
       context.sample(en: 'pending', es: 'pendiente'),
     ),
+    MemberStatus.unknown => throw UnsupportedError(
+      'The panel takes no member of unknown status',
+    ),
   };
   return PresenceEntry(
     member: MemberView(

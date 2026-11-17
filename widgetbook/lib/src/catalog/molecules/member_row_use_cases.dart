@@ -13,7 +13,8 @@ const _rowWidth = 320.0;
 /// One use case per state of the Molecules board: at home, away, invited and
 /// you (the member of this device, with the inset ring on the pebble), and a
 /// long one, whose long name, subtitle and trailing text reach the stacked
-/// layout at the large text scale of the golden scenarios.
+/// layout at the large text scale of the golden scenarios. Unknown is a member
+/// who has never said whether they are home: the plain pebble and no dot.
 WidgetbookComponent buildMemberRow() {
   return WidgetbookComponent(
     name: 'MemberRow',
@@ -30,7 +31,7 @@ WidgetbookComponent buildMemberRow() {
   );
 }
 
-enum _MemberState { home, away, invited, you, long }
+enum _MemberState { home, away, invited, you, long, unknown }
 
 Widget _row(BuildContext context, _MemberState state) {
   return switch (state) {
@@ -118,6 +119,21 @@ Widget _row(BuildContext context, _MemberState state) {
         en: 'until Friday night',
         es: 'hasta el viernes por la noche',
       ),
+    ),
+    _MemberState.unknown => MemberRow(
+      member: MemberView(
+        id: 'sara',
+        name: 'Sara',
+        initials: 'S',
+        joinOrder: 5,
+        status: MemberStatus.unknown,
+        semanticLabel: context.sample(
+          en: 'Sara, has not said',
+          es: 'Sara, no lo ha dicho',
+        ),
+      ),
+      subtitle: context.sample(en: 'Joined on Monday', es: 'Se unió el lunes'),
+      trailing: context.sample(en: 'no status', es: 'sin estado'),
     ),
   };
 }

@@ -1112,6 +1112,15 @@ void main() {
         ),
       ),
       (
+        'unknown in home',
+        _view(
+          home: PresenceGroup(
+            title: 'At home',
+            entries: [_entry('luis', 'Luis', status: MemberStatus.unknown)],
+          ),
+        ),
+      ),
+      (
         'home in invited',
         _view(
           invited: PresenceGroup(

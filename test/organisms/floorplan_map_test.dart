@@ -608,6 +608,31 @@ void main() {
       );
     });
 
+    _widgets('an absent member of unknown status gets the home pebble', (
+      tester,
+    ) async {
+      final view = _view(
+        absences: [
+          FloorplanAbsence(
+            member: _person('marta', 'Marta', 3, status: MemberStatus.unknown),
+          ),
+        ],
+      );
+      await tester.pumpWidget(host(_map(view: view)));
+
+      expect(
+        tester
+            .widget<AppPebble>(
+              find.descendant(
+                of: _member('marta'),
+                matching: find.byType(AppPebble),
+              ),
+            )
+            .status,
+        AppPebbleStatus.home,
+      );
+    });
+
     _widgets('the tray is under the plan', (tester) async {
       await tester.pumpWidget(host(_map()));
 

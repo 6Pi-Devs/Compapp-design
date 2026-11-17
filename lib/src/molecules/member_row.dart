@@ -65,7 +65,7 @@ class MemberRow extends StatelessWidget {
       joinOrder: member.joinOrder,
       semanticLabel: member.semanticLabel,
       status: switch (member.status) {
-        MemberStatus.home => AppPebbleStatus.home,
+        MemberStatus.home || MemberStatus.unknown => AppPebbleStatus.home,
         MemberStatus.away => AppPebbleStatus.away,
         MemberStatus.invited => AppPebbleStatus.invited,
       },
@@ -75,7 +75,7 @@ class MemberRow extends StatelessWidget {
     final dot = switch (member.status) {
       MemberStatus.home => AppDotStatus.home,
       MemberStatus.away => AppDotStatus.away,
-      MemberStatus.invited => null,
+      MemberStatus.invited || MemberStatus.unknown => null,
     };
     final name = member.name;
     const caption = AppTypography.caption;

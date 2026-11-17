@@ -197,7 +197,7 @@ class RoomTile extends StatelessWidget {
       semanticLabel: member.semanticLabel,
       size: AppPebbleSize.s36,
       status: switch (member.status) {
-        MemberStatus.home => AppPebbleStatus.home,
+        MemberStatus.home || MemberStatus.unknown => AppPebbleStatus.home,
         MemberStatus.away => AppPebbleStatus.away,
         MemberStatus.invited => AppPebbleStatus.invited,
       },
