@@ -394,7 +394,7 @@
         { "name": "size", "type": "ItemBeaconSize", "required": false, "default": "regular: the one-line chip of a room, a 34 tile beside the texts. large: the dashboard button, a 56 tile with a 28 glyph on top and the name and status centered under it, wrapping" }
       ],
       "variants": ["beacon", "beacon-large"],
-      "states": ["free", "mine", "others", "busy"],
+      "states": ["free", "mine", "others", "busy", "busy-mine", "busy-others"],
       "semantics": "One focusable button named by semanticLabel (\"Washer, in use by Carlos, 34 minutes\"), activated by tap, Enter and Space, with a long press action when onLongPress is set; the ring, the glyphs and the visible texts add nothing of their own. While busy it is still that button with its focus, with busySemanticLabel as its value in a live region and no tap or long press action. Drawn at least 44 tall, hit area at least 48",
       "key": "item.beacon.<itemId>",
       "notes": [
