@@ -512,6 +512,28 @@
       ]
     },
     {
+      "id": "calendar-legend",
+      "level": "molecule",
+      "class": "CalendarLegend",
+      "playground": "Molecules/CalendarLegend/playground",
+      "path": "molecules/calendar_legend.dart",
+      "props": [
+        { "name": "entries", "type": "List<CalendarLegendEntry>", "required": true, "default": "the kinds to explain, in display order, each a CalendarLegendEntry: a CalendarEventKind and its localized label" }
+      ],
+      "variants": ["legend"],
+      "states": ["all-kinds", "two-kinds"],
+      "semantics": "Not interactive. Each entry is one text node named by its label; the swatch (the glyph on the fill of its kind) is decoration and says nothing. The kind is told by the glyph and the label, never by color alone",
+      "key": "calendar.legend (also calendar.legend.<kind> on an entry)",
+      "notes": [
+        "The swatch draws the glyph and the fill an EventRibbon of the same kind draws, from the same foundation style (calendarEventStyle), so the legend cannot drift from the ribbons. A molecule cannot use another molecule, so it draws the swatch itself instead of a compact EventRibbon.",
+        "The entries wrap onto more lines when they do not fit, and a label wraps by its words, never cut."
+      ],
+      "stories": [
+        "Molecules/CalendarLegend/legend-all-kinds",
+        "Molecules/CalendarLegend/legend-two-kinds"
+      ]
+    },
+    {
       "id": "app-top-bar",
       "level": "molecule",
       "class": "AppTopBar",

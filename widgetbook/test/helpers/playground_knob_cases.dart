@@ -557,6 +557,26 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       (t) => expect(_widget<EventRibbon>(t).compact, isTrue),
     ),
   ],
+  'CalendarLegend': [
+    KnobCase(
+      'entries',
+      '2',
+      (t) => expect(_widget<CalendarLegend>(t).entries, hasLength(2)),
+    ),
+    KnobCase(
+      'firstKind',
+      'other',
+      (t) => expect(
+        _widget<CalendarLegend>(t).entries.first.kind,
+        CalendarEventKind.other,
+      ),
+    ),
+    KnobCase(
+      'firstLabel',
+      'Zed',
+      (t) => expect(_widget<CalendarLegend>(t).entries.first.label, 'Zed'),
+    ),
+  ],
   'ActivityRow': [
     KnobCase(
       'icon',
