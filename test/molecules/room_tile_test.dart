@@ -684,7 +684,7 @@ void main() {
 
     Widget oven() => ItemBeacon(
       item: const ItemView(id: 'oven', name: 'Oven', icon: AppIcons.oven),
-      inUse: false,
+      status: ItemStatus.free,
       statusLabel: 'free',
       semanticLabel: 'Oven, free',
       onTap: () {},
@@ -696,7 +696,7 @@ void main() {
           child: SizedBox(width: width, height: height, child: tile),
         );
 
-    Finder beacon() => find.byKey(const Key('floorplan.item.oven'));
+    Finder beacon() => find.byKey(const Key('item.beacon.oven'));
 
     testWidgets('170 x 104 holds a beacon and an occupant on one line', (
       tester,

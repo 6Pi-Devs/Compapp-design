@@ -258,7 +258,7 @@ class _Plan extends StatelessWidget {
           ItemBeacon(
             key: ValueKey(entry.item.id),
             item: entry.item,
-            inUse: entry.inUse,
+            status: entry.status,
             statusLabel: entry.statusLabel,
             semanticLabel: entry.semanticLabel,
             onTap: () => onItemTap(entry.item.id),

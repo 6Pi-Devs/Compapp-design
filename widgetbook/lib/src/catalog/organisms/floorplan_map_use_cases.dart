@@ -82,7 +82,7 @@ FloorplanItem _washer(BuildContext context, {required bool inUse}) {
       name: context.sample(en: 'Washer', es: 'Lavadora'),
       icon: AppIcons.washer,
     ),
-    inUse: inUse,
+    status: inUse ? ItemStatus.others : ItemStatus.free,
     statusLabel: inUse
         ? context.sample(en: '34 min', es: '34 min')
         : context.sample(en: 'Free', es: 'Libre'),

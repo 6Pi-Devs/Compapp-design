@@ -1,8 +1,9 @@
+import 'package:compapp_design/src/models/item_status.dart';
 import 'package:compapp_design/src/models/item_view.dart';
 import 'package:flutter/foundation.dart';
 
 /// A shared thing pinned to a room of the plan, as plain data: the [item], who
-/// has it, and the two texts of its beacon.
+/// has it ([status]), and the two texts of its beacon.
 ///
 /// [statusLabel] is the line under the name ("34 min", "free") and
 /// [semanticLabel] the spoken name of the beacon ("Washer, in use by Carlos,
@@ -13,14 +14,14 @@ import 'package:flutter/foundation.dart';
 class FloorplanItem {
   const new({
     required this.item,
-    required this.inUse,
+    required this.status,
     required this.statusLabel,
     required this.semanticLabel,
   }) : assert(statusLabel != '', 'A beacon says its status in words'),
        assert(semanticLabel != '', 'A beacon needs a spoken label');
 
   final ItemView item;
-  final bool inUse;
+  final ItemStatus status;
   final String statusLabel;
   final String semanticLabel;
 
@@ -28,10 +29,10 @@ class FloorplanItem {
   bool operator ==(Object other) =>
       other is FloorplanItem &&
       other.item == item &&
-      other.inUse == inUse &&
+      other.status == status &&
       other.statusLabel == statusLabel &&
       other.semanticLabel == semanticLabel;
 
   @override
-  int get hashCode => Object.hash(item, inUse, statusLabel, semanticLabel);
+  int get hashCode => Object.hash(item, status, statusLabel, semanticLabel);
 }
