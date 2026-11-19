@@ -892,6 +892,35 @@
       ]
     },
     {
+      "id": "calendar-month",
+      "level": "organism",
+      "class": "CalendarMonth",
+      "playground": "Organisms/CalendarMonth/playground",
+      "path": "organisms/calendar_month.dart",
+      "props": [
+        { "name": "view", "type": "CalendarMonthView", "required": true, "default": "the seven narrow weekday labels of the header, the days as whole weeks in order (each a CalendarMonthDay: its YYYY-MM-DD date, the visible number, its spoken label, whether it is in the month and the members away that day as MemberView, in display order), the events (each a CalendarStripEvent: a CalendarEventView, its first and last day as YYYY-MM-DD strings, which may lie outside the grid, and its spoken label), and which date is today and which is selected, or null" },
+        { "name": "onDayTap", "type": "ValueChanged<String>?", "required": true, "default": "called with the YYYY-MM-DD date of the tapped day; null disables the days" }
+      ],
+      "variants": ["month"],
+      "states": ["default", "selected-day", "many-away", "dense-events"],
+      "semantics": "A container holding one button per day, in reading order; the header of weekdays is excluded. A day is a single button node named by the app's spoken label of the day, which must contain the visible number and says who is away and what happens that day; it has a selected state, and is disabled when onDayTap is null. The pebble of the first member away, the +N counts and the ribbons are decorative and say nothing. Today is the filled primary cell and the selected day an ink ring on a soft primary fill, never color alone: the app says both in the label. The kind of an event is its glyph and its fill, never color alone. Calm: no danger color, never who is behind",
+      "key": "calendar.month (also calendar.week.<yyyy-mm-dd of its first day> on a week, calendar.day.<yyyy-mm-dd> on the button of a day, calendar.away.<yyyy-mm-dd> on who is away, calendar.away.<yyyy-mm-dd>.<memberId> on the pebble, calendar.ribbon.<eventId>.<yyyy-mm-dd> on the piece of a ribbon, calendar.more.<yyyy-mm-dd> on the count of the events left out, and event.<eventId> on the EventRibbon inside a piece)",
+      "notes": [
+        "Dates are YYYY-MM-DD strings in the home's zone that the grid only compares as strings, as in CalendarStrip: the app builds the weeks (whole weeks, including the days of the months around) and the words. A const constructor cannot read the length of a list, so CalendarMonth asserts seven weekdays, whole weeks, unique dates in order, unique event ids, events that do not end before they start and a spoken label of each day that contains its number in debug builds.",
+        "The +N counts (the members away after the first, the events of a day left out of the lanes) are derived from the count and drawn left to right, as AppBadge derives 99+: a number is not a word the app has to translate. They say nothing: the spoken label of the day lists who is away and every event.",
+        "Lanes: events are placed per week in the first lane they do not overlap, in the order the app gives them, with the same placement as CalendarStrip (shared in foundation). A week shows at most two lanes; a day with events in the lanes left out shows +N under the lanes. An event that crosses weeks may sit in a different lane in each week. Its pieces keep a flat edge at the end of a week where it goes on, and where it goes on past the grid, mirrored in right-to-left.",
+        "Who is away: the first member as an s28 pebble (the smallest size, which draws no badges) colored by join order, and +N for the rest, wrapping under the pebble when the column is too narrow for both (320 wide at 1.0, and at 2.0).",
+        "The button of a day is 48 wide in a column that is 44.6 wide at 320 and 45.7 at 328, so it spills over its neighbors by up to 2 px on each side and its semantics node is 48 wide, as in CalendarStrip. The whole cell (who is away, the ribbons, the counts) also takes the tap, outside semantics. A focus ring next to a filled neighbor may be partly covered by it: unlike CalendarStrip, the grid does not paint the focused column last.",
+        "The piece of a ribbon is copied from CalendarStrip (a compact EventRibbon with an inset on its rounded ends): foundation cannot use a molecule, and organisms cannot share code with each other."
+      ],
+      "stories": [
+        "Organisms/CalendarMonth/month-default",
+        "Organisms/CalendarMonth/month-selected-day",
+        "Organisms/CalendarMonth/month-many-away",
+        "Organisms/CalendarMonth/month-dense-events"
+      ]
+    },
+    {
       "id": "task-composer",
       "level": "organism",
       "class": "TaskComposer",

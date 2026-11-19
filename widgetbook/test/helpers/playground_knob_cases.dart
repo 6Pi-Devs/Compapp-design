@@ -1133,6 +1133,57 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       ),
     ),
   ],
+  'CalendarMonth': [
+    KnobCase(
+      'todayIndex',
+      '3',
+      (t) => expect(
+        _widget<CalendarMonth>(t).view.today,
+        _widget<CalendarMonth>(t).view.days[3].date,
+      ),
+    ),
+    KnobCase(
+      'selectedIndex',
+      '5',
+      (t) => expect(
+        _widget<CalendarMonth>(t).view.selected,
+        _widget<CalendarMonth>(t).view.days[5].date,
+      ),
+    ),
+    KnobCase(
+      'awayTogether',
+      '5',
+      (t) => expect(
+        _widget<CalendarMonth>(t).view.days
+            .map((day) => day.away.length)
+            .reduce((a, b) => a > b ? a : b),
+        5,
+      ),
+    ),
+    KnobCase(
+      'events',
+      '1',
+      (t) => expect(_widget<CalendarMonth>(t).view.events, hasLength(1)),
+    ),
+    KnobCase(
+      'denseWeek',
+      'true',
+      (t) => expect(
+        find.byKey(const Key('calendar.more.2026-11-24')),
+        findsOneWidget,
+      ),
+    ),
+    KnobCase(
+      'firstWeekday',
+      'Zed',
+      (t) => expect(_widget<CalendarMonth>(t).view.weekdays.first, 'Zed'),
+    ),
+    KnobCase(
+      'enabled',
+      'false',
+      (t) => expect(_widget<CalendarMonth>(t).onDayTap, isNull),
+    ),
+  ],
   'TaskComposer': [
     KnobCase(
       'query',
