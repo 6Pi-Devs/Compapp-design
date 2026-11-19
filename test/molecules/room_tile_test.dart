@@ -696,7 +696,7 @@ void main() {
           child: SizedBox(width: width, height: height, child: tile),
         );
 
-    Finder beacon() => find.byKey(const Key('floorplan.item.oven'));
+    Finder beacon() => find.byKey(const Key('item.beacon.oven'));
 
     testWidgets('170 x 104 holds a beacon and an occupant on one line', (
       tester,

@@ -183,7 +183,7 @@ const _roomIds = [
 ];
 
 Finder _room(String id) => find.byKey(Key('floorplan.room.$id'));
-Finder _item(String id) => find.byKey(Key('floorplan.item.$id'));
+Finder _item(String id) => find.byKey(Key('item.beacon.$id'));
 Finder _member(String id) => find.byKey(Key('floorplan.member.$id'));
 Finder get _mapFinder => find.byKey(const Key('floorplan.map'));
 Finder get _tray => find.byKey(const Key('floorplan.awayTray'));
@@ -229,7 +229,9 @@ String? _focusedKey() {
   String? found;
   context?.visitAncestorElements((element) {
     final key = element.widget.key;
-    if (key is ValueKey<String> && key.value.startsWith('floorplan.')) {
+    if (key is ValueKey<String> &&
+        (key.value.startsWith('floorplan.') ||
+            key.value.startsWith('item.beacon.'))) {
       found = key.value;
       return false;
     }
@@ -259,7 +261,7 @@ void main() {
       for (final key in [
         'floorplan.map',
         for (final id in _roomIds) 'floorplan.room.$id',
-        'floorplan.item.washer',
+        'item.beacon.washer',
         'floorplan.awayTray',
         'floorplan.member.luis',
       ]) {
@@ -884,7 +886,7 @@ void main() {
 
       for (final key in [
         'floorplan.room.kitchen',
-        'floorplan.item.washer',
+        'item.beacon.washer',
         'floorplan.member.luis',
       ]) {
         await _focusKey(tester, key);
@@ -1798,10 +1800,10 @@ void main() {
     _widgets('keeps the focus on a beacon through a rebuild, and nothing '
         'stale when its item goes away', (tester) async {
       await pumpView(tester, _view());
-      await _focusKey(tester, 'floorplan.item.washer');
+      await _focusKey(tester, 'item.beacon.washer');
 
       await pumpView(tester, _view());
-      expect(_focusedKey(), 'floorplan.item.washer');
+      expect(_focusedKey(), 'item.beacon.washer');
 
       await pumpView(
         tester,
@@ -1845,7 +1847,7 @@ void main() {
         tester,
         kitchen([item('oven', 'Oven'), item('washer', 'Washer')]),
       );
-      await _focusKey(tester, 'floorplan.item.washer');
+      await _focusKey(tester, 'item.beacon.washer');
       final element = tester.element(_item('washer'));
       final node = FocusManager.instance.primaryFocus;
 
@@ -1854,7 +1856,7 @@ void main() {
       expect(_item('oven'), findsNothing);
       expect(tester.element(_item('washer')), same(element));
       expect(FocusManager.instance.primaryFocus, same(node));
-      expect(_focusedKey(), 'floorplan.item.washer');
+      expect(_focusedKey(), 'item.beacon.washer');
     });
 
     _widgets('an item that moves to another room is drawn there and the '

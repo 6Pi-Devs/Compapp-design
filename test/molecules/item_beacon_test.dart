@@ -34,7 +34,7 @@ Widget _beacon({
     onTap: onTap ?? () {},
     onLongPress: onLongPress,
     busy: busy,
-    busySemanticLabel: busyLabel,
+    busySemanticLabel: busyLabel ?? (busy ? 'Updating' : null),
     size: size,
   ),
 );
@@ -42,7 +42,7 @@ Widget _beacon({
 /// The states in which somebody has the item.
 const List<ItemStatus> _used = [ItemStatus.mine, ItemStatus.others];
 
-Finder _key(String id) => find.byKey(Key('floorplan.item.$id'));
+Finder _key(String id) => find.byKey(Key('item.beacon.$id'));
 Finder get _button => find.byType(OutlinedButton);
 Finder get _ring => find.byType(AppProgressRing);
 Finder get _icon => find.byType(AppIcon).first;
@@ -426,6 +426,64 @@ void main() {
 
       expect(taps, 0);
       expect(longs, 0);
+    });
+
+    testWidgets('plays no ink and no click sound on Enter, unlike idle', (
+      tester,
+    ) async {
+      var clicks = 0;
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        (call) async {
+          if (call.method == 'SystemSound.play') clicks++;
+          return null;
+        },
+      );
+      addTearDown(
+        () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+          SystemChannels.platform,
+          null,
+        ),
+      );
+      InkWell ink() => tester.widget<InkWell>(
+        find.descendant(of: _button, matching: find.byType(InkWell)),
+      );
+
+      await tester.pumpWidget(host(_beacon()));
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump();
+      expect(clicks, 1, reason: 'idle plays the click');
+      expect(ink().splashFactory, isNot(NoSplash.splashFactory));
+
+      clicks = 0;
+      await tester.pumpWidget(host(_beacon(busy: true)));
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pump();
+
+      expect(clicks, 0);
+      expect(ink().enableFeedback, isFalse);
+      expect(ink().splashFactory, NoSplash.splashFactory);
+      final states = <WidgetState>{WidgetState.pressed, WidgetState.focused};
+      expect(ink().overlayColor?.resolve(states), Colors.transparent);
+    });
+
+    test('asserts a busy beacon has a spoken busy label', () {
+      ItemBeacon build({String? label, bool busy = true}) => ItemBeacon(
+        item: const ItemView(id: 'a', name: 'A', icon: AppIcons.washer),
+        status: ItemStatus.free,
+        statusLabel: 'free',
+        semanticLabel: 'A, free',
+        onTap: () {},
+        busy: busy,
+        busySemanticLabel: label,
+      );
+
+      expect(build, throwsAssertionError);
+      expect(() => build(label: ''), throwsAssertionError);
+      expect(() => build(label: 'Updating'), returnsNormally);
+      expect(() => build(busy: false), returnsNormally);
     });
 
     testWidgets('keeps the element tree and the focus when it starts', (

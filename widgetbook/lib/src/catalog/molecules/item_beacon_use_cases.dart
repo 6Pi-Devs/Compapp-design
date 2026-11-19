@@ -8,10 +8,10 @@ import 'package:widgetbook/widgetbook.dart';
 
 /// One use case per state and size of the Molecules board: the oven free, the
 /// washer in use by the person (a check before the status) and by someone else
-/// (a lock), and the oven busy while an action runs, as the regular chip and as
-/// the large dashboard button. The rings breathe unless
-/// frozen, so the use cases that show one are frozen to keep the golden
-/// deterministic.
+/// (a lock), the oven busy while an action runs, and the washer busy while in
+/// use (the amber glyph inside the primary ring), as the regular chip and as
+/// the large dashboard button. The rings breathe unless frozen, so the use
+/// cases that show one are frozen to keep the golden deterministic.
 WidgetbookComponent buildItemBeacon() {
   return WidgetbookComponent(
     name: 'ItemBeacon',
@@ -23,7 +23,7 @@ WidgetbookComponent buildItemBeacon() {
   );
 }
 
-/// The four states of one size, named `<prefix>-<state>`.
+/// The six states of one size, named `<prefix>-<state>`.
 List<WidgetbookUseCase> _sizeUseCases(String prefix, ItemBeaconSize size) {
   return [
     _useCase(
@@ -81,6 +81,42 @@ List<WidgetbookUseCase> _sizeUseCases(String prefix, ItemBeaconSize size) {
         status: ItemStatus.free,
         statusLabel: context.sample(en: 'free', es: 'libre'),
         semanticLabel: context.sample(en: 'Oven, free', es: 'Horno, libre'),
+        busy: true,
+        busySemanticLabel: context.sample(en: 'Updating', es: 'Actualizando'),
+        size: size,
+      ),
+    ),
+    _useCase(
+      '$prefix-busy-mine',
+      (context) => _beacon(
+        context,
+        id: 'washer',
+        icon: AppIcons.washer,
+        name: context.sample(en: 'Washer', es: 'Lavadora'),
+        status: ItemStatus.mine,
+        statusLabel: context.sample(en: 'You, 12 min', es: 'Tú, 12 min'),
+        semanticLabel: context.sample(
+          en: 'Washer, in use by you, 12 minutes',
+          es: 'Lavadora, en uso por ti, 12 minutos',
+        ),
+        busy: true,
+        busySemanticLabel: context.sample(en: 'Updating', es: 'Actualizando'),
+        size: size,
+      ),
+    ),
+    _useCase(
+      '$prefix-busy-others',
+      (context) => _beacon(
+        context,
+        id: 'washer',
+        icon: AppIcons.washer,
+        name: context.sample(en: 'Washer', es: 'Lavadora'),
+        status: ItemStatus.others,
+        statusLabel: context.sample(en: '34 min', es: '34 min'),
+        semanticLabel: context.sample(
+          en: 'Washer, in use by Carlos, 34 minutes',
+          es: 'Lavadora, en uso por Carlos, 34 minutos',
+        ),
         busy: true,
         busySemanticLabel: context.sample(en: 'Updating', es: 'Actualizando'),
         size: size,
@@ -181,10 +217,15 @@ WidgetbookUseCase _playground() {
         label: 'busy',
         description: 'An action is running: a ring, and every tap is ignored',
       );
-      final busySemanticLabel = context.textKnobOrNull(
+      final sampleBusyLabel = context.sample(
+        en: 'Updating',
+        es: 'Actualizando',
+      );
+      final typedBusyLabel = context.textKnob(
         'busySemanticLabel',
-        context.sample(en: 'Updating', es: 'Actualizando'),
-        description: 'Announced as the value while busy',
+        sampleBusyLabel,
+        description:
+            'Must not be empty while busy: empty falls back to the sample',
       );
 
       return useCaseFrame(
@@ -198,7 +239,9 @@ WidgetbookUseCase _playground() {
             onTap: () {},
             onLongPress: longPressEnabled ? () {} : null,
             busy: busy,
-            busySemanticLabel: busySemanticLabel,
+            busySemanticLabel: typedBusyLabel.isEmpty
+                ? sampleBusyLabel
+                : typedBusyLabel,
             size: size,
           ),
         ),

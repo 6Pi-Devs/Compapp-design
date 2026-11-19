@@ -389,14 +389,14 @@
         { "name": "semanticLabel", "type": "String", "required": true, "default": "replaces the visible texts for assistive technology" },
         { "name": "onTap", "type": "VoidCallback", "required": true },
         { "name": "onLongPress", "type": "VoidCallback?", "required": false, "default": "null: a long press does nothing; set: a secondary action, also a semantic long press" },
-        { "name": "busy", "type": "bool", "required": false, "default": "false; true: a primary ring around the glyph, same size, and every tap, long press, key and semantic action is ignored" },
-        { "name": "busySemanticLabel", "type": "String?", "required": false, "default": "announced as the value of the button, in a live region, while busy" },
+        { "name": "busy", "type": "bool", "required": false, "default": "false; true: a primary ring around the glyph, same size, no ink or click sound, and every tap, long press, key and semantic action is ignored" },
+        { "name": "busySemanticLabel", "type": "String?", "required": false, "default": "null; required and not empty while busy (asserted): announced as the value of the button, in a live region" },
         { "name": "size", "type": "ItemBeaconSize", "required": false, "default": "regular: the one-line chip of a room, a 34 tile beside the texts. large: the dashboard button, a 56 tile with a 28 glyph on top and the name and status centered under it, wrapping" }
       ],
       "variants": ["beacon", "beacon-large"],
       "states": ["free", "mine", "others", "busy"],
       "semantics": "One focusable button named by semanticLabel (\"Washer, in use by Carlos, 34 minutes\"), activated by tap, Enter and Space, with a long press action when onLongPress is set; the ring, the glyphs and the visible texts add nothing of their own. While busy it is still that button with its focus, with busySemanticLabel as its value in a live region and no tap or long press action. Drawn at least 44 tall, hit area at least 48",
-      "key": "floorplan.item.<itemId>",
+      "key": "item.beacon.<itemId>",
       "notes": [
         "Who has the item is never said by color alone: free has no ring and a muted status, a used item has the busy ring, and a glyph before the status text tells mine (a check) from others (a lock). The status and the spoken label say the rest in words, in the app's own wording. Busy is the state of an action started from the beacon, not of the item: it replaces the busy ring with a primary one so the two are not confused, and keeps the layout so nothing jumps.",
         "The large size is a variant of the same beacon, not a new component: same statuses, markers, busy state and semantics. It is a vertical layout (tile on top, texts centered under it) because a row of a 56 tile and two lines of text would need a very wide grid cell. It has its own tokens (AppSizes.beaconLg 56, beaconLgGlyph 28) and a 12 radius plate (AppRadius.md) instead of 10; the board draws no large beacon, so this is the app's dashboard need, recorded here until the board catches up. The large one grows with text and never clips. Its hit area is far above 48."
@@ -406,10 +406,14 @@
         "Molecules/ItemBeacon/beacon-mine",
         "Molecules/ItemBeacon/beacon-others",
         "Molecules/ItemBeacon/beacon-busy",
+        "Molecules/ItemBeacon/beacon-busy-mine",
+        "Molecules/ItemBeacon/beacon-busy-others",
         "Molecules/ItemBeacon/beacon-large-free",
         "Molecules/ItemBeacon/beacon-large-mine",
         "Molecules/ItemBeacon/beacon-large-others",
-        "Molecules/ItemBeacon/beacon-large-busy"
+        "Molecules/ItemBeacon/beacon-large-busy",
+        "Molecules/ItemBeacon/beacon-large-busy-mine",
+        "Molecules/ItemBeacon/beacon-large-busy-others"
       ]
     },
     {
@@ -915,7 +919,7 @@
       "variants": ["map"],
       "states": ["populated", "empty", "loading"],
       "semantics": "A container holding the plan, a list node whose list items each hold one room, and then the away tray. A room is a single focusable button node named by its spoken label (\"Ana's room, Ana is home, 3 hours\"), which contains the visible name; its caption, name and pebbles add nothing of their own. A beacon is its own button node, a child of its room, named by its spoken label (\"Washer, in use by Carlos, 34 minutes\"); a touch on it never reaches the room. The tray is a group named by its heading, holding one button for each absent member named by the spoken label of the member and then the words beside the pebble. Loading is one ring node named by the loading label and nothing else; empty is the empty state. The state of a room is said by its caption and label, and of a member in the tray by words and a moon, never by color alone. Calm: busy is amber, no danger color, never who is behind",
-      "key": "floorplan.map (also floorplan.room.<roomId> on the node of a tile, floorplan.item.<itemId> on a beacon, floorplan.awayTray on the tray, floorplan.member.<accountId> on the button of an absent member, roomTile.pebble.<memberId> on an occupant)",
+      "key": "floorplan.map (also floorplan.room.<roomId> on the node of a tile, item.beacon.<itemId> on a beacon, floorplan.awayTray on the tray, floorplan.member.<accountId> on the button of an absent member, roomTile.pebble.<memberId> on an occupant)",
       "notes": [
         "AwayTray is a private part of FloorplanMap, not an organism of its own. The board draws it inside the map card, gives it the key floorplan.awayTray in the map's key list and lists onMemberTap among the map's events, and an organism may not import another one, so a separate organism would make the app compose the two and place the tray by hand. If the app ever wants the tray on its own screen, promote it then.",
         "The board lists the map's data as FloorplanView(rooms, members, items, usages, absences, meId, now). The design system keeps no clock and no snapshot, and every word is the app's, so the app hands over rooms that are already worded: each FloorplanRoom carries its state, caption, spoken label, occupants and its items, each FloorplanItem its ItemStatus and its status line, and each FloorplanAbsence its label ('until Fri'). usages and now become those words and durations, meId becomes MemberView.isYou, and members and items are inside the rooms. Rooms that are archived have a flag and are not drawn, with their items. The ids of the rooms, of the items across every room and of the members of the tray are the keys, and asserts check that they are unique, and that the spoken label of a room and of an item contains its visible name (label in name), in debug builds. A tray button is named by the spoken label of the member and the words beside the pebble, so it contains them by construction.",

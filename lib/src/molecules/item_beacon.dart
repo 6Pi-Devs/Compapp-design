@@ -65,7 +65,11 @@ class ItemBeacon extends StatelessWidget {
     this.busySemanticLabel,
     this.size = ItemBeaconSize.regular,
     super.key,
-  }) : assert(semanticLabel != '', 'The beacon needs a spoken label');
+  }) : assert(semanticLabel != '', 'The beacon needs a spoken label'),
+       assert(
+         !busy || (busySemanticLabel != null && busySemanticLabel != ''),
+         'A busy beacon needs a spoken label for its busy state',
+       );
 
   final ItemView item;
 
@@ -85,7 +89,7 @@ class ItemBeacon extends StatelessWidget {
   final bool busy;
 
   /// Announced as the value of the beacon while [busy], for example
-  /// "Updating".
+  /// "Updating". Required (and not empty) while [busy].
   final String? busySemanticLabel;
 
   /// The chip of a room, or the large dashboard button.
@@ -191,13 +195,20 @@ class ItemBeacon extends StatelessWidget {
           );
 
     final button = OutlinedButton(
-      key: Key('floorplan.item.${item.id}'),
+      key: Key('item.beacon.${item.id}'),
       onPressed: busy ? _ignore : onTap,
       onLongPress: busy && onLongPress != null ? _ignore : onLongPress,
       style: ButtonStyle(
         minimumSize: const WidgetStatePropertyAll(
           Size.square(AppSizes.minDrawn),
         ),
+        // A busy beacon stays focusable but is inert: no ink and no click
+        // sound on Enter, Space or a switch-access activation.
+        overlayColor: busy
+            ? const WidgetStatePropertyAll(Colors.transparent)
+            : null,
+        splashFactory: busy ? NoSplash.splashFactory : null,
+        enableFeedback: busy ? false : null,
         padding: WidgetStatePropertyAll(
           large
               ? const EdgeInsets.all(AppSpacing.sm)
