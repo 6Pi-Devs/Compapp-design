@@ -1,5 +1,7 @@
 import 'dart:math' as math;
 
+import 'package:compapp_design/src/foundation/calendar_lanes.dart';
+import 'package:compapp_design/src/foundation/widen.dart';
 import 'package:compapp_design/src/models/calendar_strip_day.dart';
 import 'package:compapp_design/src/models/calendar_strip_event.dart';
 import 'package:compapp_design/src/models/calendar_strip_view.dart';
@@ -89,7 +91,8 @@ class CalendarStrip extends StatelessWidget {
     );
     final scheme = Theme.of(context).colorScheme;
 
-    final placed = _place(view);
+    final dates = [for (final day in days) day.date];
+    final placed = placeCalendarLanes(dates, view.events);
     final laneCount = placed.isEmpty
         ? 0
         : placed.map((p) => p.lane).reduce(math.max) + 1;
@@ -128,7 +131,7 @@ class CalendarStrip extends StatelessWidget {
                         ],
                         lanes: [
                           for (var lane = 0; lane < laneCount; lane++)
-                            _pieceAt(placed, lane, i, days),
+                            _pieceAt(placed, lane, i, dates),
                         ],
                         onTap: () => onDayTap(days[i].date),
                       ),
@@ -175,54 +178,19 @@ class CalendarStrip extends StatelessWidget {
     );
   }
 
-  /// The events that touch the week, each with the first and last day it
-  /// covers and the lane (row of the ribbon band) it sits in.
-  static List<_Placed> _place(CalendarStripView view) {
-    final days = view.days;
-    final placed = <_Placed>[];
-    final lanes = <List<_Placed>>[];
-    for (final event in view.events) {
-      var first = -1;
-      var last = -1;
-      for (var i = 0; i < days.length; i++) {
-        final date = days[i].date;
-        if (date.compareTo(event.startDate) >= 0 &&
-            date.compareTo(event.endDate) <= 0) {
-          if (first < 0) first = i;
-          last = i;
-        }
-      }
-      if (first < 0) continue;
-      var lane = 0;
-      while (lane < lanes.length &&
-          lanes[lane].any((p) => p.first <= last && first <= p.last)) {
-        lane++;
-      }
-      if (lane == lanes.length) lanes.add([]);
-      final item = _Placed(event, first, last, lane);
-      lanes[lane].add(item);
-      placed.add(item);
-    }
-    return placed;
-  }
-
   static Widget? _pieceAt(
-    List<_Placed> placed,
+    List<CalendarLanePlacement> placed,
     int lane,
     int index,
-    List<CalendarStripDay> days,
+    List<String> dates,
   ) {
     for (final p in placed) {
       if (p.lane != lane || !p.covers(index)) continue;
-      final before =
-          index > p.first || p.event.startDate.compareTo(days.first.date) < 0;
-      final after =
-          index < p.last || p.event.endDate.compareTo(days.last.date) > 0;
       return _Piece(
-        key: Key('calendar.ribbon.${p.event.event.id}.${days[index].date}'),
+        key: Key('calendar.ribbon.${p.event.event.id}.${dates[index]}'),
         event: p.event,
-        continuesBefore: before,
-        continuesAfter: after,
+        continuesBefore: p.continuesBefore(index, dates),
+        continuesAfter: p.continuesAfter(index, dates),
       );
     }
     return null;
@@ -239,17 +207,6 @@ class CalendarStrip extends StatelessWidget {
     final ids = [for (final e in view.events) e.event.id];
     return ids.length == ids.toSet().length;
   }
-}
-
-class _Placed {
-  const new(this.event, this.first, this.last, this.lane);
-
-  final CalendarStripEvent event;
-  final int first;
-  final int last;
-  final int lane;
-
-  bool covers(int index) => index >= first && index <= last;
 }
 
 /// One day: the button, then one slot per lane of the ribbon band.
@@ -328,7 +285,7 @@ class _DayColumn extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       spacing: CalendarStrip._ribbonGap,
       children: [
-        _Widen(minWidth: AppSizes.minTarget, child: button),
+        Widen(minWidth: AppSizes.minTarget, child: button),
         for (final lane in lanes)
           SizedBox(height: AppSizes.ribbon, child: lane),
       ],
@@ -429,96 +386,6 @@ class _EventRow extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-/// Gives its child at least [minWidth] of width, even when its parent is
-/// narrower: the child is centered and spills over the sides, so the node of a
-/// button in a narrow column is still a full tap target. It takes the width
-/// and the intrinsic widths of the column, not of the wider child.
-class _Widen extends SingleChildRenderObjectWidget {
-  const new({required this.minWidth, required super.child});
-
-  final double minWidth;
-
-  @override
-  RenderObject createRenderObject(BuildContext context) =>
-      _RenderWiden(minWidth);
-
-  @override
-  void updateRenderObject(BuildContext context, _RenderWiden renderObject) {
-    renderObject.minWidth = minWidth;
-  }
-}
-
-class _RenderWiden extends RenderShiftedBox {
-  new(this._minWidth) : super(null);
-
-  double _minWidth;
-  double get minWidth => _minWidth;
-  set minWidth(double value) {
-    if (value == _minWidth) return;
-    _minWidth = value;
-    markNeedsLayout();
-  }
-
-  BoxConstraints _childConstraints(BoxConstraints constraints) {
-    if (!constraints.hasBoundedWidth) return constraints.loosen();
-    final width = math.max(_minWidth, constraints.maxWidth);
-    return BoxConstraints(
-      minWidth: width,
-      maxWidth: width,
-      maxHeight: constraints.maxHeight,
-    );
-  }
-
-  Size _sizeFor(BoxConstraints constraints, Size child) =>
-      constraints.constrain(
-        Size(
-          constraints.hasBoundedWidth ? constraints.maxWidth : child.width,
-          child.height,
-        ),
-      );
-
-  @override
-  double computeMinIntrinsicWidth(double height) =>
-      child?.getMinIntrinsicWidth(height) ?? 0;
-
-  @override
-  double computeMaxIntrinsicWidth(double height) =>
-      child?.getMaxIntrinsicWidth(height) ?? 0;
-
-  @override
-  double computeMinIntrinsicHeight(double width) =>
-      child?.getMinIntrinsicHeight(math.max(_minWidth, width)) ?? 0;
-
-  @override
-  double computeMaxIntrinsicHeight(double width) =>
-      child?.getMaxIntrinsicHeight(math.max(_minWidth, width)) ?? 0;
-
-  @override
-  Size computeDryLayout(BoxConstraints constraints) {
-    final child = this.child;
-    if (child == null) return constraints.smallest;
-    return _sizeFor(
-      constraints,
-      child.getDryLayout(_childConstraints(constraints)),
-    );
-  }
-
-  @override
-  void performLayout() {
-    final child = this.child;
-    if (child == null) {
-      size = constraints.smallest;
-      return;
-    }
-    child.layout(_childConstraints(constraints), parentUsesSize: true);
-    size = _sizeFor(constraints, child.size);
-    (child.parentData! as BoxParentData).offset = Offset(
-      (size.width - child.size.width) / 2,
-      0,
     );
   }
 }
