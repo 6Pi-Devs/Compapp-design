@@ -434,6 +434,11 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       (t) => expect(_widget<ItemBeacon>(t).status, ItemStatus.mine),
     ),
     KnobCase(
+      'size',
+      'large',
+      (t) => expect(_widget<ItemBeacon>(t).size, ItemBeaconSize.large),
+    ),
+    KnobCase(
       'longPressEnabled',
       'true',
       (t) => expect(_widget<ItemBeacon>(t).onLongPress, isNotNull),

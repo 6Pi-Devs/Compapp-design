@@ -139,6 +139,13 @@ abstract final class AppSizes {
   /// (`size.beacon`).
   static const double beacon = 34;
 
+  /// Side of the glyph tile or the breathing ring of a large item beacon, the
+  /// size of a dashboard grid (`size.beacon-lg`).
+  static const double beaconLg = 56;
+
+  /// Glyph inside the tile of a large item beacon (`size.beacon-lg-glyph`).
+  static const double beaconLgGlyph = 28;
+
   /// Border of a room tile, solid or dashed (`size.border-room`).
   static const double borderRoom = 1.5;
 
@@ -207,6 +214,8 @@ abstract final class AppSizes {
     'size.row': row,
     'size.row-tall': rowTall,
     'size.beacon': beacon,
+    'size.beacon-lg': beaconLg,
+    'size.beacon-lg-glyph': beaconLgGlyph,
     'size.border-room': borderRoom,
     'size.ribbon': ribbon,
     'size.activity-tile': activityTile,

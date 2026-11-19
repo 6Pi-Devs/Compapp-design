@@ -10,6 +10,10 @@ import 'package:compapp_design/src/tokens/app_spacing.dart';
 import 'package:compapp_design/src/tokens/app_typography.dart';
 import 'package:flutter/material.dart';
 
+/// How big an [ItemBeacon] is. [regular] is the chip pinned to a room of the
+/// plan. [large] is the dashboard size: a taller button with the glyph on top.
+enum ItemBeaconSize { regular, large }
+
 /// A shared thing pinned to a room: its glyph, its name and a line of status,
 /// as one tappable chip on top of Material's `OutlinedButton`, which
 /// `CompappTheme` styles (surface fill, outline border, ink focus ring).
@@ -31,6 +35,15 @@ import 'package:flutter/material.dart';
 /// still a button named by [semanticLabel], with [busySemanticLabel] as its
 /// value in a live region (Flutter has no busy flag).
 ///
+/// The [size] is [ItemBeaconSize.regular] by default, the one-line chip.
+/// [ItemBeaconSize.large] is for a dashboard grid, where the beacon is a big
+/// self-explanatory button: a 56 tile or ring (`AppSizes.beaconLg`) with a 28
+/// glyph on top, then the name and the status line centered under it, each
+/// wrapping onto more lines instead of being cut. A vertical layout reads
+/// better at that size than the row, which would need a very wide cell. The
+/// status, the markers, the busy state and the semantics are the same in both
+/// sizes, and the size of a beacon never changes while it is [busy].
+///
 /// [onTap] is the main action. [onLongPress] is an optional secondary one
 /// (it is also a semantic long press action).
 ///
@@ -50,6 +63,7 @@ class ItemBeacon extends StatelessWidget {
     this.onLongPress,
     this.busy = false,
     this.busySemanticLabel,
+    this.size = ItemBeaconSize.regular,
     super.key,
   }) : assert(semanticLabel != '', 'The beacon needs a spoken label');
 
@@ -74,6 +88,9 @@ class ItemBeacon extends StatelessWidget {
   /// "Updating".
   final String? busySemanticLabel;
 
+  /// The chip of a room, or the large dashboard button.
+  final ItemBeaconSize size;
+
   static void _ignore() {}
 
   @override
@@ -81,6 +98,9 @@ class ItemBeacon extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final colors = context.appColors;
 
+    final large = size == ItemBeaconSize.large;
+    final tile = large ? AppSizes.beaconLg : AppSizes.beacon;
+    final glyph = large ? AppSizes.beaconLgGlyph : AppSizes.glyphMd;
     final used = status != ItemStatus.free;
     final glyphColor = used ? colors.busy : scheme.onSurface;
     final statusColor = used ? colors.busy : scheme.onSurfaceVariant;
@@ -90,7 +110,7 @@ class ItemBeacon extends StatelessWidget {
       ItemStatus.others => AppIcons.occupied,
     };
     final leading = SizedBox.square(
-      dimension: AppSizes.beacon,
+      dimension: tile,
       child: used || busy
           ? Stack(
               alignment: Alignment.center,
@@ -98,43 +118,101 @@ class ItemBeacon extends StatelessWidget {
                 AppProgressRing(
                   semanticLabel: null,
                   tone: busy ? AppRingTone.primary : AppRingTone.busy,
-                  size: AppSizes.beacon,
+                  size: tile,
                 ),
-                AppIcon(item.icon, size: AppSizes.glyphMd, color: glyphColor),
+                AppIcon(item.icon, size: glyph, color: glyphColor),
               ],
             )
           : DecoratedBox(
               decoration: BoxDecoration(
                 color: scheme.surfaceContainerHigh,
-                borderRadius: BorderRadius.circular(AppRadius.sm),
+                borderRadius: BorderRadius.circular(
+                  large ? AppRadius.md : AppRadius.sm,
+                ),
               ),
               child: Center(
-                child: AppIcon(
-                  item.icon,
-                  size: AppSizes.glyphMd,
-                  color: glyphColor,
-                ),
+                child: AppIcon(item.icon, size: glyph, color: glyphColor),
               ),
             ),
     );
+
+    final align = large ? CrossAxisAlignment.center : CrossAxisAlignment.start;
+    final textAlign = large ? TextAlign.center : TextAlign.start;
+    final texts = Column(
+      crossAxisAlignment: align,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          item.name,
+          textAlign: textAlign,
+          style: AppTypography.caption.copyWith(
+            color: scheme.onSurface,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: large
+              ? MainAxisAlignment.center
+              : MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (marker != null) ...[
+              AppIcon(marker, size: AppSizes.glyphMd, color: statusColor),
+              const SizedBox(width: AppSpacing.xs),
+            ],
+            Flexible(
+              child: Text(
+                statusLabel,
+                textAlign: textAlign,
+                style: AppTypography.caption.copyWith(color: statusColor),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+    final body = large
+        ? Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              leading,
+              const SizedBox(height: AppSpacing.sm),
+              Flexible(child: texts),
+            ],
+          )
+        : Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              leading,
+              const SizedBox(width: AppSpacing.sm),
+              Flexible(child: texts),
+            ],
+          );
 
     final button = OutlinedButton(
       key: Key('floorplan.item.${item.id}'),
       onPressed: busy ? _ignore : onTap,
       onLongPress: busy && onLongPress != null ? _ignore : onLongPress,
-      style: const ButtonStyle(
-        minimumSize: WidgetStatePropertyAll(Size.square(AppSizes.minDrawn)),
+      style: ButtonStyle(
+        minimumSize: const WidgetStatePropertyAll(
+          Size.square(AppSizes.minDrawn),
+        ),
         padding: WidgetStatePropertyAll(
-          EdgeInsetsDirectional.fromSTEB(
-            AppSpacing.xs,
-            AppSpacing.xs,
-            AppSpacing.sm,
-            AppSpacing.xs,
-          ),
+          large
+              ? const EdgeInsets.all(AppSpacing.sm)
+              : const EdgeInsetsDirectional.fromSTEB(
+                  AppSpacing.xs,
+                  AppSpacing.xs,
+                  AppSpacing.sm,
+                  AppSpacing.xs,
+                ),
         ),
         shape: WidgetStatePropertyAll(
           RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(AppRadius.sm)),
+            borderRadius: BorderRadius.all(
+              Radius.circular(large ? AppRadius.md : AppRadius.sm),
+            ),
           ),
         ),
       ),
@@ -143,50 +221,7 @@ class ItemBeacon extends StatelessWidget {
         value: busy ? busySemanticLabel : null,
         liveRegion: busy,
         excludeSemantics: true,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            leading,
-            const SizedBox(width: AppSpacing.sm),
-            Flexible(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    item.name,
-                    style: AppTypography.caption.copyWith(
-                      color: scheme.onSurface,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (marker != null) ...[
-                        AppIcon(
-                          marker,
-                          size: AppSizes.glyphMd,
-                          color: statusColor,
-                        ),
-                        const SizedBox(width: AppSpacing.xs),
-                      ],
-                      Flexible(
-                        child: Text(
-                          statusLabel,
-                          style: AppTypography.caption.copyWith(
-                            color: statusColor,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+        child: body,
       ),
     );
     return IgnorePointer(ignoring: busy, child: button);

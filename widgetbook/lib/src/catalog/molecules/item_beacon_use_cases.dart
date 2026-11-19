@@ -6,9 +6,10 @@ import 'package:compapp_design_widgetbook/src/support/story_support.dart';
 import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
 
-/// One use case per state of the Molecules board: the oven free, the washer
-/// in use by the person (a check before the status) and by someone else (a
-/// lock), and the oven busy while an action runs. The rings breathe unless
+/// One use case per state and size of the Molecules board: the oven free, the
+/// washer in use by the person (a check before the status) and by someone else
+/// (a lock), and the oven busy while an action runs, as the regular chip and as
+/// the large dashboard button. The rings breathe unless
 /// frozen, so the use cases that show one are frozen to keep the golden
 /// deterministic.
 WidgetbookComponent buildItemBeacon() {
@@ -16,64 +17,76 @@ WidgetbookComponent buildItemBeacon() {
     name: 'ItemBeacon',
     useCases: [
       _playground(),
-      _useCase(
-        'beacon-free',
-        (context) => _beacon(
-          context,
-          id: 'oven',
-          icon: AppIcons.oven,
-          name: context.sample(en: 'Oven', es: 'Horno'),
-          status: ItemStatus.free,
-          statusLabel: context.sample(en: 'free', es: 'libre'),
-          semanticLabel: context.sample(en: 'Oven, free', es: 'Horno, libre'),
-        ),
-      ),
-      _useCase(
-        'beacon-mine',
-        (context) => _beacon(
-          context,
-          id: 'washer',
-          icon: AppIcons.washer,
-          name: context.sample(en: 'Washer', es: 'Lavadora'),
-          status: ItemStatus.mine,
-          statusLabel: context.sample(en: 'You, 12 min', es: 'Tú, 12 min'),
-          semanticLabel: context.sample(
-            en: 'Washer, in use by you, 12 minutes',
-            es: 'Lavadora, en uso por ti, 12 minutos',
-          ),
-        ),
-      ),
-      _useCase(
-        'beacon-others',
-        (context) => _beacon(
-          context,
-          id: 'washer',
-          icon: AppIcons.washer,
-          name: context.sample(en: 'Washer', es: 'Lavadora'),
-          status: ItemStatus.others,
-          statusLabel: context.sample(en: '34 min', es: '34 min'),
-          semanticLabel: context.sample(
-            en: 'Washer, in use by Carlos, 34 minutes',
-            es: 'Lavadora, en uso por Carlos, 34 minutos',
-          ),
-        ),
-      ),
-      _useCase(
-        'beacon-busy',
-        (context) => _beacon(
-          context,
-          id: 'oven',
-          icon: AppIcons.oven,
-          name: context.sample(en: 'Oven', es: 'Horno'),
-          status: ItemStatus.free,
-          statusLabel: context.sample(en: 'free', es: 'libre'),
-          semanticLabel: context.sample(en: 'Oven, free', es: 'Horno, libre'),
-          busy: true,
-          busySemanticLabel: context.sample(en: 'Updating', es: 'Actualizando'),
-        ),
-      ),
+      ..._sizeUseCases('beacon', ItemBeaconSize.regular),
+      ..._sizeUseCases('beacon-large', ItemBeaconSize.large),
     ],
   );
+}
+
+/// The four states of one size, named `<prefix>-<state>`.
+List<WidgetbookUseCase> _sizeUseCases(String prefix, ItemBeaconSize size) {
+  return [
+    _useCase(
+      '$prefix-free',
+      (context) => _beacon(
+        context,
+        id: 'oven',
+        icon: AppIcons.oven,
+        name: context.sample(en: 'Oven', es: 'Horno'),
+        status: ItemStatus.free,
+        statusLabel: context.sample(en: 'free', es: 'libre'),
+        semanticLabel: context.sample(en: 'Oven, free', es: 'Horno, libre'),
+        size: size,
+      ),
+    ),
+    _useCase(
+      '$prefix-mine',
+      (context) => _beacon(
+        context,
+        id: 'washer',
+        icon: AppIcons.washer,
+        name: context.sample(en: 'Washer', es: 'Lavadora'),
+        status: ItemStatus.mine,
+        statusLabel: context.sample(en: 'You, 12 min', es: 'Tú, 12 min'),
+        semanticLabel: context.sample(
+          en: 'Washer, in use by you, 12 minutes',
+          es: 'Lavadora, en uso por ti, 12 minutos',
+        ),
+        size: size,
+      ),
+    ),
+    _useCase(
+      '$prefix-others',
+      (context) => _beacon(
+        context,
+        id: 'washer',
+        icon: AppIcons.washer,
+        name: context.sample(en: 'Washer', es: 'Lavadora'),
+        status: ItemStatus.others,
+        statusLabel: context.sample(en: '34 min', es: '34 min'),
+        semanticLabel: context.sample(
+          en: 'Washer, in use by Carlos, 34 minutes',
+          es: 'Lavadora, en uso por Carlos, 34 minutos',
+        ),
+        size: size,
+      ),
+    ),
+    _useCase(
+      '$prefix-busy',
+      (context) => _beacon(
+        context,
+        id: 'oven',
+        icon: AppIcons.oven,
+        name: context.sample(en: 'Oven', es: 'Horno'),
+        status: ItemStatus.free,
+        statusLabel: context.sample(en: 'free', es: 'libre'),
+        semanticLabel: context.sample(en: 'Oven, free', es: 'Horno, libre'),
+        busy: true,
+        busySemanticLabel: context.sample(en: 'Updating', es: 'Actualizando'),
+        size: size,
+      ),
+    ),
+  ];
 }
 
 WidgetbookUseCase _useCase(
@@ -103,6 +116,7 @@ Widget _beacon(
   required String semanticLabel,
   bool busy = false,
   String? busySemanticLabel,
+  ItemBeaconSize size = ItemBeaconSize.regular,
 }) {
   return ItemBeacon(
     item: ItemView(id: id, name: name, icon: icon),
@@ -112,6 +126,7 @@ Widget _beacon(
     onTap: () {},
     busy: busy,
     busySemanticLabel: busySemanticLabel,
+    size: size,
   );
 }
 
@@ -153,6 +168,11 @@ WidgetbookUseCase _playground() {
         sampleLabel,
         description: 'Must not be empty: an empty one falls back to the sample',
       );
+      final size = context.enumKnob(
+        'size',
+        ItemBeaconSize.values,
+        description: 'Regular: the chip of a room. Large: the dashboard button',
+      );
       final longPressEnabled = context.knobs.boolean(
         label: 'longPressEnabled',
         description: 'onLongPress is set: null means no secondary action',
@@ -179,6 +199,7 @@ WidgetbookUseCase _playground() {
             onLongPress: longPressEnabled ? () {} : null,
             busy: busy,
             busySemanticLabel: busySemanticLabel,
+            size: size,
           ),
         ),
       );

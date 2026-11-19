@@ -22,6 +22,7 @@ Widget _beacon({
   VoidCallback? onLongPress,
   bool busy = false,
   String? busyLabel,
+  ItemBeaconSize size = ItemBeaconSize.regular,
 }) => Align(
   alignment: AlignmentDirectional.centerStart,
   child: ItemBeacon(
@@ -34,6 +35,7 @@ Widget _beacon({
     onLongPress: onLongPress,
     busy: busy,
     busySemanticLabel: busyLabel,
+    size: size,
   ),
 );
 
@@ -616,6 +618,200 @@ void main() {
 
       expect(taps, 1);
       handle.dispose();
+    });
+  });
+
+  group('large size', () {
+    Widget large({
+      ItemStatus status = ItemStatus.others,
+      bool busy = false,
+      VoidCallback? onTap,
+      VoidCallback? onLongPress,
+      String? statusText,
+      String name = 'Washer',
+    }) => _beacon(
+      size: ItemBeaconSize.large,
+      status: status,
+      busy: busy,
+      onTap: onTap,
+      onLongPress: onLongPress,
+      statusText: statusText,
+      name: name,
+    );
+
+    testWidgets('regular is the default and keeps the 34 tile', (tester) async {
+      await tester.pumpWidget(host(_beacon()));
+
+      expect(tester.getSize(_ring), const Size.square(AppSizes.beacon));
+      expect(tester.getSize(_icon), const Size.square(AppSizes.glyphMd));
+    });
+
+    for (final status in ItemStatus.values) {
+      testWidgets('${status.name}: a 56 tile with a 28 glyph on top of the '
+          'texts', (tester) async {
+        await tester.pumpWidget(host(large(status: status)));
+
+        final tile = status == ItemStatus.free
+            ? find
+                  .ancestor(of: _icon, matching: find.byType(DecoratedBox))
+                  .first
+            : _ring;
+        expect(tester.getSize(tile), const Size.square(AppSizes.beaconLg));
+        expect(
+          tester.getSize(_icon),
+          const Size.square(AppSizes.beaconLgGlyph),
+        );
+        expect(
+          tester.getCenter(_icon),
+          offsetMoreOrLessEquals(tester.getCenter(tile), epsilon: 0.01),
+        );
+        final name = tester.getRect(find.text('Washer'));
+        expect(tester.getRect(tile).bottom, lessThanOrEqualTo(name.top));
+        expect(
+          tester.getCenter(tile).dx,
+          moreOrLessEquals(
+            tester.getCenter(find.text('Washer')).dx,
+            epsilon: 1,
+          ),
+          reason: 'the tile and the name share one axis',
+        );
+        expect(tester.takeException(), isNull);
+      });
+    }
+
+    testWidgets('keeps the check for mine and the lock for others', (
+      tester,
+    ) async {
+      await tester.pumpWidget(host(large(status: ItemStatus.mine)));
+      expect(tester.widget<AppIcon>(_statusMarker).icon, AppIcons.check);
+
+      await tester.pumpWidget(host(large()));
+      expect(tester.widget<AppIcon>(_statusMarker).icon, AppIcons.occupied);
+
+      await tester.pumpWidget(host(large(status: ItemStatus.free)));
+      expect(find.byType(AppIcon), findsOneWidget);
+    });
+
+    testWidgets('is a 12 radius plate, at least 48 to hit', (tester) async {
+      await tester.pumpWidget(host(large()));
+
+      final button = tester.widget<OutlinedButton>(_button);
+      final shape = button.style!.shape!.resolve({})! as RoundedRectangleBorder;
+      expect(shape.borderRadius, BorderRadius.circular(AppRadius.md));
+      expect(tester.getSize(_button).height, greaterThan(AppSizes.minTarget));
+      expect(tester.getSize(_button).width, greaterThan(AppSizes.minTarget));
+    });
+
+    for (final status in ItemStatus.values) {
+      testWidgets('busy keeps its size, ${status.name}', (tester) async {
+        await tester.pumpWidget(host(large(status: status)));
+        final idle = tester.getSize(_button);
+
+        await tester.pumpWidget(host(large(status: status, busy: true)));
+
+        expect(tester.getSize(_button), idle);
+        final ring = tester.widget<AppProgressRing>(_ring);
+        expect(ring.tone, AppRingTone.primary);
+        expect(tester.getSize(_ring), const Size.square(AppSizes.beaconLg));
+      });
+    }
+
+    testWidgets('taps and long presses work, and busy ignores them', (
+      tester,
+    ) async {
+      var taps = 0;
+      var longs = 0;
+      await tester.pumpWidget(
+        host(large(onTap: () => taps++, onLongPress: () => longs++)),
+      );
+      await tester.tap(_button);
+      await tester.longPress(_button);
+      await tester.pump();
+      expect((taps, longs), (1, 1));
+
+      await tester.pumpWidget(
+        host(
+          large(busy: true, onTap: () => taps++, onLongPress: () => longs++),
+        ),
+      );
+      await tester.tap(_button, warnIfMissed: false);
+      await tester.longPress(_button, warnIfMissed: false);
+      await tester.pump();
+      expect((taps, longs), (1, 1));
+    });
+
+    testWidgets('is one button named by the label, busy says its value', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        host(
+          _beacon(
+            size: ItemBeaconSize.large,
+            busy: true,
+            busyLabel: 'Updating',
+          ),
+        ),
+      );
+
+      expect(
+        tester.getSemantics(_button),
+        isSemantics(
+          label: _spokenInUse,
+          value: 'Updating',
+          isButton: true,
+          isEnabled: true,
+          isFocusable: true,
+          isLiveRegion: true,
+        ),
+      );
+      expect(semanticsLabels(tester), [_spokenInUse]);
+      handle.dispose();
+    });
+
+    testWidgets('grows with large text and wraps the texts, nothing clips', (
+      tester,
+    ) async {
+      const longName = 'Lavavajillas de la cocina grande';
+      const longStatus = 'libre desde hace dos horas';
+      for (final status in ItemStatus.values) {
+        for (final scale in [1.0, 1.5, 2.0]) {
+          await tester.pumpWidget(
+            host(
+              large(status: status, name: longName, statusText: longStatus),
+              textScale: scale,
+              width: 160,
+            ),
+          );
+          final reason = '${status.name} at ${scale}x';
+          final hit = tester.getRect(_button);
+          final drawn = _drawn(tester);
+
+          expect(tester.takeException(), isNull, reason: reason);
+          expect(hit.width, lessThanOrEqualTo(160.01), reason: reason);
+          for (final box in [
+            tester.getRect(find.text(longName)),
+            tester.getRect(find.text(longStatus)),
+            tester.getRect(_ring.evaluate().isEmpty ? _icon : _ring),
+          ]) {
+            expect(box.left, greaterThanOrEqualTo(drawn.left), reason: reason);
+            expect(box.right, lessThanOrEqualTo(drawn.right), reason: reason);
+            expect(box.top, greaterThanOrEqualTo(drawn.top), reason: reason);
+            expect(box.bottom, lessThanOrEqualTo(drawn.bottom), reason: reason);
+          }
+        }
+      }
+    });
+
+    testWidgets('right to left: the tile stays above the texts', (
+      tester,
+    ) async {
+      await tester.pumpWidget(host(large(), direction: TextDirection.rtl));
+
+      expect(
+        tester.getRect(_ring).bottom,
+        lessThanOrEqualTo(tester.getRect(find.text('Washer')).top),
+      );
     });
   });
 

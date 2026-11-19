@@ -289,6 +289,7 @@ To add or update a golden (a new atom, or an intentional visual change):
 | `size.freshness-bar` | `AppSizes.freshnessBar` (4): height of `AppFreshnessBar` |
 | `size.row`, `row-tall` | `AppSizes.row` (64), `rowTall` (72), both grow with their text: least height of a list row, `MemberRow`, and of one with a bar under its texts, `TaskRow` |
 | `size.beacon` | `AppSizes.beacon` (34): glyph tile or breathing ring of `ItemBeacon` |
+| `size.beacon-lg`, `beacon-lg-glyph` | `AppSizes.beaconLg` (56), `beaconLgGlyph` (28): glyph tile or ring of a large `ItemBeacon`, and the glyph inside it |
 | `size.border-room` | `AppSizes.borderRoom` (1.5): border of a `RoomTile`, solid or dashed |
 | `size.ribbon` | `AppSizes.ribbon` (28, grows with its text): least height of an `EventRibbon` |
 | `size.activity-tile` | `AppSizes.activityTile` (40): glyph tile of `ActivityRow` |

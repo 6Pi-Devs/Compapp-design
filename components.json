@@ -390,21 +390,26 @@
         { "name": "onTap", "type": "VoidCallback", "required": true },
         { "name": "onLongPress", "type": "VoidCallback?", "required": false, "default": "null: a long press does nothing; set: a secondary action, also a semantic long press" },
         { "name": "busy", "type": "bool", "required": false, "default": "false; true: a primary ring around the glyph, same size, and every tap, long press, key and semantic action is ignored" },
-        { "name": "busySemanticLabel", "type": "String?", "required": false, "default": "announced as the value of the button, in a live region, while busy" }
+        { "name": "busySemanticLabel", "type": "String?", "required": false, "default": "announced as the value of the button, in a live region, while busy" },
+        { "name": "size", "type": "ItemBeaconSize", "required": false, "default": "regular: the one-line chip of a room, a 34 tile beside the texts. large: the dashboard button, a 56 tile with a 28 glyph on top and the name and status centered under it, wrapping" }
       ],
-      "variants": ["beacon"],
+      "variants": ["beacon", "beacon-large"],
       "states": ["free", "mine", "others", "busy"],
       "semantics": "One focusable button named by semanticLabel (\"Washer, in use by Carlos, 34 minutes\"), activated by tap, Enter and Space, with a long press action when onLongPress is set; the ring, the glyphs and the visible texts add nothing of their own. While busy it is still that button with its focus, with busySemanticLabel as its value in a live region and no tap or long press action. Drawn at least 44 tall, hit area at least 48",
       "key": "floorplan.item.<itemId>",
       "notes": [
         "Who has the item is never said by color alone: free has no ring and a muted status, a used item has the busy ring, and a glyph before the status text tells mine (a check) from others (a lock). The status and the spoken label say the rest in words, in the app's own wording. Busy is the state of an action started from the beacon, not of the item: it replaces the busy ring with a primary one so the two are not confused, and keeps the layout so nothing jumps.",
-        "Board gap, large variant: the chip is 44 drawn and 48 to hit and has one size. A larger beacon for a dashboard grid needs a size token of its own (a glyph tile above the 34 of AppSizes.beacon), so it waits for the board to draw one."
+        "The large size is a variant of the same beacon, not a new component: same statuses, markers, busy state and semantics. It is a vertical layout (tile on top, texts centered under it) because a row of a 56 tile and two lines of text would need a very wide grid cell. It has its own tokens (AppSizes.beaconLg 56, beaconLgGlyph 28) and a 12 radius plate (AppRadius.md) instead of 10; the board draws no large beacon, so this is the app's dashboard need, recorded here until the board catches up. The large one grows with text and never clips. Its hit area is far above 48."
       ],
       "stories": [
         "Molecules/ItemBeacon/beacon-free",
         "Molecules/ItemBeacon/beacon-mine",
         "Molecules/ItemBeacon/beacon-others",
-        "Molecules/ItemBeacon/beacon-busy"
+        "Molecules/ItemBeacon/beacon-busy",
+        "Molecules/ItemBeacon/beacon-large-free",
+        "Molecules/ItemBeacon/beacon-large-mine",
+        "Molecules/ItemBeacon/beacon-large-others",
+        "Molecules/ItemBeacon/beacon-large-busy"
       ]
     },
     {
