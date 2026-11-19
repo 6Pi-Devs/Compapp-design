@@ -63,15 +63,18 @@ FloorplanRoom _luis({bool es = false}) => FloorplanRoom(
       : "Luis's room, Luis is away",
 );
 
-FloorplanItem _washer({bool es = false, bool inUse = true}) => FloorplanItem(
+FloorplanItem _washer({
+  bool es = false,
+  ItemStatus status = ItemStatus.others,
+}) => FloorplanItem(
   item: ItemView(
     id: 'washer',
     name: es ? 'Lavadora' : 'Washer',
     icon: AppIcons.washer,
   ),
-  inUse: inUse,
-  statusLabel: inUse ? '34 min' : (es ? 'Libre' : 'Free'),
-  semanticLabel: inUse
+  status: status,
+  statusLabel: status != ItemStatus.free ? '34 min' : (es ? 'Libre' : 'Free'),
+  semanticLabel: status != ItemStatus.free
       ? (es
             ? 'Lavadora, en uso por Carlos, 34 minutos'
             : 'Washer, in use by Carlos, 34 minutes')
@@ -442,7 +445,7 @@ void main() {
           matching: find.byType(ItemBeacon),
         ),
       );
-      expect(beacon.inUse, isTrue);
+      expect(beacon.status, ItemStatus.others);
       expect(beacon.statusLabel, '34 min');
     });
 
@@ -475,7 +478,7 @@ void main() {
         items: [
           FloorplanItem(
             item: ItemView(id: 'vacuum', name: 'Vacuum', icon: AppIcons.washer),
-            inUse: false,
+            status: ItemStatus.free,
             statusLabel: 'Free',
             semanticLabel: 'Vacuum, free',
           ),
@@ -653,7 +656,7 @@ void main() {
       expect(_luisAway(), _luisAway());
       expect(_luisAway(), isNot(_luisAway(label: 'until Sun')));
       expect(_washer(), _washer());
-      expect(_washer(), isNot(_washer(inUse: false)));
+      expect(_washer(), isNot(_washer(status: ItemStatus.free)));
       expect(_view().visibleRooms, _view().rooms);
 
       expect(
@@ -709,7 +712,7 @@ void main() {
       expect(
         () => FloorplanItem(
           item: const ItemView(id: 'a', name: 'A', icon: AppIcons.oven),
-          inUse: false,
+          status: ItemStatus.free,
           statusLabel: 'free',
           semanticLabel: '',
         ),
@@ -774,7 +777,7 @@ void main() {
               items: [
                 const FloorplanItem(
                   item: ItemView(id: 'o', name: 'Oven', icon: AppIcons.oven),
-                  inUse: false,
+                  status: ItemStatus.free,
                   statusLabel: 'Free',
                   semanticLabel: 'The appliance',
                 ),
@@ -1276,7 +1279,7 @@ void main() {
       final calm = _view(
         rooms: [
           _ana(),
-          _kitchen(items: [_washer(inUse: false)]),
+          _kitchen(items: [_washer(status: ItemStatus.free)]),
         ],
       );
       await tester.pumpWidget(host(_map(view: calm)));
@@ -1310,7 +1313,7 @@ void main() {
     FloorplanItem stressItem(String id, String name, String status) =>
         FloorplanItem(
           item: ItemView(id: id, name: name, icon: AppIcons.washer),
-          inUse: true,
+          status: ItemStatus.others,
           statusLabel: status,
           semanticLabel: '$name, $status',
         );
@@ -1827,7 +1830,7 @@ void main() {
         'before it in the same room goes away', (tester) async {
       FloorplanItem item(String id, String name) => FloorplanItem(
         item: ItemView(id: id, name: name, icon: AppIcons.washer),
-        inUse: false,
+        status: ItemStatus.free,
         statusLabel: 'Free',
         semanticLabel: '$name, free',
       );

@@ -684,7 +684,7 @@ void main() {
 
     Widget oven() => ItemBeacon(
       item: const ItemView(id: 'oven', name: 'Oven', icon: AppIcons.oven),
-      inUse: false,
+      status: ItemStatus.free,
       statusLabel: 'free',
       semanticLabel: 'Oven, free',
       onTap: () {},

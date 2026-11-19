@@ -189,7 +189,7 @@ void main() {
           'tappable': 'true',
         },
       ),
-      ('ItemBeacon', {'semanticLabel': '', 'inUse': 'true'}),
+      ('ItemBeacon', {'semanticLabel': '', 'status': 'mine'}),
       ('AppTopBar', {'unreadCount': '-3'}),
       ('AppTopBar', {'accountLabel': ''}),
       ('AppTopBar', {'activityLabel': ''}),

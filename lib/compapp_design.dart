@@ -31,6 +31,7 @@ export 'src/models/floorplan_room_kind.dart';
 export 'src/models/floorplan_view.dart';
 export 'src/models/item_sheet_mode.dart';
 export 'src/models/item_sheet_view.dart';
+export 'src/models/item_status.dart';
 export 'src/models/item_usage.dart';
 export 'src/models/item_view.dart';
 export 'src/models/knock_cooldown.dart';

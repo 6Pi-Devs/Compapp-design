@@ -429,9 +429,24 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       (t) => expect(_widget<ItemBeacon>(t).item.icon, AppIcons.oven),
     ),
     KnobCase(
-      'inUse',
+      'status',
+      'mine',
+      (t) => expect(_widget<ItemBeacon>(t).status, ItemStatus.mine),
+    ),
+    KnobCase(
+      'longPressEnabled',
       'true',
-      (t) => expect(_widget<ItemBeacon>(t).inUse, isTrue),
+      (t) => expect(_widget<ItemBeacon>(t).onLongPress, isNotNull),
+    ),
+    KnobCase(
+      'busy',
+      'true',
+      (t) => expect(_widget<ItemBeacon>(t).busy, isTrue),
+    ),
+    KnobCase(
+      'busySemanticLabel',
+      'Zed',
+      (t) => expect(_widget<ItemBeacon>(t).busySemanticLabel, 'Zed'),
     ),
     KnobCase(
       'statusLabel',
@@ -1196,8 +1211,8 @@ final playgroundKnobCases = <String, List<KnobCase>>{
             .firstWhere((r) => r.room.id == 'kitchen')
             .items
             .single
-            .inUse,
-        isFalse,
+            .status,
+        ItemStatus.free,
       ),
     ),
     KnobCase(
