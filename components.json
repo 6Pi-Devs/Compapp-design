@@ -677,24 +677,26 @@
       "path": "molecules/presence_switch.dart",
       "props": [
         { "name": "value", "type": "Presence", "required": true, "default": "home or away: the selected side" },
-        { "name": "onChanged", "type": "ValueChanged<Presence>", "required": true, "default": "called with the other side only; choosing the selected side does nothing" },
+        { "name": "onChanged", "type": "ValueChanged<Presence>?", "required": true, "default": "called with the other side only; choosing the selected side does nothing; null disables the switch" },
         { "name": "homeLabel", "type": "String", "required": true, "default": "label of the home side" },
         { "name": "awayLabel", "type": "String", "required": true, "default": "label of the away side" },
         { "name": "semanticLabel", "type": "String", "required": true, "default": "name of the group for assistive technology (\"Your presence\")" }
       ],
       "variants": ["switch"],
-      "states": ["home", "away"],
-      "semantics": "A radio group named by semanticLabel with two toggle buttons (homeLabel, awayLabel), exactly one checked and in a mutually exclusive group, each focusable and activated by tap, Enter and Space. The glyphs and the second drawing of each face (see notes) add nothing. The selected side is the only one under a filled thumb (3:1 against the track) and both sides have their own glyph and label, so the state is never color alone",
+      "states": ["home", "away", "disabled"],
+      "semantics": "A radio group named by semanticLabel with two toggle buttons (homeLabel, awayLabel), exactly one checked and in a mutually exclusive group, each focusable and activated by tap, Enter and Space. The glyphs and the second drawing of each face (see notes) add nothing. The selected side is the only one under a filled thumb (3:1 against the track) and both sides have their own glyph and label, so the state is never color alone. A null onChanged disables both sides: they take no tap, no focus and no key, and report not enabled while keeping their labels and which side is checked",
       "key": "presence.switch, presence.switch.home, presence.switch.away",
       "notes": [
         "Board gaps: the board builds the sides from two AppButtons with a fill each, but the away side is filled with presence-away and AppButton has no variant for it, so the sides are Material TextButtons under one filled thumb that slides.",
         "Board gaps: the track gets a 1 px outline border the board does not draw, so it keeps 3:1 against the page and a card. With it the sides are 54 tall where the board draws 56 (64 minus 4 and 4), and their corner is 11 where the board draws 12.",
         "While the thumb slides every label and glyph is drawn twice, in the muted ink clipped to what is outside the thumb and in the on-color clipped to the thumb, so no color is blended and every pixel reads on every frame. At rest each face is drawn once. The second drawing is excluded from semantics, pointer and focus. The thumb jumps when animations are off. Each face sets its own text style, so a line limit, an italic or an underline around the switch does not change a label while the thumb slides.",
+        "Disabled (a null onChanged) is not dimmed by opacity, which would wash the labels out: the thumb is the card surface (surfaceContainerLowest) at either value, every label and glyph is the muted ink (4.5:1 on the thumb and on the track) and the track border is the hairline (outlineVariant). The thumb still slides when the value changes from outside, which is how the app shows the side it is sending.",
         "The contract names a Presence type: it is a new two-value enum (home, away) because MemberStatus also has invited and unknown."
       ],
       "stories": [
         "Molecules/PresenceSwitch/switch-home",
-        "Molecules/PresenceSwitch/switch-away"
+        "Molecules/PresenceSwitch/switch-away",
+        "Molecules/PresenceSwitch/switch-disabled"
       ]
     },
     {

@@ -10,44 +10,46 @@ import 'package:widgetbook/widgetbook.dart';
 /// a switch that takes the space that is left would be drawn with none.
 const _switchWidth = 320.0;
 
-/// One use case per side of the Molecules board: home selected and away
-/// selected. The sides change fill with motion, frozen here so the golden is
-/// deterministic.
+/// One use case per side of the Molecules board (home selected and away
+/// selected) and the disabled switch. The sides change fill with motion,
+/// frozen here so the golden is deterministic.
 WidgetbookComponent buildPresenceSwitch() {
   return WidgetbookComponent(
     name: 'PresenceSwitch',
     useCases: [
       _playground(),
-      for (final side in Presence.values)
-        WidgetbookUseCase(
-          name: 'switch-${side.name}',
-          builder: (context) => useCaseFrame(
-            child: FrozenMotion(
-              child: SizedBox(
-                width: _switchWidth,
-                child: PresenceSwitch(
-                  value: side,
-                  onChanged: (_) {},
-                  homeLabel: context.sample(
-                    en: "I'm home",
-                    es: 'Estoy en casa',
-                  ),
-                  awayLabel: context.sample(en: "I'm out", es: 'Estoy fuera'),
-                  semanticLabel: context.sample(
-                    en: 'Your presence',
-                    es: 'Tu presencia',
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
+      for (final side in Presence.values) _fixed('switch-${side.name}', side),
+      _fixed('switch-disabled', Presence.home, enabled: false),
     ],
   );
 }
 
-/// Every prop of [PresenceSwitch] as a knob: the selected side, both labels
-/// and the spoken name of the group. The switch stays interactive: choosing a
+WidgetbookUseCase _fixed(String name, Presence side, {bool enabled = true}) {
+  return WidgetbookUseCase(
+    name: name,
+    builder: (context) => useCaseFrame(
+      child: FrozenMotion(
+        child: SizedBox(
+          width: _switchWidth,
+          child: PresenceSwitch(
+            value: side,
+            onChanged: enabled ? (_) {} : null,
+            homeLabel: context.sample(en: "I'm home", es: 'Estoy en casa'),
+            awayLabel: context.sample(en: "I'm out", es: 'Estoy fuera'),
+            semanticLabel: context.sample(
+              en: 'Your presence',
+              es: 'Tu presencia',
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+/// Every prop of [PresenceSwitch] as a knob: the selected side, an enabled
+/// switch (off is a null callback), both labels and the spoken name of the
+/// group. The switch stays interactive: choosing a
 /// side drives local state, held by [SeededState]. Editing any knob rebuilds
 /// the preview from the knob values. The callback is plumbing: the story owns
 /// it.
@@ -59,6 +61,11 @@ WidgetbookUseCase _playground() {
         'value',
         Presence.values,
         initial: Presence.home,
+      );
+      final enabled = context.knobs.boolean(
+        label: 'enabled',
+        description: 'A null onChanged disables the switch',
+        initialValue: true,
       );
       final sampleHome = context.sample(en: "I'm home", es: 'Estoy en casa');
       final sampleAway = context.sample(en: "I'm out", es: 'Estoy fuera');
@@ -89,7 +96,7 @@ WidgetbookUseCase _playground() {
             initial: value,
             builder: (context, current, onChanged) => PresenceSwitch(
               value: current,
-              onChanged: onChanged,
+              onChanged: enabled ? onChanged : null,
               homeLabel: homeLabel.isEmpty ? sampleHome : homeLabel,
               awayLabel: awayLabel.isEmpty ? sampleAway : awayLabel,
               semanticLabel: typedLabel.isEmpty ? sampleLabel : typedLabel,
