@@ -611,6 +611,11 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       (t) => expect(_widget<PresenceSwitch>(t).value, Presence.away),
     ),
     KnobCase(
+      'enabled',
+      'false',
+      (t) => expect(_widget<PresenceSwitch>(t).onChanged, isNull),
+    ),
+    KnobCase(
       'homeLabel',
       'Zed',
       (t) => expect(_widget<PresenceSwitch>(t).homeLabel, 'Zed'),

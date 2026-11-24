@@ -19,12 +19,13 @@ const _group = 'Your presence';
 PresenceSwitch _switch({
   Presence value = Presence.home,
   ValueChanged<Presence>? onChanged,
+  bool enabled = true,
   String home = 'Home',
   String away = 'Out',
   String label = _group,
 }) => PresenceSwitch(
   value: value,
-  onChanged: onChanged ?? (_) {},
+  onChanged: enabled ? (onChanged ?? (_) {}) : null,
   homeLabel: home,
   awayLabel: away,
   semanticLabel: label,
@@ -44,6 +45,10 @@ Offset _fillProbe(WidgetTester tester, Finder side) {
   final rect = tester.getRect(side);
   return Offset(rect.left + 3 - box.left, rect.center.dy - box.top);
 }
+
+/// The color painted at the left padding of [side]: its fill.
+Future<Color> fill(WidgetTester tester, Finder side) =>
+    paintedColorAt(tester, hostBoundaryKey, _fillProbe(tester, side));
 
 /// Shows [child] with animations off, as the system setting does.
 Widget _frozen(Widget child) => Builder(
@@ -364,9 +369,6 @@ void main() {
   });
 
   group('motion', () {
-    Future<Color> fill(WidgetTester tester, Finder side) =>
-        paintedColorAt(tester, hostBoundaryKey, _fillProbe(tester, side));
-
     Rect inBoundary(WidgetTester tester, Rect rect) =>
         rect.shift(-tester.getTopLeft(find.byKey(hostBoundaryKey)));
 
@@ -1037,6 +1039,202 @@ void main() {
         tester.getRect(_icon(_home)).center.dx,
         greaterThan(tester.getRect(find.text('Home')).center.dx),
       );
+    });
+  });
+
+  group('disabled', () {
+    testWidgets('a null onChanged ignores taps on both sides', (tester) async {
+      for (final value in Presence.values) {
+        await tester.pumpWidget(host(_switch(value: value, enabled: false)));
+        await tester.pumpAndSettle();
+        await tester.tap(_home, warnIfMissed: false);
+        await tester.tap(_away, warnIfMissed: false);
+        await tester.tap(find.text('Out'), warnIfMissed: false);
+        await tester.pump();
+
+        expect(tester.takeException(), isNull);
+        for (final side in [_home, _away]) {
+          expect(tester.widget<TextButton>(side).onPressed, isNull);
+        }
+      }
+    });
+
+    testWidgets('neither side takes focus or keys', (tester) async {
+      await tester.pumpWidget(host(_switch(enabled: false)));
+
+      final focusable = FocusManager.instance.rootScope.traversalDescendants
+          .where(
+            (node) =>
+                node is! FocusScopeNode &&
+                node.canRequestFocus &&
+                !node.skipTraversal,
+          );
+      expect(focusable, isEmpty);
+    });
+
+    testWidgets('semantics say it is not enabled and keep the labels and the '
+        'checked side', (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(host(_switch(enabled: false)));
+
+      expect(tester.getSemantics(_track).getSemanticsData().label, _group);
+      expect(
+        tester.getSemantics(_home),
+        isSemantics(
+          label: 'Home',
+          isButton: true,
+          hasCheckedState: true,
+          isChecked: true,
+          isInMutuallyExclusiveGroup: true,
+          hasEnabledState: true,
+          isEnabled: false,
+        ),
+      );
+      expect(
+        tester.getSemantics(_away),
+        isSemantics(
+          label: 'Out',
+          isButton: true,
+          hasCheckedState: true,
+          isChecked: false,
+          isInMutuallyExclusiveGroup: true,
+          hasEnabledState: true,
+          isEnabled: false,
+        ),
+      );
+      expect(semanticsLabels(tester), [_group, 'Home', 'Out']);
+      handle.dispose();
+    });
+
+    for (final (name, theme) in themes) {
+      final scheme = theme.colorScheme;
+
+      testWidgets('is drawn with the disabled look: muted thumb under the '
+          'selected side, hairline border, not dimmed ($name)', (tester) async {
+        for (final value in Presence.values) {
+          await tester.pumpWidget(
+            host(
+              _switch(value: value, enabled: false),
+              theme: theme,
+              background: scheme.surface,
+            ),
+          );
+          await tester.pumpAndSettle();
+          final selected = value == Presence.home ? _home : _away;
+          final other = value == Presence.home ? _away : _home;
+          final selectedLabel = value == Presence.home ? 'Home' : 'Out';
+          final otherLabel = value == Presence.home ? 'Out' : 'Home';
+          final box = tester.getRect(find.byKey(hostBoundaryKey));
+          final track = tester.getRect(_track);
+
+          final thumb = await paintedColorAt(
+            tester,
+            hostBoundaryKey,
+            _fillProbe(tester, selected),
+          );
+          final trackFill = await paintedColorAt(
+            tester,
+            hostBoundaryKey,
+            _fillProbe(tester, other),
+          );
+          expect(thumb, isSameColorAs(scheme.onSurfaceVariant));
+          expect(trackFill, isSameColorAs(scheme.surfaceContainerHigh));
+          expect(
+            contrastRatio(thumb, trackFill),
+            greaterThanOrEqualTo(3),
+            reason: '$value: the selected side is told apart from the track',
+          );
+          expect(
+            await paintedColorAt(
+              tester,
+              hostBoundaryKey,
+              Offset(track.center.dx - box.left, track.top - box.top),
+            ),
+            isSameColorAs(scheme.outlineVariant),
+          );
+          for (final (label, color) in [
+            (selectedLabel, scheme.surfaceContainerLowest),
+            (otherLabel, scheme.onSurfaceVariant),
+          ]) {
+            expect(
+              countPixels(
+                await paintedPixels(
+                  tester,
+                  hostBoundaryKey,
+                  region: tester.getRect(find.text(label)).shift(-box.topLeft),
+                ),
+                color,
+              ),
+              greaterThan(10),
+              reason: '$value: label $label',
+            );
+          }
+          expectContrast(
+            {
+              'label on the thumb': (
+                scheme.surfaceContainerLowest,
+                scheme.onSurfaceVariant,
+              ),
+              'label on the track': (
+                scheme.onSurfaceVariant,
+                scheme.surfaceContainerHigh,
+              ),
+            },
+            minimum: 4.5,
+            reason: 'the disabled switch ($name)',
+          );
+        }
+      });
+    }
+
+    testWidgets('still slides to a new value while disabled', (tester) async {
+      final scheme = CompappTheme.light.colorScheme;
+      await tester.pumpWidget(
+        host(_switch(enabled: false), background: scheme.surface),
+      );
+      await tester.pumpAndSettle();
+      await tester.pumpWidget(
+        host(
+          _switch(value: Presence.away, enabled: false),
+          background: scheme.surface,
+        ),
+      );
+      await tester.pump();
+      expect(await fill(tester, _home), isSameColorAs(scheme.onSurfaceVariant));
+      expect(tester.hasRunningAnimations, isTrue);
+
+      await tester.pump(AppMotion.presence ~/ 2);
+      final box = tester.getRect(find.byKey(hostBoundaryKey));
+      final middle = Offset(
+        (tester.getRect(_home).right + tester.getRect(_away).left) / 2 -
+            box.left,
+        tester.getRect(_home).center.dy - box.top,
+      );
+      expect(
+        await paintedColorAt(tester, hostBoundaryKey, middle),
+        isSameColorAs(scheme.onSurfaceVariant),
+        reason: 'the thumb is over the gap between the sides',
+      );
+
+      await tester.pump(AppMotion.presence);
+      expect(
+        await fill(tester, _home),
+        isSameColorAs(scheme.surfaceContainerHigh),
+      );
+      expect(await fill(tester, _away), isSameColorAs(scheme.onSurfaceVariant));
+      expect(tester.hasRunningAnimations, isFalse);
+    });
+
+    testWidgets('becomes enabled again when onChanged comes back', (
+      tester,
+    ) async {
+      final calls = <Presence>[];
+      await tester.pumpWidget(host(_switch(enabled: false)));
+      await tester.pumpWidget(host(_switch(onChanged: calls.add)));
+      await tester.tap(_away);
+      await tester.pump();
+
+      expect(calls, [Presence.away]);
     });
   });
 
