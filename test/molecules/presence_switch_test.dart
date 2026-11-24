@@ -1053,10 +1053,9 @@ void main() {
         await tester.pump();
 
         expect(tester.takeException(), isNull);
-        expect(
-          tester.widget<PresenceSwitch>(find.byType(PresenceSwitch)).value,
-          value,
-        );
+        for (final side in [_home, _away]) {
+          expect(tester.widget<TextButton>(side).onPressed, isNull);
+        }
       }
     });
 
@@ -1110,8 +1109,8 @@ void main() {
     for (final (name, theme) in themes) {
       final scheme = theme.colorScheme;
 
-      testWidgets('is drawn with the disabled look: card thumb, muted ink '
-          'and hairline border, not dimmed ($name)', (tester) async {
+      testWidgets('is drawn with the disabled look: muted thumb under the '
+          'selected side, hairline border, not dimmed ($name)', (tester) async {
         for (final value in Presence.values) {
           await tester.pumpWidget(
             host(
@@ -1122,16 +1121,28 @@ void main() {
           );
           await tester.pumpAndSettle();
           final selected = value == Presence.home ? _home : _away;
+          final other = value == Presence.home ? _away : _home;
+          final selectedLabel = value == Presence.home ? 'Home' : 'Out';
+          final otherLabel = value == Presence.home ? 'Out' : 'Home';
           final box = tester.getRect(find.byKey(hostBoundaryKey));
           final track = tester.getRect(_track);
 
+          final thumb = await paintedColorAt(
+            tester,
+            hostBoundaryKey,
+            _fillProbe(tester, selected),
+          );
+          final trackFill = await paintedColorAt(
+            tester,
+            hostBoundaryKey,
+            _fillProbe(tester, other),
+          );
+          expect(thumb, isSameColorAs(scheme.onSurfaceVariant));
+          expect(trackFill, isSameColorAs(scheme.surfaceContainerHigh));
           expect(
-            await paintedColorAt(
-              tester,
-              hostBoundaryKey,
-              _fillProbe(tester, selected),
-            ),
-            isSameColorAs(scheme.surfaceContainerLowest),
+            contrastRatio(thumb, trackFill),
+            greaterThanOrEqualTo(3),
+            reason: '$value: the selected side is told apart from the track',
           );
           expect(
             await paintedColorAt(
@@ -1141,7 +1152,10 @@ void main() {
             ),
             isSameColorAs(scheme.outlineVariant),
           );
-          for (final label in ['Home', 'Out']) {
+          for (final (label, color) in [
+            (selectedLabel, scheme.surfaceContainerLowest),
+            (otherLabel, scheme.onSurfaceVariant),
+          ]) {
             expect(
               countPixels(
                 await paintedPixels(
@@ -1149,17 +1163,17 @@ void main() {
                   hostBoundaryKey,
                   region: tester.getRect(find.text(label)).shift(-box.topLeft),
                 ),
-                scheme.onSurfaceVariant,
+                color,
               ),
               greaterThan(10),
-              reason: '$value: label $label is the muted ink',
+              reason: '$value: label $label',
             );
           }
           expectContrast(
             {
               'label on the thumb': (
-                scheme.onSurfaceVariant,
                 scheme.surfaceContainerLowest,
+                scheme.onSurfaceVariant,
               ),
               'label on the track': (
                 scheme.onSurfaceVariant,
@@ -1186,10 +1200,7 @@ void main() {
         ),
       );
       await tester.pump();
-      expect(
-        await fill(tester, _home),
-        isSameColorAs(scheme.surfaceContainerLowest),
-      );
+      expect(await fill(tester, _home), isSameColorAs(scheme.onSurfaceVariant));
       expect(tester.hasRunningAnimations, isTrue);
 
       await tester.pump(AppMotion.presence ~/ 2);
@@ -1201,7 +1212,7 @@ void main() {
       );
       expect(
         await paintedColorAt(tester, hostBoundaryKey, middle),
-        isSameColorAs(scheme.surfaceContainerLowest),
+        isSameColorAs(scheme.onSurfaceVariant),
         reason: 'the thumb is over the gap between the sides',
       );
 
@@ -1210,10 +1221,7 @@ void main() {
         await fill(tester, _home),
         isSameColorAs(scheme.surfaceContainerHigh),
       );
-      expect(
-        await fill(tester, _away),
-        isSameColorAs(scheme.surfaceContainerLowest),
-      );
+      expect(await fill(tester, _away), isSameColorAs(scheme.onSurfaceVariant));
       expect(tester.hasRunningAnimations, isFalse);
     });
 

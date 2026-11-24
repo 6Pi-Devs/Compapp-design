@@ -39,10 +39,13 @@ import 'package:flutter/rendering.dart';
 /// nothing, neither side takes focus, and the semantics say it is not enabled
 /// while keeping the labels and which side is checked. Material's 38% dimming
 /// would wash the labels out, so it is drawn with the disabled conventions of
-/// the other controls instead: the thumb is the card surface (`surface`
-/// lowest), every label and glyph is the muted ink and the track border is the
-/// hairline. [value] can still change from outside and the thumb slides to it,
-/// as the app does while it sends the new side.
+/// the other controls instead: the thumb is the muted ink (`onSurfaceVariant`,
+/// 3:1 and more against the track) under the label and glyph of the selected
+/// side in `surfaceContainerLowest`, the other side keeps the muted ink on the
+/// track, and the track border is the hairline (`outlineVariant`), so the
+/// selected side stays the one that is filled. [value] can still change from
+/// outside and the thumb slides to it, as the app does while it sends the new
+/// side.
 ///
 /// The track has a hairline border in `outline`, which keeps 3:1 against the
 /// page and a card (the sunken fill alone does not).
@@ -115,12 +118,10 @@ class PresenceSwitch extends StatelessWidget {
                 spacing: _inset,
                 textDirection: Directionality.of(context),
                 position: position,
-                homeFill: enabled
-                    ? scheme.primary
-                    : scheme.surfaceContainerLowest,
+                homeFill: enabled ? scheme.primary : scheme.onSurfaceVariant,
                 awayFill: enabled
                     ? colors.presenceAway
-                    : scheme.surfaceContainerLowest,
+                    : scheme.onSurfaceVariant,
                 radius: _sideRadius,
                 children: [
                   for (final side in Presence.values)
@@ -148,7 +149,7 @@ class PresenceSwitch extends StatelessWidget {
                           side: side,
                           label: labels[side]!,
                           color: !enabled
-                              ? scheme.onSurfaceVariant
+                              ? scheme.surfaceContainerLowest
                               : switch (side) {
                                   Presence.home => scheme.onPrimary,
                                   Presence.away => colors.onPresenceAway,
@@ -244,7 +245,8 @@ class _Face extends StatelessWidget {
 /// under it at rest (the on-color of the thumb when selected, the muted ink
 /// when not) and none while the thumb slides, when the overlays draw it. A null
 /// [onChosen] is the disabled switch: the button takes no press and no focus,
-/// and its face is the muted ink on the thumb too.
+/// and its face on the thumb is `surfaceContainerLowest`, which reads on the
+/// muted thumb of the disabled switch.
 class _Shell extends StatelessWidget {
   const new({
     required this.side,
@@ -268,7 +270,7 @@ class _Shell extends StatelessWidget {
     final colors = context.appColors;
     final enabled = onChosen != null;
     final onThumb = !enabled
-        ? scheme.onSurfaceVariant
+        ? scheme.surfaceContainerLowest
         : switch (side) {
             Presence.home => scheme.onPrimary,
             Presence.away => colors.onPresenceAway,
