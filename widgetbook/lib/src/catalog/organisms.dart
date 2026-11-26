@@ -1,4 +1,5 @@
 import 'package:compapp_design_widgetbook/src/catalog/organisms/activity_list_use_cases.dart';
+import 'package:compapp_design_widgetbook/src/catalog/organisms/calendar_month_use_cases.dart';
 import 'package:compapp_design_widgetbook/src/catalog/organisms/calendar_strip_use_cases.dart';
 import 'package:compapp_design_widgetbook/src/catalog/organisms/floorplan_map_use_cases.dart';
 import 'package:compapp_design_widgetbook/src/catalog/organisms/item_sheet_use_cases.dart';
@@ -13,6 +14,7 @@ List<WidgetbookComponent> buildOrganisms() => [
   buildActivityList(),
   buildPresencePanel(),
   buildCalendarStrip(),
+  buildCalendarMonth(),
   buildTaskComposer(),
   buildFloorplanMap(),
   buildItemSheet(),

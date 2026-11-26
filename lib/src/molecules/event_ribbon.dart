@@ -1,8 +1,6 @@
 import 'package:compapp_design/src/atoms/app_icon.dart';
-import 'package:compapp_design/src/models/app_icons.dart';
-import 'package:compapp_design/src/models/calendar_event_kind.dart';
+import 'package:compapp_design/src/foundation/calendar_event_style.dart';
 import 'package:compapp_design/src/models/calendar_event_view.dart';
-import 'package:compapp_design/src/tokens/app_colors_context.dart';
 import 'package:compapp_design/src/tokens/app_radius.dart';
 import 'package:compapp_design/src/tokens/app_sizes.dart';
 import 'package:compapp_design/src/tokens/app_spacing.dart';
@@ -65,34 +63,10 @@ class EventRibbon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final colors = context.appColors;
-
-    final (fill, ink, glyph, icon) = switch (event.kind) {
-      CalendarEventKind.visit => (
-        colors.pebbleSky,
-        colors.onPebble,
-        colors.onPebble,
-        AppIcons.visit,
-      ),
-      CalendarEventKind.overnight => (
-        colors.pebbleApricot,
-        colors.onPebble,
-        colors.onPebble,
-        AppIcons.bed,
-      ),
-      CalendarEventKind.absence => (
-        scheme.surfaceContainerHigh,
-        scheme.onSurface,
-        colors.presenceAway,
-        AppIcons.away,
-      ),
-      CalendarEventKind.other => (
-        colors.pebbleSand,
-        colors.onPebble,
-        colors.onPebble,
-        AppIcons.calendar,
-      ),
-    };
+    final (:fill, :ink, :glyph, :icon, :border) = calendarEventStyle(
+      context,
+      event.kind,
+    );
 
     const round = Radius.circular(AppRadius.sm);
     final radius = BorderRadiusDirectional.horizontal(
@@ -111,9 +85,7 @@ class EventRibbon extends StatelessWidget {
           decoration: BoxDecoration(
             color: fill,
             borderRadius: radius,
-            border: event.kind == CalendarEventKind.absence
-                ? Border.all(color: scheme.outlineVariant)
-                : null,
+            border: border ? Border.all(color: scheme.outlineVariant) : null,
           ),
           child: Padding(
             padding: EdgeInsets.symmetric(

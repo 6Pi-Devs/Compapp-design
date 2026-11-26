@@ -557,6 +557,26 @@ final playgroundKnobCases = <String, List<KnobCase>>{
       (t) => expect(_widget<EventRibbon>(t).compact, isTrue),
     ),
   ],
+  'CalendarLegend': [
+    KnobCase(
+      'entries',
+      '2',
+      (t) => expect(_widget<CalendarLegend>(t).entries, hasLength(2)),
+    ),
+    KnobCase(
+      'firstKind',
+      'other',
+      (t) => expect(
+        _widget<CalendarLegend>(t).entries.first.kind,
+        CalendarEventKind.other,
+      ),
+    ),
+    KnobCase(
+      'firstLabel',
+      'Zed',
+      (t) => expect(_widget<CalendarLegend>(t).entries.first.label, 'Zed'),
+    ),
+  ],
   'ActivityRow': [
     KnobCase(
       'icon',
@@ -1116,6 +1136,57 @@ final playgroundKnobCases = <String, List<KnobCase>>{
         _widget<CalendarStrip>(t).view.events.first.semanticLabel,
         contains('Zed'),
       ),
+    ),
+  ],
+  'CalendarMonth': [
+    KnobCase(
+      'todayIndex',
+      '3',
+      (t) => expect(
+        _widget<CalendarMonth>(t).view.today,
+        _widget<CalendarMonth>(t).view.days[3].date,
+      ),
+    ),
+    KnobCase(
+      'selectedIndex',
+      '5',
+      (t) => expect(
+        _widget<CalendarMonth>(t).view.selected,
+        _widget<CalendarMonth>(t).view.days[5].date,
+      ),
+    ),
+    KnobCase(
+      'awayTogether',
+      '5',
+      (t) => expect(
+        _widget<CalendarMonth>(t).view.days
+            .map((day) => day.away.length)
+            .reduce((a, b) => a > b ? a : b),
+        5,
+      ),
+    ),
+    KnobCase(
+      'events',
+      '1',
+      (t) => expect(_widget<CalendarMonth>(t).view.events, hasLength(1)),
+    ),
+    KnobCase(
+      'denseWeek',
+      'true',
+      (t) => expect(
+        find.byKey(const Key('calendar.more.2026-11-24')),
+        findsOneWidget,
+      ),
+    ),
+    KnobCase(
+      'firstWeekday',
+      'Zed',
+      (t) => expect(_widget<CalendarMonth>(t).view.weekdays.first, 'Zed'),
+    ),
+    KnobCase(
+      'enabled',
+      'false',
+      (t) => expect(_widget<CalendarMonth>(t).onDayTap, isNull),
     ),
   ],
   'TaskComposer': [
